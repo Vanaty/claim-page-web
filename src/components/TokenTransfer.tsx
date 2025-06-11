@@ -35,11 +35,15 @@ const TokenTransfer: React.FC<TokenTransferProps> = ({ user, onTokensTransferred
 
     try {
       setIsLoading(true);
-      await transferTokens(recipientId, amount);
-      setAlert({ type: 'success', message: `${amount} jetons transférés avec succès` });
-      onTokensTransferred(amount);
-      setRecipientId('');
-      setAmount(0);
+      const data = await transferTokens(recipientId, amount);
+      if (data.success) {
+        setAlert({ type: 'success', message: `${amount} jetons transférés avec succès` });
+        onTokensTransferred(amount);
+        setRecipientId('');
+        setAmount(0);
+      } else {
+        setAlert({ type: 'error', message: data.message || 'Échec du transfert' });
+      }
     } catch (error: any) {
       console.error('Échec du transfert:', error);
       setAlert({ 

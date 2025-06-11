@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { User, TronAccount, LoginResponse, ClaimResult } from '../types';
+import { User, TronAccount, LoginResponse, ClaimResult, TransferAlert } from '../types';
 import { parseTronAccount } from './utils';
 
 const api = axios.create({
@@ -71,6 +71,7 @@ export const updateAccountTokens = async (accountId: string): Promise<ClaimResul
   };
 };
 
-export const transferTokens = async (recipientId: string, amount: number): Promise<void> => {
-  await api.post('/users/transfer-tokens', { recipientId, amount });
+export const transferTokens = async (recipientId: string, amount: number): Promise<TransferAlert> => {
+  const response =  await api.post('/users/transfer-tokens', { recipientId, amount });
+  return response.data;
 };

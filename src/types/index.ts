@@ -35,3 +35,8 @@ export interface LoginResponse {
   user: User;
   token: Token;
 }
+
+export interface TransferAlert {
+  success: boolean;
+  message: string;
+}
