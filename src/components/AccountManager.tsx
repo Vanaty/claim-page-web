@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, Eye, EyeOff, X } from 'lucide-react';
+import { Plus, Trash2, Eye, EyeOff, X, AlertCircle, CheckCircle } from 'lucide-react';
 import { TronAccount } from '../types';
 import { addAccount as apiAddAccount, removeAccount as apiRemoveAccount } from '../services/apiService';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,6 +10,12 @@ interface AccountManagerProps {
   onRemoveAccount: (accountId: string) => void;
 }
 
+interface Toast {
+  id: string;
+  type: 'success' | 'error';
+  message: string;
+}
+
 const AccountManager: React.FC<AccountManagerProps> = ({ 
   accounts, 
   onAddAccount, 
@@ -17,6 +23,7 @@ const AccountManager: React.FC<AccountManagerProps> = ({
 }) => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showPrivateKey, setShowPrivateKey] = useState<string | null>(null);
+  const [toasts, setToasts] = useState<Toast[]>([]);
   const [formData, setFormData] = useState({
     address: '',
     privateKey: '',
@@ -25,18 +32,32 @@ const AccountManager: React.FC<AccountManagerProps> = ({
     proxy: ''
   });
 
+  const showToast = (type: 'success' | 'error', message: string) => {
+    const id = Date.now().toString();
+    setToasts(prev => [...prev, { id, type, message }]);
+    
+    // Auto-remove toast after 5 seconds
+    setTimeout(() => {
+      setToasts(prev => prev.filter(toast => toast.id !== id));
+    }, 5000);
+  };
+
+  const removeToast = (id: string) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validate address format (basic validation)
     if (!formData.address.includes('@') || !formData.address.includes('.')) {
-      alert('Email invalide. Veuillez entrer une adresse email valide.');
+      showToast('error', 'Email invalide. Veuillez entrer une adresse email valide.');
       return;
     }
 
     // Check if address already exists
     if (accounts.some(acc => acc.address === formData.address)) {
-      alert('Cet email existe déjà dans vos comptes.');
+      showToast('error', 'Cet email existe déjà dans vos comptes.');
       return;
     }
 
@@ -58,8 +79,9 @@ const AccountManager: React.FC<AccountManagerProps> = ({
       onAddAccount(newAccount);
       setFormData({ address: '', privateKey: '', balance: 0, lastClaim: '', proxy: '' });
       setShowAddForm(false);
+      showToast('success', 'Compte ajouté avec succès!');
     } catch (error) {
-      alert('Erreur lors de l\'ajout du compte. Veuillez réessayer.');
+      showToast('error', 'L\'ajout du compte prend du temps que prevue. Rafraichir la page apres quelque minute.');
       console.error('Failed to add account:', error);
     }
   };
@@ -80,13 +102,50 @@ const AccountManager: React.FC<AccountManagerProps> = ({
     try {
       await apiRemoveAccount(accountId);
       onRemoveAccount(accountId);
+      showToast('success', 'Compte supprimé avec succès');
     } catch (error) {
+      showToast('error', 'Échec de la suppression du compte');
       console.error('Failed to remove account:', error);
     }
   };
 
   return (
     <div>
+      {/* Toast Notifications */}
+      <div className="fixed top-4 right-4 z-50">
+        <AnimatePresence>
+          {toasts.map((toast) => (
+            <motion.div
+              key={toast.id}
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 50 }}
+              className={`mb-2 p-4 rounded-lg shadow-lg flex items-center justify-between ${
+                toast.type === 'success' 
+                  ? 'bg-green-100 text-green-800 border-l-4 border-green-500' 
+                  : 'bg-red-100 text-red-800 border-l-4 border-red-500'
+              }`}
+              style={{ minWidth: '300px' }}
+            >
+              <div className="flex items-center">
+                {toast.type === 'success' ? (
+                  <CheckCircle size={18} className="mr-2" />
+                ) : (
+                  <AlertCircle size={18} className="mr-2" />
+                )}
+                <p>{toast.message}</p>
+              </div>
+              <button 
+                onClick={() => removeToast(toast.id)}
+                className="text-slate-500 hover:text-slate-700"
+              >
+                <X size={16} />
+              </button>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+
       {/* Add Account Button and Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <h2 className="text-2xl font-bold text-slate-800">Gestion des comptes</h2>
