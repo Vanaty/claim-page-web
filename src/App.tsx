@@ -111,6 +111,10 @@ function App() {
     }
   };
 
+  const updateAccounts = (updatedAccounts: TronAccount[]) => {
+    setAccounts(updatedAccounts.map(parseTronAccount));
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -247,7 +251,7 @@ function App() {
               <Dashboard 
                 user={user} 
                 accounts={accounts} 
-                onUpdateTokens={updateAccountTokens}
+                onUpdateAccounts={updateAccounts}
               />
             )}
             {activeTab === 'accounts' && (

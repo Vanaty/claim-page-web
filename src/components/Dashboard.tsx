@@ -3,74 +3,38 @@ import { TrendingUp, Wallet, Clock, Zap } from 'lucide-react';
 import { User, TronAccount } from '../types';
 import AccountCard from './AccountCard';
 import { motion } from 'framer-motion';
+import { fetchAccounts } from '../services/apiService';
 
 interface DashboardProps {
   user: User;
   accounts: TronAccount[];
-  onUpdateTokens: (accountId: string, tokensUsed: number) => void;
+  onUpdateAccounts: (updatedAccounts: TronAccount[]) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ user, accounts, onUpdateTokens }) => {
+const Dashboard: React.FC<DashboardProps> = ({ user, accounts, onUpdateAccounts }) => {
   const [isAutoClaiming, setIsAutoClaiming] = useState(true);
-  const [claimedIds, setClaimedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    
-    if (isAutoClaiming && accounts.length > 0) {
-      interval = setInterval(() => {
-        // Check if any account is ready for claim
-        const now = new Date();
-        accounts.forEach(account => {
-          if (
-            account.status === 'active' &&
-            account.nextClaim &&
-            account.nextClaim <= now &&
-            !claimedIds.has(account.id)
-          ) {
-            if (user.tokens > 0) {
-              console.log(`Auto-claiming for account ${account.address}`);
-              onUpdateTokens(account.id, 1);
-              setClaimedIds(prev => new Set(prev).add(account.id));
-            }
-          }
-        });
-      }, 1000);
+
+    if (isAutoClaiming) {
+      interval = setInterval(async () => {
+        try {
+          const updatedAccounts = await fetchAccounts();
+          onUpdateAccounts(updatedAccounts);
+        } catch (error) {
+          console.error('Failed to fetch accounts:', error);
+        }
+      }, 5000); // Fetch updated accounts every 5 seconds
     }
 
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [accounts, user.tokens, onUpdateTokens, isAutoClaiming, claimedIds]);
+  }, [isAutoClaiming, onUpdateAccounts]);
 
   const activeAccounts = accounts.filter(acc => acc.status === 'active').length;
   const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
-  const pendingClaims = accounts.filter(acc => {
-    const now = new Date();
-    return acc.nextClaim && acc.nextClaim <= now;
-  }).length;
-
-  const handleManualClaimAll = () => {
-    if (user.tokens < pendingClaims) {
-      alert(`Jetons insuffisants. Vous avez ${user.tokens} jetons mais ${pendingClaims} réclamations sont en attente.`);
-      return;
-    }
-
-    const now = new Date();
-    let claimedCount = 0;
-    
-    accounts.forEach(account => {
-      if (account.status === 'active' && account.nextClaim && account.nextClaim <= now && !claimedIds.has(account.id)) {
-        onUpdateTokens(account.id, 1);
-        setClaimedIds(prev => new Set(prev).add(account.id));
-        claimedCount++;
-      }
-    });
-
-    if (claimedCount > 0) {
-      alert(`${claimedCount} réclamation(s) effectuée(s) avec succès !`);
-    }
-  };
 
   const container = {
     hidden: { opacity: 0 },
@@ -105,17 +69,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user, accounts, onUpdateTokens })
             <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
             <span className="ml-3 text-sm font-medium text-slate-700">Auto-Claim</span>
           </div>
-          
-          {pendingClaims > 0 && (
-            <button 
-              className="btn btn-success"
-              onClick={handleManualClaimAll}
-              disabled={user.tokens < pendingClaims}
-            >
-              <Zap size={18} />
-              Tout réclamer ({pendingClaims})
-            </button>
-          )}
         </div>
       </div>
 
@@ -150,16 +103,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user, accounts, onUpdateTokens })
             <p className="text-slate-500 text-sm">TRX Total</p>
           </div>
         </motion.div>
-        
-        <motion.div variants={item} className="glass-card p-5 flex items-center">
-          <div className="bg-amber-100 rounded-full p-3 mr-4">
-            <Clock className="text-amber-600" size={24} />
-          </div>
-          <div>
-            <h3 className="text-2xl font-bold text-amber-600">{pendingClaims}</h3>
-            <p className="text-slate-500 text-sm">Claims prêts</p>
-          </div>
-        </motion.div>
       </div>
 
       {/* Accounts List */}
@@ -186,8 +129,8 @@ const Dashboard: React.FC<DashboardProps> = ({ user, accounts, onUpdateTokens })
             <motion.div key={account.id} variants={item}>
               <AccountCard 
                 account={account} 
-                onClaim={() => onUpdateTokens(account.id, 1)}
-                canClaim={user.tokens > 0 && !claimedIds.has(account.id)}
+                onClaim={() => {}} // No manual claim needed
+                canClaim={false} // Disable manual claim
               />
             </motion.div>
           ))}
