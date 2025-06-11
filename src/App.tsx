@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { User, Wallet, Clock, TrendingUp, Settings, Plus, LogOut, Menu, X } from 'lucide-react';
+import { User, Wallet, Clock, TrendingUp, Settings, Plus, LogOut, Menu, X, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoginForm from './components/LoginForm';
 import Dashboard from './components/Dashboard';
 import AccountManager from './components/AccountManager';
+import TokenTransfer from './components/TokenTransfer';
 import { User as UserType, TronAccount, ClaimResult } from './types';
 import { loginUser, fetchAccounts, updateAccountTokens as apiUpdateAccountTokens, registerUser, fetchUser } from './services/apiService';
 import { parseTronAccount } from './services/utils';
@@ -11,7 +12,7 @@ import { parseTronAccount } from './services/utils';
 function App() {
   const [user, setUser] = useState<UserType | null>(null);
   const [accounts, setAccounts] = useState<TronAccount[]>([]);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'accounts' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'accounts' | 'settings' | 'transfer'>('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -113,6 +114,12 @@ function App() {
 
   const updateAccounts = (updatedAccounts: TronAccount[]) => {
     setAccounts(updatedAccounts.map(parseTronAccount));
+  };
+
+  const handleTokenTransfer = (amount: number) => {
+    if (user) {
+      setUser({ ...user, tokens: user.tokens - amount });
+    }
   };
 
   if (isLoading) {
@@ -230,6 +237,13 @@ function App() {
             <span>Comptes ({accounts.length})</span>
           </button>
           <button 
+            className={`nav-link flex items-center flex-shrink-0 ${activeTab === 'transfer' ? 'active' : ''}`}
+            onClick={() => setActiveTab('transfer')}
+          >
+            <Send size={18} className="mr-2" />
+            <span>Transfert</span>
+          </button>
+          <button 
             className={`nav-link flex items-center flex-shrink-0 ${activeTab === 'settings' ? 'active' : ''}`}
             onClick={() => setActiveTab('settings')}
           >
@@ -259,6 +273,12 @@ function App() {
                 accounts={accounts}
                 onAddAccount={addAccount}
                 onRemoveAccount={removeAccount}
+              />
+            )}
+            {activeTab === 'transfer' && (
+              <TokenTransfer
+                user={user}
+                onTokensTransferred={handleTokenTransfer}
               />
             )}
             {activeTab === 'settings' && (
