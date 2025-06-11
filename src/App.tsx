@@ -5,6 +5,7 @@ import LoginForm from './components/LoginForm';
 import Dashboard from './components/Dashboard';
 import AccountManager from './components/AccountManager';
 import TokenTransfer from './components/TokenTransfer';
+import Setting from './components/Setting';
 import { User as UserType, TronAccount, ClaimResult } from './types';
 import { loginUser, fetchAccounts, updateAccountTokens as apiUpdateAccountTokens, registerUser, fetchUser } from './services/apiService';
 import { parseTronAccount } from './services/utils';
@@ -282,11 +283,7 @@ function App() {
               />
             )}
             {activeTab === 'settings' && (
-              <div className="glass-card p-6 text-center">
-                <Settings size={48} className="text-slate-400 mb-3 mx-auto" />
-                <h4 className="text-xl font-semibold mb-2">Paramètres</h4>
-                <p className="text-slate-500">Fonctionnalité en cours de développement</p>
-              </div>
+              <Setting user={user} />
             )}
           </motion.div>
         </AnimatePresence>
