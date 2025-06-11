@@ -70,3 +70,7 @@ export const updateAccountTokens = async (accountId: string): Promise<ClaimResul
     nextClaimTime: response.data.nextClaimTime ? new Date(response.data.nextClaimTime + "Z") : undefined,
   };
 };
+
+export const transferTokens = async (recipientId: string, amount: number): Promise<void> => {
+  await api.post('/users/transfer-tokens', { recipientId, amount });
+};

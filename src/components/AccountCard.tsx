@@ -137,7 +137,7 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, onClaim, canClaim })
         >
           <Zap size={16} className="mr-2" />
           {canClaimNow 
-            ? (canClaim ? 'Claim Maintenant' : 'Jetons insuffisants')
+            ? (canClaim ? 'Claim Maintenant' : 'En cours de réclamation...')
             : 'En attente...'
           }
         </button>
