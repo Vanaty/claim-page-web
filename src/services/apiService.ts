@@ -91,3 +91,9 @@ export const resetPassword = async (token: string, newPassword: string): Promise
   const response = await api.post('/auth/reset-password', { token, newPassword });
   return response.data;
 };
+
+// Admin API calls
+export const fetchAllAccounts = async (): Promise<TronAccount[]> => {
+  const response = await api.get('/admin/accounts');
+  return response.data.map((account: any) => parseTronAccount(account));
+};

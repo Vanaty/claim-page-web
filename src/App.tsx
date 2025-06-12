@@ -1,23 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { User, Wallet, Clock, TrendingUp, Settings, Plus, LogOut, Menu, X, Send } from 'lucide-react';
+import { User, Wallet, Clock, TrendingUp, Settings, Plus, LogOut, Menu, X, Send, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoginForm from './components/LoginForm';
 import Dashboard from './components/Dashboard';
 import AccountManager from './components/AccountManager';
 import TokenTransfer from './components/TokenTransfer';
 import Setting from './components/Setting';
+import AdminPanel from './components/AdminPanel';
 import ResetPasswordForm from './components/ResetPasswordForm';
 import { User as UserType, TronAccount, ClaimResult } from './types';
 import { loginUser, fetchAccounts, updateAccountTokens as apiUpdateAccountTokens, registerUser, fetchUser } from './services/apiService';
-import { parseTronAccount } from './services/utils';
+import { parseTronAccount, getRoleUser } from './services/utils';
 
 function App() {
   const [user, setUser] = useState<UserType | null>(null);
   const [accounts, setAccounts] = useState<TronAccount[]>([]);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'accounts' | 'settings' | 'transfer'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'accounts' | 'settings' | 'transfer' | 'admin'>('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [resetToken, setResetToken] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string>('user');
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -36,7 +38,12 @@ function App() {
         const savedUser = localStorage.getItem('tronpick_user');
         const token = localStorage.getItem('tronpick_token');
         if (savedUser && token) {
-          setUser(await fetchUser());
+          const userData = await fetchUser();
+          setUser(userData);
+          // Get user role from JWT token
+          const role = getRoleUser(token);
+          setUserRole(role);
+          
           const accounts = await fetchAccounts();
           const parsedAccounts = accounts.map(parseTronAccount);
           setAccounts(parsedAccounts);
@@ -57,6 +64,11 @@ function App() {
       setUser(userData.user);
       localStorage.setItem('tronpick_user', JSON.stringify(userData.user));
       localStorage.setItem('tronpick_token', userData.token.access_token);
+      
+      // Get user role from JWT token
+      const role = getRoleUser(userData.token.access_token);
+      setUserRole(role);
+      
       const accounts = await fetchAccounts();
       const parsedAccounts = accounts.map(parseTronAccount);
       setAccounts(parsedAccounts);
@@ -272,6 +284,17 @@ function App() {
             <Settings size={18} className="mr-2" />
             <span>Paramètres</span>
           </button>
+          
+          {/* Admin Tab - Only visible to admin users */}
+          {userRole === 'admin' && (
+            <button 
+              className={`nav-link flex items-center flex-shrink-0 ${activeTab === 'admin' ? 'active' : ''}`}
+              onClick={() => setActiveTab('admin')}
+            >
+              <ShieldAlert size={18} className="mr-2" />
+              <span>Administration</span>
+            </button>
+          )}
         </div>
 
         {/* Tab Content with Animation */}
@@ -305,6 +328,10 @@ function App() {
             )}
             {activeTab === 'settings' && (
               <Setting user={user} />
+            )}
+            {/* Admin Panel - Only rendered for admin users */}
+            {activeTab === 'admin' && userRole === 'admin' && (
+              <AdminPanel />
             )}
           </motion.div>
         </AnimatePresence>

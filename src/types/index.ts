@@ -4,6 +4,7 @@ export interface User {
   email: string;
   tokens: number;
   registeredAt: Date;
+  role?: string; // Add role field to User type
 }
 
 export type BaseUrlOption = 
@@ -29,6 +30,7 @@ export interface TronAccount {
   baseUrl?: BaseUrlOption; // Updated to specific options
   canGame?: number; // '1' if the account can game, '0' otherwise;Utility for reaching stamina wagared
   proxy?: string; // Optional proxy for the account
+  userId?: string; // ID of the user who owns this account - for admin panel
 }
 
 export interface ClaimResult {
