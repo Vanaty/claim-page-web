@@ -52,3 +52,17 @@ export interface TransferAlert {
   success: boolean;
   message: string;
 }
+
+export interface PasswordResetRequest {
+  email: string;
+}
+
+export interface PasswordResetResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface PasswordChangeRequest {
+  token: string;
+  newPassword: string;
+}

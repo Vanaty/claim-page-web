@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard';
 import AccountManager from './components/AccountManager';
 import TokenTransfer from './components/TokenTransfer';
 import Setting from './components/Setting';
+import ResetPasswordForm from './components/ResetPasswordForm';
 import { User as UserType, TronAccount, ClaimResult } from './types';
 import { loginUser, fetchAccounts, updateAccountTokens as apiUpdateAccountTokens, registerUser, fetchUser } from './services/apiService';
 import { parseTronAccount } from './services/utils';
@@ -16,10 +17,22 @@ function App() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'accounts' | 'settings' | 'transfer'>('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [resetToken, setResetToken] = useState<string | null>(null);
 
   useEffect(() => {
     const loadInitialData = async () => {
       try {
+        // Check if there's a password reset token in the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const tokenR = urlParams.get('reset-token');
+        if (tokenR) {
+          setResetToken(tokenR);
+          // Clean the URL
+          window.history.replaceState({}, document.title, window.location.pathname);
+          setIsLoading(false);
+          return;
+        }
+
         const savedUser = localStorage.getItem('tronpick_user');
         const token = localStorage.getItem('tronpick_token');
         if (savedUser && token) {
@@ -123,6 +136,10 @@ function App() {
     }
   };
 
+  const handleResetPasswordSuccess = () => {
+    setResetToken(null);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -132,6 +149,10 @@ function App() {
         </div>
       </div>
     );
+  }
+
+  if (resetToken) {
+    return <ResetPasswordForm token={resetToken} onSuccess={handleResetPasswordSuccess} />;
   }
 
   if (!user) {
