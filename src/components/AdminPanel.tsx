@@ -11,7 +11,7 @@ interface AdminPanelProps {
 interface AccountFilter {
   proxy: string;
   domain: string;
-  userId: string;
+  user_id: string;
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = () => {
@@ -21,11 +21,11 @@ const AdminPanel: React.FC<AdminPanelProps> = () => {
   const [filters, setFilters] = useState<AccountFilter>({
     proxy: '',
     domain: '',
-    userId: '',
+    user_id: '',
   });
   const [showFilters, setShowFilters] = useState(false);
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof TronAccount | 'userId';
+    key: keyof TronAccount | 'user_id';
     direction: 'ascending' | 'descending';
   } | null>({ key: 'addedAt', direction: 'descending' });
   const [currentPage, setCurrentPage] = useState(1);
@@ -62,12 +62,12 @@ const AdminPanel: React.FC<AdminPanelProps> = () => {
     setFilters({
       proxy: '',
       domain: '',
-      userId: '',
+      user_id: '',
     });
     setCurrentPage(1);
   };
 
-  const handleSort = (key: keyof TronAccount | 'userId') => {
+  const handleSort = (key: keyof TronAccount | 'user_id') => {
     let direction: 'ascending' | 'descending' = 'ascending';
     if (sortConfig?.key === key && sortConfig.direction === 'ascending') {
       direction = 'descending';
@@ -82,8 +82,8 @@ const AdminPanel: React.FC<AdminPanelProps> = () => {
     const matchesDomain = !filters.domain || 
       (account.baseUrl && account.baseUrl.toLowerCase().includes(filters.domain.toLowerCase()));
     
-    const matchesUserId = !filters.userId || 
-      (account.userId && account.userId.toLowerCase().includes(filters.userId.toLowerCase()));
+    const matchesUserId = !filters.user_id || 
+      (account.user_id && account.user_id.toLowerCase().includes(filters.user_id.toLowerCase()));
     
     return matchesProxy && matchesDomain && matchesUserId;
   });
@@ -94,9 +94,9 @@ const AdminPanel: React.FC<AdminPanelProps> = () => {
     const key = sortConfig.key;
     const direction = sortConfig.direction === 'ascending' ? 1 : -1;
 
-    if (key === 'userId') {
-      const valueA = a.userId || '';
-      const valueB = b.userId || '';
+    if (key === 'user_id') {
+      const valueA = a.user_id || '';
+      const valueB = b.user_id || '';
       return valueA.localeCompare(valueB) * direction;
     }
 
@@ -126,7 +126,7 @@ const AdminPanel: React.FC<AdminPanelProps> = () => {
     filteredAccounts.forEach(account => {
       const row = [
         account.id,
-        account.userId || 'N/A',
+        account.user_id || 'N/A',
         account.address,
         account.status,
         account.addedAt ? new Date(account.addedAt).toISOString() : 'N/A',
@@ -149,7 +149,7 @@ const AdminPanel: React.FC<AdminPanelProps> = () => {
     document.body.removeChild(link);
   };
 
-  const SortIcon = ({ column }: { column: keyof TronAccount | 'userId' }) => {
+  const SortIcon = ({ column }: { column: keyof TronAccount | 'user_id' }) => {
     if (sortConfig?.key !== column) {
       return <span className="ml-1 opacity-30">↕</span>;
     }
@@ -197,7 +197,7 @@ const AdminPanel: React.FC<AdminPanelProps> = () => {
                 const value = e.target.value.toLowerCase();
                 setFilters({
                   ...filters,
-                  userId: value,
+                  user_id: value,
                 });
                 setCurrentPage(1);
               }}
@@ -290,8 +290,8 @@ const AdminPanel: React.FC<AdminPanelProps> = () => {
                   <input
                     type="text"
                     className="form-input"
-                    name="userId"
-                    value={filters.userId}
+                    name="user_id"
+                    value={filters.user_id}
                     onChange={handleFilterChange}
                     placeholder="Filtrer par ID utilisateur"
                   />
@@ -332,10 +332,10 @@ const AdminPanel: React.FC<AdminPanelProps> = () => {
                   </th>
                   <th 
                     className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100"
-                    onClick={() => handleSort('userId')}
+                    onClick={() => handleSort('user_id')}
                   >
                     <div className="flex items-center">
-                      Utilisateur ID <SortIcon column="userId" />
+                      Utilisateur ID <SortIcon column="user_id" />
                     </div>
                   </th>
                   <th 
@@ -352,6 +352,14 @@ const AdminPanel: React.FC<AdminPanelProps> = () => {
                   >
                     <div className="flex items-center">
                       Status <SortIcon column="status" />
+                    </div>
+                  </th>
+                  <th 
+                    className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100"
+                    onClick={() => handleSort('proxy')}
+                  >
+                    <div className="flex items-center">
+                      Proxy <SortIcon column="proxy" />
                     </div>
                   </th>
                   <th 
@@ -380,7 +388,7 @@ const AdminPanel: React.FC<AdminPanelProps> = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-xs font-mono text-slate-600">
-                        {account.userId ? `${account.userId.slice(0, 8)}...` : 'N/A'}
+                        {account.user_id ? `${account.user_id.slice(0, 8)}...` : 'N/A'}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -392,6 +400,9 @@ const AdminPanel: React.FC<AdminPanelProps> = () => {
                           account.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
                         {account.status}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-slate-500">{account.proxy || 'N/A'}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-slate-500">{account.baseUrl || 'N/A'}</div>
@@ -518,7 +529,7 @@ const AdminPanel: React.FC<AdminPanelProps> = () => {
         <div className="glass-card p-5">
           <h3 className="text-sm font-medium text-slate-500 mb-2">Utilisateurs Uniques</h3>
           <div className="text-3xl font-bold text-blue-600">
-            {new Set(accounts.map(acc => acc.userId)).size}
+            {new Set(accounts.map(acc => acc.user_id)).size}
           </div>
         </div>
       </div>

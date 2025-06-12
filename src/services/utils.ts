@@ -6,7 +6,7 @@ export function parseTronAccount(data: any): TronAccount {
       lastClaim: data.lastClaim ? new Date(data.lastClaim + "Z") : undefined,
       nextClaim: data.nextClaim ? new Date(data.nextClaim + "Z") : undefined,
       addedAt: data.addedAt ? new Date(data.addedAt + "Z") : undefined,
-      userId: data.userId || undefined
+      userId: data.user_id || undefined
     };
   }
 
