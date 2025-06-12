@@ -75,3 +75,9 @@ export const transferTokens = async (recipientId: string, amount: number): Promi
   const response =  await api.post('/users/transfer-tokens', { recipientId, amount });
   return response.data;
 };
+
+export const updateAccount = async (accountId: string, accountData: Partial<TronAccount>): Promise<TronAccount> => {
+  accountData.id = accountId; // Ensure the account ID is included in the data
+  const response = await api.put(`/tron-accounts`, accountData);
+  return parseTronAccount(response.data);
+};

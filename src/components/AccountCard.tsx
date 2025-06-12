@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Wallet, Clock, TrendingUp, Zap } from 'lucide-react';
+import { Wallet, Clock, TrendingUp, Zap, Globe } from 'lucide-react';
 import { TronAccount } from '../types';
 import { motion } from 'framer-motion';
 
@@ -90,7 +90,15 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, onClaim, canClaim })
                 {account.address.slice(0, 8)}...{account.address.slice(-6)}
               </h3>
             </div>
-            {getStatusBadge()}
+            <div className="flex items-center">
+              {getStatusBadge()}
+              {account.baseUrl && (
+                <span className="ml-2 text-xs text-slate-500 flex items-center">
+                  <Globe size={12} className="mr-1" />
+                  {account.baseUrl}
+                </span>
+              )}
+            </div>
           </div>
           
           <button 

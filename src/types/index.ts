@@ -6,6 +6,16 @@ export interface User {
   registeredAt: Date;
 }
 
+export type BaseUrlOption = 
+  | 'tronpick.io'
+  | 'litepick.io'
+  | 'dogepick.io'
+  | 'bnbpick.io'
+  | 'solpick.io'
+  | 'polpick.io'
+  | 'tonpick.game'
+  | 'suipick.io';
+
 export interface TronAccount {
   id: string;
   address: string;
@@ -16,6 +26,8 @@ export interface TronAccount {
   nextClaim?: Date;
   status: 'active' | 'pending' | 'error';
   addedAt: Date;
+  baseUrl?: BaseUrlOption; // Updated to specific options
+  canGame?: number; // '1' if the account can game, '0' otherwise;Utility for reaching stamina wagared
   proxy?: string; // Optional proxy for the account
 }
 
