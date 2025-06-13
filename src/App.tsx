@@ -94,6 +94,10 @@ function App() {
       const parsedAccounts = accounts.map(parseTronAccount);
       setAccounts(parsedAccounts);
       showToast('success', 'Connexion réussie');
+      
+      // Redirigez vers le tableau de bord après la connexion
+      setShowLoginForm(false);
+      setActiveTab('dashboard');
     } catch (error) {
       console.error('Login failed:', error);
       showToast('error', 'Échec de la connexion. Veuillez vérifier vos identifiants.');
@@ -197,12 +201,12 @@ function App() {
     return <ResetPasswordForm token={resetToken} onSuccess={handleResetPasswordSuccess} />;
   }
 
-  if (showLoginForm) {
-    return <LoginForm onLogin={handleLogin} onRegister={handleRegister} />;
+  if (!user && !showLoginForm) {
+    return <LandingPage onLoginClick={handleLoginClick} />;
   }
 
-  if (!user) {
-    return <LandingPage onLoginClick={handleLoginClick} />;
+  if (showLoginForm) {
+    return <LoginForm onLogin={handleLogin} onRegister={handleRegister} />;
   }
 
   const toggleMobileMenu = () => {
