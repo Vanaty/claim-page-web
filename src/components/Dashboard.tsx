@@ -20,12 +20,16 @@ const Dashboard: React.FC<DashboardProps> = ({ user, accounts, onUpdateAccounts 
     if (isAutoClaiming) {
       interval = setInterval(async () => {
         try {
+          const canFeatchAccounts = accounts.some((account) => {
+            return account.nextClaim && new Date(account.nextClaim) <= new Date();
+          });
+          if (!canFeatchAccounts) return;
           const updatedAccounts = await fetchAccounts();
           onUpdateAccounts(updatedAccounts);
         } catch (error) {
           console.error('Failed to fetch accounts:', error);
         }
-      }, 5000); // Fetch updated accounts every 5 seconds
+      }, 10000); // Fetch accounts every 10 seconds
     }
 
     return () => {
