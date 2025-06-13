@@ -99,6 +99,7 @@ function App() {
       setShowLoginForm(false);
       setActiveTab('dashboard');
     } catch (error) {
+      setShowLoginForm(true);
       console.error('Login failed:', error);
       showToast('error', 'Échec de la connexion. Veuillez vérifier vos identifiants.');
     } finally {
@@ -116,9 +117,12 @@ function App() {
       const accounts = await fetchAccounts();
       const parsedAccounts = accounts.map(parseTronAccount);
       setAccounts(parsedAccounts);
+      setActiveTab('dashboard');
+      setShowLoginForm(false);
       showToast('success', 'Inscription réussie. Bienvenue !');
     } catch (error) {
       console.error('Registration failed:', error);
+      setShowLoginForm(true);
       showToast('error', 'Échec de l\'inscription. Veuillez réessayer.');
     } finally {
       setIsLoading(false);

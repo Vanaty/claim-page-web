@@ -30,6 +30,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister }) => {
       onLogin(formData.username, formData.password);
     } else {
       onRegister(formData.username, formData.email, formData.password);
+      setIsLogin(false);
     }
   };
 
