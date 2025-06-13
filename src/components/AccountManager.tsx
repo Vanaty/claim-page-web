@@ -268,35 +268,22 @@ const AccountManager: React.FC<AccountManagerProps> = ({
                         />
                       </div>
                       <div>
-                        <label className="form-label">Mot de passe *</label>
+                        <label className="form-label">Clé privée *</label>
                         <input
                           type="password"
                           className="form-input"
-                          name="password"
-                          value={formData.password}
+                          name="privateKey"
+                          value={formData.privateKey}
                           onChange={handleInputChange}
-                          placeholder="••••••••"
-                          required
+                          placeholder="••••••••••••••••••••••••••••••••"
+                          required={!editingAccountId}
                         />
+                        <small className="text-slate-500 text-xs mt-1 block">
+                          {editingAccountId ? 'Laissez vide pour conserver l\'existant' : 'Clé privée pour l\'auto-claim'}
+                        </small>
                       </div>
                     </>
                   )}
-
-                  <div>
-                    <label className="form-label">Clé privée *</label>
-                    <input
-                      type="password"
-                      className="form-input"
-                      name="privateKey"
-                      value={formData.privateKey}
-                      onChange={handleInputChange}
-                      placeholder="••••••••••••••••••••••••••••••••"
-                      required={!editingAccountId}
-                    />
-                    <small className="text-slate-500 text-xs mt-1 block">
-                      {editingAccountId ? 'Laissez vide pour conserver l\'existant' : 'Clé privée pour l\'auto-claim'}
-                    </small>
-                  </div>
 
                   <div>
                     <label className="form-label">
