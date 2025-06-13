@@ -7,6 +7,7 @@ import { User } from '../types';
 interface TokenTransferProps {
   user: User;
   onTokensTransferred: (amount: number) => void;
+  showToast?: (type: 'success' | 'error' | 'info', message: string) => void;
 }
 
 interface TransferAlert {
@@ -14,7 +15,7 @@ interface TransferAlert {
   message: string;
 }
 
-const TokenTransfer: React.FC<TokenTransferProps> = ({ user, onTokensTransferred }) => {
+const TokenTransfer: React.FC<TokenTransferProps> = ({ user, onTokensTransferred, showToast }) => {
   const [recipientId, setRecipientId] = useState('');
   const [amount, setAmount] = useState<number>(0);
   const [alert, setAlert] = useState<TransferAlert | null>(null);
@@ -25,11 +26,13 @@ const TokenTransfer: React.FC<TokenTransferProps> = ({ user, onTokensTransferred
     
     if (amount <= 0) {
       setAlert({ type: 'error', message: 'Le montant doit être supérieur à 0' });
+      if (showToast) showToast('error', 'Le montant doit être supérieur à 0');
       return;
     }
 
     if (amount > user.tokens) {
       setAlert({ type: 'error', message: 'Solde insuffisant' });
+      if (showToast) showToast('error', 'Solde insuffisant');
       return;
     }
 
@@ -38,18 +41,19 @@ const TokenTransfer: React.FC<TokenTransferProps> = ({ user, onTokensTransferred
       const data = await transferTokens(recipientId, amount);
       if (data.success) {
         setAlert({ type: 'success', message: `${amount} jetons transférés avec succès` });
+        if (showToast) showToast('success', `${amount} jetons transférés avec succès`);
         onTokensTransferred(amount);
         setRecipientId('');
         setAmount(0);
       } else {
         setAlert({ type: 'error', message: data.message || 'Échec du transfert' });
+        if (showToast) showToast('error', data.message || 'Échec du transfert');
       }
     } catch (error: any) {
       console.error('Échec du transfert:', error);
-      setAlert({ 
-        type: 'error', 
-        message: error.response?.data?.message || 'Échec du transfert. Veuillez vérifier l\'ID du destinataire.'
-      });
+      const errorMessage = error.response?.data?.message || 'Échec du transfert. Veuillez vérifier l\'ID du destinataire.';
+      setAlert({ type: 'error', message: errorMessage });
+      if (showToast) showToast('error', errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -65,7 +69,7 @@ const TokenTransfer: React.FC<TokenTransferProps> = ({ user, onTokensTransferred
       
       <div className="glass-card p-6">
         <AnimatePresence>
-          {alert && (
+          {alert && !showToast && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}

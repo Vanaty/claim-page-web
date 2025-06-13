@@ -8,6 +8,8 @@ import TokenTransfer from './components/TokenTransfer';
 import Setting from './components/Setting';
 import AdminPanel from './components/AdminPanel';
 import ResetPasswordForm from './components/ResetPasswordForm';
+import LandingPage from './components/LandingPage';
+import ToastContainer, { ToastProps } from './components/Toast';
 import { User as UserType, TronAccount, ClaimResult } from './types';
 import { loginUser, fetchAccounts, updateAccountTokens as apiUpdateAccountTokens, registerUser, fetchUser } from './services/apiService';
 import { parseTronAccount, getRoleUser } from './services/utils';
@@ -20,6 +22,25 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [resetToken, setResetToken] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string>('user');
+  const [showLoginForm, setShowLoginForm] = useState(false);
+  
+  // Toast state
+  const [toasts, setToasts] = useState<ToastProps[]>([]);
+
+  // Toast functions
+  const showToast = (type: 'success' | 'error' | 'info', message: string) => {
+    const id = Date.now().toString();
+    setToasts(prev => [...prev, { id, type, message, onClose: removeToast }]);
+
+    // Auto-remove toast after 5 seconds
+    setTimeout(() => {
+      removeToast(id);
+    }, 5000);
+  };
+
+  const removeToast = (id: string) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  };
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -72,9 +93,10 @@ function App() {
       const accounts = await fetchAccounts();
       const parsedAccounts = accounts.map(parseTronAccount);
       setAccounts(parsedAccounts);
+      showToast('success', 'Connexion réussie');
     } catch (error) {
       console.error('Login failed:', error);
-      alert('Échec de la connexion. Veuillez vérifier vos identifiants.');
+      showToast('error', 'Échec de la connexion. Veuillez vérifier vos identifiants.');
     } finally {
       setIsLoading(false);
     }
@@ -90,9 +112,10 @@ function App() {
       const accounts = await fetchAccounts();
       const parsedAccounts = accounts.map(parseTronAccount);
       setAccounts(parsedAccounts);
+      showToast('success', 'Inscription réussie. Bienvenue !');
     } catch (error) {
       console.error('Registration failed:', error);
-      alert('Échec de l\'inscription. Veuillez réessayer.');
+      showToast('error', 'Échec de l\'inscription. Veuillez réessayer.');
     } finally {
       setIsLoading(false);
     }
@@ -104,6 +127,8 @@ function App() {
     localStorage.removeItem('tronpick_token');
     setAccounts([]);
     setActiveTab('dashboard');
+    setShowLoginForm(false);
+    showToast('info', 'Déconnexion réussie');
   };
 
   const addAccount = async (account: TronAccount) => {
@@ -133,7 +158,7 @@ function App() {
         setUser({ ...user, tokens: user.tokens - tokensUsed });
       }
     } catch (error) {
-      alert('Échec de la mise à jour des jetons du compte. Veuillez réessayer.');
+      showToast('error', 'Échec de la mise à jour des jetons du compte. Veuillez réessayer.');
       console.error('Failed to update account tokens:', error);
     }
   };
@@ -150,6 +175,11 @@ function App() {
 
   const handleResetPasswordSuccess = () => {
     setResetToken(null);
+    showToast('success', 'Mot de passe réinitialisé avec succès');
+  };
+
+  const handleLoginClick = () => {
+    setShowLoginForm(true);
   };
 
   if (isLoading) {
@@ -167,8 +197,12 @@ function App() {
     return <ResetPasswordForm token={resetToken} onSuccess={handleResetPasswordSuccess} />;
   }
 
-  if (!user) {
+  if (showLoginForm) {
     return <LoginForm onLogin={handleLogin} onRegister={handleRegister} />;
+  }
+
+  if (!user) {
+    return <LandingPage onLoginClick={handleLoginClick} />;
   }
 
   const toggleMobileMenu = () => {
@@ -177,6 +211,9 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200">
+      {/* Toast Container */}
+      <ToastContainer toasts={toasts} />
+      
       {/* Header Navigation */}
       <header className="bg-white shadow-md sticky top-0 z-10">
         <div className="container mx-auto px-4">
@@ -318,20 +355,22 @@ function App() {
                 accounts={accounts}
                 onAddAccount={addAccount}
                 onRemoveAccount={removeAccount}
+                showToast={showToast}
               />
             )}
             {activeTab === 'transfer' && (
               <TokenTransfer
                 user={user}
                 onTokensTransferred={handleTokenTransfer}
+                showToast={showToast}
               />
             )}
             {activeTab === 'settings' && (
-              <Setting user={user} />
+              <Setting user={user} showToast={showToast} />
             )}
             {/* Admin Panel - Only rendered for admin users */}
             {activeTab === 'admin' && userRole === 'admin' && (
-              <AdminPanel />
+              <AdminPanel showToast={showToast} />
             )}
           </motion.div>
         </AnimatePresence>

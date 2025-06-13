@@ -3,7 +3,7 @@ import { User, TronAccount, LoginResponse, ClaimResult, TransferAlert, PasswordR
 import { parseTronAccount } from './utils';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL, // Récupéré depuis le fichier .env
+  baseURL: '/api', // Récupéré depuis le fichier .env
   timeout: 10000,
 });
 

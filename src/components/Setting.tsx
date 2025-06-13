@@ -5,9 +5,10 @@ import { User } from '../types';
 
 interface SettingsProps {
   user: User;
+  showToast?: (type: 'success' | 'error' | 'info', message: string) => void;
 }
 
-const Setting: React.FC<SettingsProps> = ({ user }) => {
+const Setting: React.FC<SettingsProps> = ({ user, showToast }) => {
   // Format the registration date
   const formattedDate = new Date(user.registeredAt).toLocaleDateString('fr-FR', {
     year: 'numeric',
@@ -17,6 +18,13 @@ const Setting: React.FC<SettingsProps> = ({ user }) => {
   
   // First 8 and last 4 characters of the user ID
   const truncatedUserId = `${user.id.substring(0, 8)}...${user.id.substring(user.id.length - 4)}`;
+
+  const copyToClipboard = (text: string, message: string) => {
+    navigator.clipboard.writeText(text);
+    if (showToast) {
+      showToast('success', message);
+    }
+  };
 
   return (
     <div>
@@ -110,10 +118,7 @@ const Setting: React.FC<SettingsProps> = ({ user }) => {
                 <span className="text-sm text-slate-600">ID Complet</span>
                 <button 
                   className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-lg hover:bg-blue-200"
-                  onClick={() => {
-                    navigator.clipboard.writeText(user.id);
-                    alert('ID copié dans le presse-papier');
-                  }}
+                  onClick={() => copyToClipboard(user.id, 'ID copié dans le presse-papier')}
                 >
                   Copier
                 </button>

@@ -7,9 +7,10 @@ interface AccountCardProps {
   account: TronAccount;
   onClaim: () => void;
   canClaim: boolean;
+  showToast?: (type: 'success' | 'error' | 'info', message: string) => void;
 }
 
-const AccountCard: React.FC<AccountCardProps> = ({ account, onClaim, canClaim }) => {
+const AccountCard: React.FC<AccountCardProps> = ({ account, onClaim, canClaim, showToast }) => {
   const [timeLeft, setTimeLeft] = useState<string>('');
   const [canClaimNow, setCanClaimNow] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -46,6 +47,14 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, onClaim, canClaim })
   const handleClaim = () => {
     if (canClaimNow && canClaim) {
       onClaim();
+    }
+  };
+
+  const showAddressDetails = () => {
+    if (showToast) {
+      showToast('info', `Adresse complète : ${account.address}`);
+    } else {
+      alert(`Adresse complète : ${account.address}`);
     }
   };
 
@@ -103,7 +112,7 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, onClaim, canClaim })
           
           <button 
             className="text-slate-400 hover:text-blue-600 transition-colors rounded-full p-1 hover:bg-blue-50"
-            onClick={() => alert(`Adresse complète : ${account.address}`)}
+            onClick={showAddressDetails}
           >
             <Wallet size={16} />
           </button>

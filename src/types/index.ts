@@ -31,6 +31,7 @@ export interface TronAccount {
   canGame?: number; // '1' if the account can game, '0' otherwise;Utility for reaching stamina wagared
   proxy?: string; // Optional proxy for the account
   user_id?: string; // ID of the user who owns this account - for admin panel
+  cookies?: string;
 }
 
 export interface ClaimResult {

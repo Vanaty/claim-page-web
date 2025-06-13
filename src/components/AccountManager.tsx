@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, Eye, EyeOff, X, AlertCircle, CheckCircle, Edit, Gamepad2 } from 'lucide-react';
+import { Plus, Trash2, Eye, EyeOff, X, Edit, Gamepad2 } from 'lucide-react';
 import { TronAccount, BaseUrlOption } from '../types';
 import { addAccount as apiAddAccount, removeAccount as apiRemoveAccount, updateAccount as apiUpdateAccount } from '../services/apiService';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,22 +8,17 @@ interface AccountManagerProps {
   accounts: TronAccount[];
   onAddAccount: (account: TronAccount) => void;
   onRemoveAccount: (accountId: string) => void;
-}
-
-interface Toast {
-  id: string;
-  type: 'success' | 'error';
-  message: string;
+  showToast?: (type: 'success' | 'error' | 'info', message: string) => void;
 }
 
 const AccountManager: React.FC<AccountManagerProps> = ({
   accounts,
   onAddAccount,
-  onRemoveAccount
+  onRemoveAccount,
+  showToast
 }) => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showPrivateKey, setShowPrivateKey] = useState<string | null>(null);
-  const [toasts, setToasts] = useState<Toast[]>([]);
   const [editingAccountId, setEditingAccountId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     address: '',
@@ -32,22 +27,11 @@ const AccountManager: React.FC<AccountManagerProps> = ({
     lastClaim: '',
     proxy: '',
     baseUrl: 'tronpick.io' as BaseUrlOption,
-    canGame: 0
+    canGame: 0,
+    cookie: '',
+    password: ''
   });
-
-  const showToast = (type: 'success' | 'error', message: string) => {
-    const id = Date.now().toString();
-    setToasts(prev => [...prev, { id, type, message }]);
-
-    // Auto-remove toast after 5 seconds
-    setTimeout(() => {
-      setToasts(prev => prev.filter(toast => toast.id !== id));
-    }, 5000);
-  };
-
-  const removeToast = (id: string) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
-  };
+  const [addMethod, setAddMethod] = useState<'cookie' | 'login'>('cookie'); // Toggle between methods
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,13 +43,13 @@ const AccountManager: React.FC<AccountManagerProps> = ({
       // Add new account
       // Validate address format (basic validation)
       if (!formData.address.includes('@') || !formData.address.includes('.')) {
-        showToast('error', 'Email invalide. Veuillez entrer une adresse email valide.');
+        if (showToast) showToast('error', 'Email invalide. Veuillez entrer une adresse email valide.');
         return;
       }
 
       // Check if address already exists
       if (accounts.some(acc => acc.address === formData.address)) {
-        showToast('error', 'Cet email existe déjà dans vos comptes.');
+        if (showToast) showToast('error', 'Cet email existe déjà dans vos comptes.');
         return;
       }
 
@@ -83,13 +67,14 @@ const AccountManager: React.FC<AccountManagerProps> = ({
           baseUrl: formData.baseUrl,
           timeZoneOffset: today.getTimezoneOffset() / -60,
           status: 'active',
-          nextClaim: today
+          nextClaim: today,
+          cookies: addMethod === 'cookie' ? formData.cookie : '',
         });
         onAddAccount(newAccount);
         resetForm();
-        showToast('success', 'Compte ajouté avec succès!');
+        if (showToast) showToast('success', 'Compte ajouté avec succès!');
       } catch (error) {
-        showToast('error', 'L\'ajout du compte prend du temps que prevue. Rafraichir la page apres quelque minute.');
+        if (showToast) showToast('error', 'L\'ajout du compte prend du temps que prevue. Rafraichir la page apres quelque minute.');
         console.error('Failed to add account:', error);
       }
     }
@@ -121,15 +106,12 @@ const AccountManager: React.FC<AccountManagerProps> = ({
       });
 
       // Update local accounts list
-      const updatedAccounts = accounts.map(acc =>
-        acc.id === editingAccountId ? updatedAccount : acc
-      );
       onAddAccount(updatedAccount); // This will trigger the parent component to update its state
 
       resetForm();
-      showToast('success', 'Compte mis à jour avec succès!');
+      if (showToast) showToast('success', 'Compte mis à jour avec succès!');
     } catch (error) {
-      showToast('error', 'Échec de la mise à jour du compte');
+      if (showToast) showToast('error', 'Échec de la mise à jour du compte');
       console.error('Failed to update account:', error);
     }
   };
@@ -145,7 +127,9 @@ const AccountManager: React.FC<AccountManagerProps> = ({
       lastClaim: '', // We don't prefill this
       proxy: accountToEdit.proxy || '',
       baseUrl: accountToEdit.baseUrl as BaseUrlOption || 'tronpick.io',
-      canGame: accountToEdit.canGame || 0
+      canGame: accountToEdit.canGame || 0,
+      cookie: '',
+      password: ''
     });
 
     setEditingAccountId(accountId);
@@ -160,13 +144,15 @@ const AccountManager: React.FC<AccountManagerProps> = ({
       lastClaim: '',
       proxy: '',
       baseUrl: 'tronpick.io',
-      canGame: 0
+      canGame: 0,
+      cookie: '',
+      password: ''
     });
     setShowAddForm(false);
     setEditingAccountId(null);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -187,52 +173,22 @@ const AccountManager: React.FC<AccountManagerProps> = ({
   };
 
   const handleRemoveAccount = async (accountId: string) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce compte ?')) {
+      return;
+    }
+    
     try {
       await apiRemoveAccount(accountId);
       onRemoveAccount(accountId);
-      showToast('success', 'Compte supprimé avec succès');
+      if (showToast) showToast('success', 'Compte supprimé avec succès');
     } catch (error) {
-      showToast('error', 'Échec de la suppression du compte');
+      if (showToast) showToast('error', 'Échec de la suppression du compte');
       console.error('Failed to remove account:', error);
     }
   };
 
   return (
     <div>
-      {/* Toast Notifications */}
-      <div className="fixed top-4 right-4 z-50">
-        <AnimatePresence>
-          {toasts.map((toast) => (
-            <motion.div
-              key={toast.id}
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 50 }}
-              className={`mb-2 p-4 rounded-lg shadow-lg flex items-center justify-between ${toast.type === 'success'
-                  ? 'bg-green-100 text-green-800 border-l-4 border-green-500'
-                  : 'bg-red-100 text-red-800 border-l-4 border-red-500'
-                }`}
-              style={{ minWidth: '300px' }}
-            >
-              <div className="flex items-center">
-                {toast.type === 'success' ? (
-                  <CheckCircle size={18} className="mr-2" />
-                ) : (
-                  <AlertCircle size={18} className="mr-2" />
-                )}
-                <p>{toast.message}</p>
-              </div>
-              <button
-                onClick={() => removeToast(toast.id)}
-                className="text-slate-500 hover:text-slate-700"
-              >
-                <X size={16} />
-              </button>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
-
       {/* Add Account Button and Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <h2 className="text-2xl font-bold text-slate-800">Gestion des comptes</h2>
@@ -259,32 +215,72 @@ const AccountManager: React.FC<AccountManagerProps> = ({
           >
             <button
               onClick={() => resetForm()}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 transition-colors"
+              className="absolute top-2 right-2 md:top-4 md:right-4 text-slate-400 hover:text-slate-700 transition-colors z-10"
             >
               <X size={20} />
             </button>
 
-            <div className="p-6">
-              <h3 className="text-xl font-semibold mb-4">
+            <div className="p-3 md:p-6">
+              <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">
                 {editingAccountId ? 'Modifier le compte' : 'Nouveau compte'}
               </h3>
 
               <form onSubmit={handleSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-1 gap-3 mb-4">
                   <div>
-                    <label className="form-label">Email *</label>
-                    <input
-                      type="email"
+                    <label className="form-label">Méthode d'ajout</label>
+                    <select
                       className="form-input"
-                      name="address"
-                      value={formData.address}
-                      onChange={handleInputChange}
-                      placeholder="exemple@domaine.com"
-                      required={!editingAccountId}
-                      disabled={!!editingAccountId}
-                    />
-                    <small className="text-slate-500 text-xs mt-1 block">Adresse email associée à votre compte</small>
+                      value={addMethod}
+                      onChange={(e) => setAddMethod(e.target.value as 'cookie' | 'login')}
+                    >
+                      <option value="cookie">Via Cookie</option>
+                      <option value="login">Via Login</option>
+                    </select>
                   </div>
+
+                  {addMethod === 'cookie' && (
+                    <div>
+                      <label className="form-label">Cookie *</label>
+                      <textarea
+                        className="form-input"
+                        name="cookie"
+                        value={formData.cookie || ''}
+                        onChange={handleInputChange}
+                        placeholder="Entrez le cookie ici"
+                        required
+                      />
+                    </div>
+                  )}
+
+                  {addMethod === 'login' && (
+                    <>
+                      <div>
+                        <label className="form-label">Email *</label>
+                        <input
+                          type="email"
+                          className="form-input"
+                          name="address"
+                          value={formData.address}
+                          onChange={handleInputChange}
+                          placeholder="exemple@domaine.com"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="form-label">Mot de passe *</label>
+                        <input
+                          type="password"
+                          className="form-input"
+                          name="password"
+                          value={formData.password}
+                          onChange={handleInputChange}
+                          placeholder="••••••••"
+                          required
+                        />
+                      </div>
+                    </>
+                  )}
 
                   <div>
                     <label className="form-label">Clé privée *</label>
@@ -358,16 +354,16 @@ const AccountManager: React.FC<AccountManagerProps> = ({
 
                   {/* Add canGame toggle for account update */}
                   {editingAccountId && (
-                    <div className="col-span-2">
-                      <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
-                        <div className="flex items-start">
-                          <div className="mr-3 flex-shrink-0">
-                            <Gamepad2 size={20} className="text-blue-600" />
+                    <div>
+                      <div className="flex items-center justify-between p-3 md:p-4 bg-blue-50 rounded-lg">
+                        <div className="flex items-start flex-1">
+                          <div className="mr-2 md:mr-3 flex-shrink-0">
+                            <Gamepad2 size={18} className="text-blue-600" />
                           </div>
                           <div>
-                            <label className="form-label mb-0 block">Activer le Game Automatique</label>
-                            <p className="text-slate-600 text-sm">
-                              Le jeu sera lancé toutes les heures pour atteindre le but du stamina wagered
+                            <label className="form-label mb-0 block text-sm md:text-base">Activer le Game Auto</label>
+                            <p className="text-slate-600 text-xs md:text-sm">
+                              Jeu lancé toutes les heures
                             </p>
                           </div>
                         </div>
@@ -380,14 +376,14 @@ const AccountManager: React.FC<AccountManagerProps> = ({
                             onChange={(e) => handleToggleChange('canGame', e.target.checked)}
                             id="game-toggle"
                           />
-                          <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                          <div className="w-9 md:w-11 h-5 md:h-6 bg-slate-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 md:after:h-5 after:w-4 md:after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                         </div>
                       </div>
                     </div>
                   )}
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-col md:flex-row">
                   <button type="submit" className="btn btn-success">
                     {editingAccountId ? (
                       <>
@@ -432,7 +428,7 @@ const AccountManager: React.FC<AccountManagerProps> = ({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-4"
+          className="grid grid-cols-1 gap-4"
         >
           {accounts.map(account => (
             <motion.div
@@ -443,30 +439,26 @@ const AccountManager: React.FC<AccountManagerProps> = ({
               exit={{ opacity: 0, y: -20 }}
               className="glass-card overflow-hidden"
             >
-              <div className="p-5">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="font-semibold text-slate-800 truncate max-w-[70%]" title={account.address}>
-                    {account.address.slice(0, 16)}...
+              <div className="p-4">
+                <div className="flex justify-between items-start mb-3">
+                  <h3 className="font-semibold text-slate-800 truncate max-w-[60%]" title={account.address}>
+                    {account.address.slice(0, 12)}...
                   </h3>
 
                   <div className="flex space-x-1">
                     <button
-                      className="text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-2 rounded-full transition-colors"
+                      className="text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-1.5 rounded-full transition-colors"
                       onClick={() => handleEditAccount(account.id)}
                       title="Modifier le compte"
                     >
-                      <Edit size={16} />
+                      <Edit size={14} />
                     </button>
                     <button
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-full transition-colors"
-                      onClick={() => {
-                        if (confirm('Êtes-vous sûr de vouloir supprimer ce compte ?')) {
-                          handleRemoveAccount(account.id);
-                        }
-                      }}
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-full transition-colors"
+                      onClick={() => handleRemoveAccount(account.id)}
                       title="Supprimer le compte"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={14} />
                     </button>
                   </div>
                 </div>
