@@ -47,6 +47,12 @@ const AccountManager: React.FC<AccountManagerProps> = ({
         return;
       }
 
+      // Validate cookie if using cookie method
+      if (addMethod === 'cookie' && (!formData.cookie.trim() || !validateCookie(formData.cookie))) {
+        if (showToast) showToast('error', 'Cookie invalide. Veuillez entrer un cookie valide.');
+        return;
+      }
+
       // Check if address already exists
       if (accounts.some(acc => acc.address === formData.address)) {
         if (showToast) showToast('error', 'Cet email existe déjà dans vos comptes.');
@@ -79,7 +85,12 @@ const AccountManager: React.FC<AccountManagerProps> = ({
       }
     }
   };
-
+  const validateCookie = (cookie: string): boolean => {
+    // Basic validation for cookie format
+    // name=value; name2=value2; ...
+    const cookiePattern = /^[^=]+=[^;]+(; [^=]+=[^;]+)*$/;
+    return cookiePattern.test(cookie.trim());
+  }
   const handleUpdateAccount = async () => {
     if (!editingAccountId) return;
 
@@ -247,7 +258,7 @@ const AccountManager: React.FC<AccountManagerProps> = ({
                         name="cookie"
                         value={formData.cookie || ''}
                         onChange={handleInputChange}
-                        placeholder="Entrez le cookie ici"
+                        placeholder="cookie1=value1; cookie2=value2; ..."
                         required
                       />
                     </div>
