@@ -42,7 +42,7 @@ const AccountManager: React.FC<AccountManagerProps> = ({
     } else {
       // Add new account
       // Validate address format (basic validation)
-      if (!formData.address.includes('@') || !formData.address.includes('.')) {
+      if (addMethod != 'cookie' && (!formData.address.includes('@') || !formData.address.includes('.'))) {
         if (showToast) showToast('error', 'Email invalide. Veuillez entrer une adresse email valide.');
         return;
       }
