@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Wallet, Zap, Clock, Shield, ArrowRight, Users, ChevronDown, Mail, Facebook } from 'lucide-react';
 
@@ -73,13 +74,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
                 Réclamez automatiquement vos récompenses sur les plateformes de la famille Pick sans effort. Plus besoin de connexions manuelles.
               </p>
               <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
-                <button 
-                  onClick={onLoginClick}
+                <Link 
+                  to="/login"
                   className="btn btn-primary text-base px-6 py-3"
                 >
                   Commencer maintenant
                   <ArrowRight className="ml-2" size={18} />
-                </button>
+                </Link>
                 <a 
                   href="#fonctionnement" 
                   className="btn bg-white text-slate-800 border border-slate-300 hover:bg-slate-100 text-base px-6 py-3"
@@ -227,13 +228,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
           </div>
 
           <div className="mt-12 text-center">
-            <button 
-              onClick={onLoginClick}
+            <Link 
+              to="/login"
               className="btn btn-primary text-base px-6 py-3"
             >
               Démarrer mon Auto-Claim
               <ArrowRight className="ml-2" size={18} />
-            </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -297,12 +298,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
             <p className="text-xl text-blue-100 mb-8">
               Rejoignez des centaines d'utilisateurs qui ont déjà automatisé leurs réclamations et qui gagnent plus sans effort supplémentaire.
             </p>
-            <button 
-              onClick={onLoginClick}
+            <Link 
+              to="/login"
               className="bg-white text-blue-700 hover:bg-blue-50 transition-colors px-8 py-4 rounded-lg font-bold text-lg"
             >
               Commencer gratuitement
-            </button>
+            </Link>
           </div>
         </div>
         <div className="absolute inset-0 opacity-10">
