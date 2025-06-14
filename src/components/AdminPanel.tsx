@@ -30,22 +30,35 @@ const AdminPanel: React.FC<AdminPanelProps> = () => {
   } | null>({ key: 'addedAt', direction: 'descending' });
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(20);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [isDataFetching, setIsDataFetching] = useState(false);
 
   useEffect(() => {
-    loadAccounts();
-  }, []);
+    if (!isInitialized) {
+      loadAccounts();
+      setIsInitialized(true);
+    }
+  }, [isInitialized]);
 
   const loadAccounts = async () => {
+    if (isDataFetching) return; // Prevent concurrent calls
+    
     try {
+      setIsDataFetching(true);
       setLoading(true);
       setError(null);
       const data = await fetchAllAccounts();
-      setAccounts(data);
+      // Ensure unique data
+      const uniqueData = data.filter((item, index, self) => 
+        index === self.findIndex(t => t.id === item.id)
+      );
+      setAccounts(uniqueData);
     } catch (err) {
       console.error("Failed to load accounts:", err);
       setError("Impossible de charger les données. Vérifiez vos droits d'accès ou réessayez plus tard.");
     } finally {
       setLoading(false);
+      setIsDataFetching(false);
     }
   };
 
@@ -381,8 +394,8 @@ const AdminPanel: React.FC<AdminPanelProps> = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-slate-200">
-                {currentItems.map((account) => (
-                  <tr key={account.id} className="hover:bg-slate-50">
+                {currentItems.map((account, index) => (
+                  <tr key={`${account.id}-${index}`} className="hover:bg-slate-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-xs font-mono text-slate-600">{account.id.slice(0, 8)}...</div>
                     </td>

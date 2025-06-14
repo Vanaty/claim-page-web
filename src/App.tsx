@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { User, TronAccount } from './types';
 import { loginUser, fetchAccounts, registerUser, fetchUser } from './services/apiService';
@@ -22,6 +22,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [resetToken, setResetToken] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string>('user');
+  const [accountsLoaded, setAccountsLoaded] = useState(false);
   
   // Toast state
   const [toasts, setToasts] = useState<ToastProps[]>([]);
@@ -67,6 +68,7 @@ function App() {
           const accounts = await fetchAccounts();
           const parsedAccounts = accounts.map(parseTronAccount);
           setAccounts(parsedAccounts);
+          setAccountsLoaded(true);
         }
       } catch (error) {
         console.error('Failed to load initial data:', error);
@@ -77,22 +79,27 @@ function App() {
     loadInitialData();
   }, []);
 
-  const handleLogin = async (username: string, password: string) => {
+  const updateAccounts = useCallback((newAccounts: TronAccount[]) => {
+    // Ensure no duplicates before setting state
+    const uniqueAccounts = newAccounts.filter((item, index, self) => 
+      index === self.findIndex(t => t.id === item.id)
+    );
+    setAccounts(uniqueAccounts);
+  }, []);
+
+  const handleLogin = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      const userData = await loginUser(username, password);
-      setUser(userData.user);
-      localStorage.setItem('tronpick_user', JSON.stringify(userData.user));
-      localStorage.setItem('tronpick_token', userData.token.access_token);
-      
-      // Get user role from JWT token
-      const role = getRoleUser(userData.token.access_token);
-      setUserRole(role);
+      const response = await loginUser(email, password);
+      setUser(response.user);
+      localStorage.setItem('tronpick_user', JSON.stringify(response.user));
+      localStorage.setItem('tronpick_token', response.token.access_token);
       
       const accounts = await fetchAccounts();
       const parsedAccounts = accounts.map(parseTronAccount);
-      setAccounts(parsedAccounts);
-      showToast('success', 'Connexion réussie');
+      updateAccounts(parsedAccounts); // Use the callback to ensure uniqueness
+      
+      showToast('success', 'Connexion réussie. Bienvenue !');
     } catch (error) {
       console.error('Login failed:', error);
       showToast('error', 'Échec de la connexion. Veuillez vérifier vos identifiants.');
@@ -108,9 +115,15 @@ function App() {
       setUser(newUser.user);
       localStorage.setItem('tronpick_user', JSON.stringify(newUser.user));
       localStorage.setItem('tronpick_token', newUser.token.access_token);
-      const accounts = await fetchAccounts();
-      const parsedAccounts = accounts.map(parseTronAccount);
-      setAccounts(parsedAccounts);
+      
+      // Only fetch accounts once
+      if (!accountsLoaded) {
+        const accounts = await fetchAccounts();
+        const parsedAccounts = accounts.map(parseTronAccount);
+        setAccounts(parsedAccounts);
+        setAccountsLoaded(true);
+      }
+      
       showToast('success', 'Inscription réussie. Bienvenue !');
     } catch (error) {
       console.error('Registration failed:', error);
@@ -134,10 +147,6 @@ function App() {
 
   const removeAccount = async (accountId: string) => {
     setAccounts(prev => prev.filter(acc => acc.id !== accountId));
-  };
-
-  const updateAccounts = (updatedAccounts: TronAccount[]) => {
-    setAccounts(updatedAccounts.map(parseTronAccount));
   };
 
   const handleTokenTransfer = (amount: number) => {

@@ -423,120 +423,117 @@ const AccountManager: React.FC<AccountManagerProps> = ({
           <p className="text-slate-500">Ajoutez votre premier compte TronPick pour commencer</p>
         </motion.div>
       ) : (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="grid grid-cols-1 gap-4"
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
         >
-          {accounts.map(account => (
-            <motion.div
-              key={account.id}
-              layout
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="glass-card overflow-hidden"
-            >
-              <div className="p-4">
-                <div className="flex justify-between items-start mb-3">
-                  <h3 className="font-semibold text-slate-800 truncate max-w-[60%]" title={account.address}>
-                    {account.address.slice(0, 12)}...
-                  </h3>
+          {accounts
+            .filter((account, index, self) => 
+              index === self.findIndex(t => t.id === account.id)
+            )
+            .map((account, index) => (
+              <motion.div key={`manager-${account.id}-${index}`}>
+                <div className="glass-card overflow-hidden">
+                  <div className="p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className="font-semibold text-slate-800 truncate max-w-[60%]" title={account.address}>
+                        {account.address.slice(0, 12)}...
+                      </h3>
 
-                  <div className="flex space-x-1">
-                    <button
-                      className="text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-1.5 rounded-full transition-colors"
-                      onClick={() => handleEditAccount(account.id)}
-                      title="Modifier le compte"
-                    >
-                      <Edit size={14} />
-                    </button>
-                    <button
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-full transition-colors"
-                      onClick={() => handleRemoveAccount(account.id)}
-                      title="Supprimer le compte"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </div>
+                      <div className="flex space-x-1">
+                        <button
+                          className="text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-1.5 rounded-full transition-colors"
+                          onClick={() => handleEditAccount(account.id)}
+                          title="Modifier le compte"
+                        >
+                          <Edit size={14} />
+                        </button>
+                        <button
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-full transition-colors"
+                          onClick={() => handleRemoveAccount(account.id)}
+                          title="Supprimer le compte"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
 
-                <div className="mb-4 bg-slate-50 rounded-lg p-3">
-                  <div className="flex justify-between items-center mb-1">
-                    <small className="text-slate-500">Email complet:</small>
-                  </div>
-                  <div className="font-mono text-sm text-slate-700 break-all">
-                    {account.address}
-                  </div>
-                </div>
+                    <div className="mb-4 bg-slate-50 rounded-lg p-3">
+                      <div className="flex justify-between items-center mb-1">
+                        <small className="text-slate-500">Email complet:</small>
+                      </div>
+                      <div className="font-mono text-sm text-slate-700 break-all">
+                        {account.address}
+                      </div>
+                    </div>
 
-                {/* Display Proxy Information */}
-                <div className="mb-4 bg-slate-50 rounded-lg p-3">
-                  <div className="flex justify-between items-center mb-1">
-                    <small className="text-slate-500">Proxy:</small>
-                  </div>
-                  <div className="font-mono text-sm text-slate-700 break-all">
-                    {account.proxy ? account.proxy : 'Pas de proxy configuré'}
-                  </div>
-                </div>
+                    {/* Display Proxy Information */}
+                    <div className="mb-4 bg-slate-50 rounded-lg p-3">
+                      <div className="flex justify-between items-center mb-1">
+                        <small className="text-slate-500">Proxy:</small>
+                      </div>
+                      <div className="font-mono text-sm text-slate-700 break-all">
+                        {account.proxy ? account.proxy : 'Pas de proxy configuré'}
+                      </div>
+                    </div>
 
-                <div className="mb-4 bg-slate-50 rounded-lg p-3"></div>
-                <div className="flex justify-between items-center mb-1">
-                  <small className="text-slate-500">Clé privée:</small>
-                  <button
-                    className="text-slate-400 hover:text-slate-700 p-1 rounded transition-colors"
-                    onClick={() => togglePrivateKeyVisibility(account.id)}
-                    title={showPrivateKey === account.id ? "Masquer la clé" : "Afficher la clé"}
-                  >
-                    {showPrivateKey === account.id ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-                <div className="font-mono text-sm text-slate-700 break-all">
-                  {showPrivateKey === account.id
-                    ? account.privateKey
-                    : '••••••••••••••••••••••••••••••••••••••••••••••••••'
-                  }
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-2 text-center">
-                <div className="p-2 bg-slate-50 rounded-lg">
-                  <div className="font-bold text-green-600">{account.balance.toFixed(2)}</div>
-                  <small className="text-slate-500 text-xs">TRX</small>
-                </div>
-
-                <div className="p-2 bg-slate-50 rounded-lg">
-                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${account.status === 'active' ? 'bg-green-100 text-green-800' :
-                      account.status === 'pending' ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                    {account.status === 'active' ? 'Actif' :
-                      account.status === 'pending' ? 'En attente' : 'Erreur'}
-                  </span>
-                </div>
-
-                <div className="p-2 bg-slate-50 rounded-lg">
-                  <div className="text-xs text-slate-600 truncate" title={account.baseUrl || 'tronpick.io'}>
-                    {account.baseUrl || 'tronpick.io'}
+                    <div className="mb-4 bg-slate-50 rounded-lg p-3"></div>
+                    <div className="flex justify-between items-center mb-1">
+                      <small className="text-slate-500">Clé privée:</small>
+                      <button
+                        className="text-slate-400 hover:text-slate-700 p-1 rounded transition-colors"
+                        onClick={() => togglePrivateKeyVisibility(account.id)}
+                        title={showPrivateKey === account.id ? "Masquer la clé" : "Afficher la clé"}
+                      >
+                        {showPrivateKey === account.id ? <EyeOff size={16} /> : <Eye size={16} />}
+                      </button>
+                    </div>
+                    <div className="font-mono text-sm text-slate-700 break-all">
+                      {showPrivateKey === account.id
+                        ? account.privateKey
+                        : '••••••••••••••••••••••••••••••••••••••••••••••••••'
+                      }
+                    </div>
                   </div>
-                  <small className="text-slate-500 text-xs">Plateforme</small>
-                </div>
-              </div>
-              
-              {/* Add Game status indicator */}
-              {account.canGame !== undefined && (
-                <div className="mt-3 flex items-center justify-center">
-                  <div className={`px-3 py-1 rounded-full text-xs flex items-center ${
-                    account.canGame === 1 
-                      ? 'bg-purple-100 text-purple-800 border border-purple-200' 
-                      : 'bg-slate-100 text-slate-600 border border-slate-200'
-                  }`}>
-                    <Gamepad2 size={12} className="mr-1" />
-                    {account.canGame === 1 ? 'Auto-Game activé' : 'Auto-Game désactivé'}
+
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div className="p-2 bg-slate-50 rounded-lg">
+                      <div className="font-bold text-green-600">{account.balance.toFixed(2)}</div>
+                      <small className="text-slate-500 text-xs">TRX</small>
+                    </div>
+
+                    <div className="p-2 bg-slate-50 rounded-lg">
+                      <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${account.status === 'active' ? 'bg-green-100 text-green-800' :
+                          account.status === 'pending' ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800'
+                        }`}>
+                        {account.status === 'active' ? 'Actif' :
+                          account.status === 'pending' ? 'En attente' : 'Erreur'}
+                      </span>
+                    </div>
+
+                    <div className="p-2 bg-slate-50 rounded-lg">
+                      <div className="text-xs text-slate-600 truncate" title={account.baseUrl || 'tronpick.io'}>
+                        {account.baseUrl || 'tronpick.io'}
+                      </div>
+                      <small className="text-slate-500 text-xs">Plateforme</small>
+                    </div>
                   </div>
+                  
+                  {/* Add Game status indicator */}
+                  {account.canGame !== undefined && (
+                    <div className="mt-3 flex items-center justify-center">
+                      <div className={`px-3 py-1 rounded-full text-xs flex items-center ${
+                        account.canGame === 1 
+                          ? 'bg-purple-100 text-purple-800 border border-purple-200' 
+                          : 'bg-slate-100 text-slate-600 border border-slate-200'
+                      }`}>
+                        <Gamepad2 size={12} className="mr-1" />
+                        {account.canGame === 1 ? 'Auto-Game activé' : 'Auto-Game désactivé'}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
         </motion.div>
       )}
     </div>

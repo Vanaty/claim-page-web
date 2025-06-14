@@ -4,6 +4,7 @@ import { User, TronAccount } from '../types';
 import AccountCard from './AccountCard';
 import { motion } from 'framer-motion';
 import { fetchAccounts } from '../services/apiService';
+import { useUniqueData } from '../hooks/useUniqueData';
 
 interface DashboardProps {
   user: User;
@@ -13,32 +14,55 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ user, accounts, onUpdateAccounts }) => {
   const [isAutoClaiming, setIsAutoClaiming] = useState(true);
-
+  const uniqueAccounts = useUniqueData(accounts);
+  
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: NodeJS.Timeout | null = null;
+    let isMounted = true; // Track component mount status
+    
+    // Fetch initial data only once
+    const fetchInitialData = async () => {
+      try {
+        const accounts = await fetchAccounts();
+        const parsedAccounts = accounts.map(parseTronAccount);
+        onUpdateAccounts(parsedAccounts);
+      } catch (error) {
+        console.error('Failed to fetch accounts:', error);
+      }
+    };
 
+    // Only fetch initial data if we don't have accounts yet
+    if (accounts.length === 0) {
+      fetchInitialData();
+    }
+
+    // Set up interval only if auto-claiming is enabled
     if (isAutoClaiming) {
       interval = setInterval(async () => {
+        if (!isMounted) return; // Don't update if component unmounted
+        
         try {
-          const canFeatchAccounts = accounts.some((account) => {
-            return account.nextClaim && new Date(account.nextClaim) <= new Date();
-          });
-          if (!canFeatchAccounts) return;
-          const updatedAccounts = await fetchAccounts();
-          onUpdateAccounts(updatedAccounts);
+          const accounts = await fetchAccounts();
+          const parsedAccounts = accounts.map(parseTronAccount);
+          // Remove duplicates based on ID
+          const uniqueAccounts = parsedAccounts.filter((item, index, self) => 
+            index === self.findIndex(t => t.id === item.id)
+          );
+          onUpdateAccounts(uniqueAccounts);
         } catch (error) {
           console.error('Failed to fetch accounts:', error);
         }
-      }, 10000); // Fetch accounts every 10 seconds
+      }, 10000);
     }
 
     return () => {
+      isMounted = false;
       if (interval) clearInterval(interval);
     };
-  }, [isAutoClaiming, onUpdateAccounts]);
+  }, [isAutoClaiming]); // Remove onUpdateAccounts from dependencies
 
-  const activeAccounts = accounts.filter(acc => acc.status === 'active').length;
-  const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
+  const activeAccounts = uniqueAccounts.filter(acc => acc.status === 'active').length;
+  const totalBalance = uniqueAccounts.reduce((sum, acc) => sum + acc.balance, 0);
 
   const container = {
     hidden: { opacity: 0 },
@@ -129,12 +153,12 @@ const Dashboard: React.FC<DashboardProps> = ({ user, accounts, onUpdateAccounts 
           animate="show"
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
         >
-          {accounts.map(account => (
-            <motion.div key={account.id} variants={item}>
+          {uniqueAccounts.map((account, index) => (
+            <motion.div key={`unique-${account.id}`} variants={item}>
               <AccountCard 
                 account={account} 
-                onClaim={() => {}} // No manual claim needed
-                canClaim={false} // Disable manual claim
+                onClaim={() => {}}
+                canClaim={false}
               />
             </motion.div>
           ))}

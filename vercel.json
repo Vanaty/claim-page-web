@@ -1,8 +1,12 @@
 {
-    "rewrites": [
-      {
-        "source": "/api/:path*",
-        "destination": "https://server-pick.ip-ddns.com/:path*"
-      }
-    ]
-  }
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://server-pick.ip-ddns.com/:path*"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/"
+    }
+  ]
+}
