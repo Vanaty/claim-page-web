@@ -43,8 +43,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user, accounts, onUpdateAccounts 
         if (!isMounted) return; // Don't update if component unmounted
         
         try {
-          const canClaim = uniqueAccounts.some(acc => acc.nextClaim <= new Date());
-          if (!canClaim) return;
           const accounts = await fetchAccounts();
           const parsedAccounts = accounts.map(parseTronAccount);
           // Remove duplicates based on ID
