@@ -3,11 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Wallet, Zap, Clock, Shield, ArrowRight, Users, ChevronDown, Mail, Facebook } from 'lucide-react';
 
-interface LandingPageProps {
-  onLoginClick: () => void;
-}
-
-const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
+const LandingPage: React.FC = () => {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
   const toggleFaq = (index: number) => {
@@ -75,7 +71,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
               </p>
               <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
                 <Link 
-                  to="/login"
+                  to="/register"
                   className="btn btn-primary text-base px-6 py-3"
                 >
                   Commencer maintenant
@@ -229,7 +225,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
 
           <div className="mt-12 text-center">
             <Link 
-              to="/login"
+              to="/register"
               className="btn btn-primary text-base px-6 py-3"
             >
               Démarrer mon Auto-Claim
@@ -299,7 +295,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
               Rejoignez des centaines d'utilisateurs qui ont déjà automatisé leurs réclamations et qui gagnent plus sans effort supplémentaire.
             </p>
             <Link 
-              to="/login"
+              to="/register"
               className="bg-white text-blue-700 hover:bg-blue-50 transition-colors px-8 py-4 rounded-lg font-bold text-lg"
             >
               Commencer gratuitement

@@ -5,7 +5,9 @@ import { loginUser, fetchAccounts, registerUser, fetchUser } from './services/ap
 import { parseTronAccount, getRoleUser } from './services/utils';
 import ToastContainer, { ToastProps } from './components/Toast';
 import LandingPage from './components/LandingPage';
-import LoginForm from './components/LoginForm';
+import LoginPage from './components/LoginPage';
+import RegisterPage from './components/RegisterPage';
+import ForgotPasswordPage from './components/ForgotPasswordPage';
 import ResetPasswordForm from './components/ResetPasswordForm';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
@@ -175,7 +177,7 @@ function App() {
           path="/" 
           element={
             !user ? (
-              <LandingPage onLoginClick={() => {}} />
+              <LandingPage />
             ) : (
               <Navigate to="/dashboard" replace />
             )
@@ -185,7 +187,27 @@ function App() {
           path="/login" 
           element={
             !user ? (
-              <LoginForm onLogin={handleLogin} onRegister={handleRegister} />
+              <LoginPage onLogin={handleLogin} isLoading={isLoading} />
+            ) : (
+              <Navigate to="/dashboard" replace />
+            )
+          } 
+        />
+        <Route 
+          path="/register" 
+          element={
+            !user ? (
+              <RegisterPage onRegister={handleRegister} isLoading={isLoading} />
+            ) : (
+              <Navigate to="/dashboard" replace />
+            )
+          } 
+        />
+        <Route 
+          path="/forgot-password" 
+          element={
+            !user ? (
+              <ForgotPasswordPage />
             ) : (
               <Navigate to="/dashboard" replace />
             )
@@ -201,6 +223,7 @@ function App() {
                 user={user} 
                 userRole={userRole} 
                 onLogout={handleLogout}
+                accountsCount={accounts.length}
               >
                 <Routes>
                   <Route 

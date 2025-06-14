@@ -9,9 +9,10 @@ interface LayoutProps {
   userRole: string;
   onLogout: () => void;
   children: React.ReactNode;
+  accountsCount: number;
 }
 
-const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children }) => {
+const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, accountsCount }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -25,7 +26,7 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children }) =
 
   const navItems = [
     { path: '/dashboard', icon: TrendingUp, label: 'Dashboard' },
-    { path: '/accounts', icon: Plus, label: `Comptes (${0})` }, // You might want to pass accounts count as prop
+    { path: '/accounts', icon: Plus, label: `Comptes (${accountsCount})` },
     { path: '/transfer', icon: Send, label: 'Transfert' },
     { path: '/settings', icon: Settings, label: 'Paramètres' },
   ];
