@@ -1,13 +1,22 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Wallet, Zap, Clock, Shield, ArrowRight, Users, ChevronDown, Mail, Facebook } from 'lucide-react';
+import { Wallet, Zap, Clock, Shield, ArrowRight, Users, ChevronDown, Mail, Facebook, Menu, X } from 'lucide-react';
 
 const LandingPage: React.FC = () => {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleFaq = (index: number) => {
     setActiveFaq(activeFaq === index ? null : index);
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
   };
 
   const faqs = [
@@ -53,56 +62,174 @@ const LandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200">
+      {/* Header */}
+      <header className="bg-white/95 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-50">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <Link to="/" className="flex items-center space-x-2">
+              <Wallet className="text-blue-700" size={28} />
+              <span className="font-bold text-xl text-slate-900">TronPick Auto-Claim</span>
+            </Link>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-8">
+              <a href="#fonctionnement" className="text-slate-600 hover:text-blue-700 transition-colors">
+                Comment ça marche
+              </a>
+              <a href="#features" className="text-slate-600 hover:text-blue-700 transition-colors">
+                Fonctionnalités
+              </a>
+              <a href="#faq" className="text-slate-600 hover:text-blue-700 transition-colors">
+                FAQ
+              </a>
+              <a href="mailto:eritiavina31@gmail.com" className="text-slate-600 hover:text-blue-700 transition-colors">
+                Contact
+              </a>
+            </nav>
+
+            {/* Desktop Auth Buttons */}
+            <div className="hidden md:flex items-center space-x-3">
+              <Link 
+                to="/login" 
+                className="text-slate-600 hover:text-blue-700 transition-colors font-medium"
+              >
+                Connexion
+              </Link>
+              <Link 
+                to="/register" 
+                className="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors font-medium"
+              >
+                S'inscrire
+              </Link>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={toggleMobileMenu}
+              className="md:hidden p-2 rounded-lg hover:bg-slate-100 transition-colors"
+              aria-label="Toggle mobile menu"
+            >
+              {isMobileMenuOpen ? (
+                <X size={24} className="text-slate-700" />
+              ) : (
+                <Menu size={24} className="text-slate-700" />
+              )}
+            </button>
+          </div>
+
+          {/* Mobile Navigation Menu */}
+          <motion.div
+            className={`md:hidden overflow-hidden ${isMobileMenuOpen ? 'block' : 'hidden'}`}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ 
+              height: isMobileMenuOpen ? 'auto' : 0, 
+              opacity: isMobileMenuOpen ? 1 : 0 
+            }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="py-4 border-t border-slate-200">
+              <nav className="flex flex-col space-y-4">
+                <a 
+                  href="#fonctionnement" 
+                  className="text-slate-600 hover:text-blue-700 transition-colors px-2 py-1"
+                  onClick={closeMobileMenu}
+                >
+                  Comment ça marche
+                </a>
+                <a 
+                  href="#features" 
+                  className="text-slate-600 hover:text-blue-700 transition-colors px-2 py-1"
+                  onClick={closeMobileMenu}
+                >
+                  Fonctionnalités
+                </a>
+                <a 
+                  href="#faq" 
+                  className="text-slate-600 hover:text-blue-700 transition-colors px-2 py-1"
+                  onClick={closeMobileMenu}
+                >
+                  FAQ
+                </a>
+                <a 
+                  href="mailto:eritiavina31@gmail.com" 
+                  className="text-slate-600 hover:text-blue-700 transition-colors px-2 py-1"
+                  onClick={closeMobileMenu}
+                >
+                  Contact
+                </a>
+                <div className="flex flex-col space-y-3 pt-4 border-t border-slate-200">
+                  <Link 
+                    to="/login" 
+                    className="text-slate-600 hover:text-blue-700 transition-colors font-medium px-2 py-1"
+                    onClick={closeMobileMenu}
+                  >
+                    Connexion
+                  </Link>
+                  <Link 
+                    to="/register" 
+                    className="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors font-medium text-center"
+                    onClick={closeMobileMenu}
+                  >
+                    S'inscrire
+                  </Link>
+                </div>
+              </nav>
+            </div>
+          </motion.div>
+        </div>
+      </header>
+
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="container mx-auto px-4 py-16 md:py-24">
+        <div className="container mx-auto px-4 py-12 md:py-16 lg:py-24">
           <div className="flex flex-col md:flex-row items-center">
             <motion.div 
-              className="md:w-1/2 mb-10 md:mb-0"
+              className="md:w-1/2 mb-8 md:mb-0"
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-4">
                 Automatisez vos gains sur <span className="text-blue-700">TronPick</span>
               </h1>
-              <p className="text-xl text-slate-600 mb-8">
+              <p className="text-lg md:text-xl text-slate-600 mb-6 md:mb-8">
                 Réclamez automatiquement vos récompenses sur les plateformes de la famille Pick sans effort. Plus besoin de connexions manuelles.
               </p>
               <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
                 <Link 
                   to="/register"
-                  className="btn btn-primary text-base px-6 py-3"
+                  className="btn btn-primary text-base px-6 py-3 flex items-center justify-center"
                 >
                   Commencer maintenant
                   <ArrowRight className="ml-2" size={18} />
                 </Link>
                 <a 
                   href="#fonctionnement" 
-                  className="btn bg-white text-slate-800 border border-slate-300 hover:bg-slate-100 text-base px-6 py-3"
+                  className="btn bg-white text-slate-800 border border-slate-300 hover:bg-slate-100 text-base px-6 py-3 flex items-center justify-center"
                 >
                   Comment ça marche ?
                 </a>
               </div>
             </motion.div>
             <motion.div 
-              className="md:w-1/2"
+              className="md:w-1/2 w-full"
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <div className="glass-card p-6 rounded-xl shadow-xl transform rotate-1">
+              <div className="glass-card p-4 md:p-6 rounded-xl shadow-xl transform rotate-1 max-w-md mx-auto md:max-w-none">
                 <div className="bg-blue-700 rounded-lg p-4 text-white text-center mb-4">
-                  <Wallet size={40} className="mx-auto mb-2" />
-                  <h3 className="text-xl font-semibold">Système Auto-Claim</h3>
+                  <Wallet size={32} md:size={40} className="mx-auto mb-2" />
+                  <h3 className="text-lg md:text-xl font-semibold">Système Auto-Claim</h3>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-3 md:space-y-4">
                   <div className="flex items-center">
-                    <div className="bg-green-100 p-2 rounded-full">
-                      <Zap size={18} className="text-green-600" />
+                    <div className="bg-green-100 p-2 rounded-full flex-shrink-0">
+                      <Zap size={16} md:size={18} className="text-green-600" />
                     </div>
-                    <div className="ml-3">
-                      <span className="font-medium text-slate-800">Claim automatique</span>
+                    <div className="ml-3 flex-1 min-w-0">
+                      <span className="font-medium text-slate-800 text-sm md:text-base">Claim automatique</span>
                       <div className="h-2 w-full bg-slate-200 rounded-full mt-1">
                         <div className="h-full bg-green-500 rounded-full animate-pulse" style={{ width: '87%' }}></div>
                       </div>
@@ -110,20 +237,20 @@ const LandingPage: React.FC = () => {
                   </div>
                   <div className="bg-blue-50 rounded-lg p-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-slate-700">Prochain claim:</span>
-                      <span className="font-mono bg-white px-2 py-1 rounded text-blue-700">00:05:37</span>
+                      <span className="text-slate-700 text-sm md:text-base">Prochain claim:</span>
+                      <span className="font-mono bg-white px-2 py-1 rounded text-blue-700 text-sm">00:05:37</span>
                     </div>
                   </div>
                   <div className="bg-blue-50 rounded-lg p-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-slate-700">Comptes actifs:</span>
-                      <span className="font-mono bg-white px-2 py-1 rounded text-green-700">3</span>
+                      <span className="text-slate-700 text-sm md:text-base">Comptes actifs:</span>
+                      <span className="font-mono bg-white px-2 py-1 rounded text-green-700 text-sm">3</span>
                     </div>
                   </div>
                   <div className="bg-blue-50 rounded-lg p-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-slate-700">Total réclamé:</span>
-                      <span className="font-mono bg-white px-2 py-1 rounded text-blue-700">357.25 TRX</span>
+                      <span className="text-slate-700 text-sm md:text-base">Total réclamé:</span>
+                      <span className="font-mono bg-white px-2 py-1 rounded text-blue-700 text-sm">357.25 TRX</span>
                     </div>
                   </div>
                 </div>
@@ -139,16 +266,16 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Features Section */}
-      <section className="bg-white py-16">
+      <section id="features" className="bg-white py-12 md:py-16">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Pourquoi choisir TronPick Auto-Claim</h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 mb-4">Pourquoi choisir TronPick Auto-Claim</h2>
+            <p className="text-base md:text-lg text-slate-600 max-w-2xl mx-auto">
               Notre plateforme vous fait économiser du temps et maximiser vos gains sans effort.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             {features.map((feature, index) => (
               <motion.div 
                 key={index}
@@ -161,8 +288,8 @@ const LandingPage: React.FC = () => {
                 <div className="bg-blue-100 p-3 rounded-full mb-4">
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-semibold text-slate-800 mb-2">{feature.title}</h3>
-                <p className="text-slate-600">{feature.description}</p>
+                <h3 className="text-lg md:text-xl font-semibold text-slate-800 mb-2">{feature.title}</h3>
+                <p className="text-sm md:text-base text-slate-600">{feature.description}</p>
               </motion.div>
             ))}
           </div>
@@ -170,16 +297,16 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* How It Works */}
-      <section id="fonctionnement" className="py-16 bg-slate-50">
+      <section id="fonctionnement" className="py-12 md:py-16 bg-slate-50">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Comment ça marche</h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 mb-4">Comment ça marche</h2>
+            <p className="text-base md:text-lg text-slate-600 max-w-2xl mx-auto">
               En seulement trois étapes simples, commencez à automatiser vos réclamations
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             <motion.div 
               className="glass-card p-6 rounded-xl relative"
               initial={{ opacity: 0, y: 20 }}
@@ -223,10 +350,10 @@ const LandingPage: React.FC = () => {
             </motion.div>
           </div>
 
-          <div className="mt-12 text-center">
+          <div className="mt-8 md:mt-12 text-center">
             <Link 
               to="/register"
-              className="btn btn-primary text-base px-6 py-3"
+              className="btn btn-primary text-base px-6 py-3 inline-flex items-center"
             >
               Démarrer mon Auto-Claim
               <ArrowRight className="ml-2" size={18} />
@@ -236,11 +363,11 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-16 bg-white">
+      <section id="faq" className="py-12 md:py-16 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Questions fréquentes</h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 mb-4">Questions fréquentes</h2>
+            <p className="text-base md:text-lg text-slate-600 max-w-2xl mx-auto">
               Tout ce que vous devez savoir sur notre service d'auto-claim
             </p>
           </div>
@@ -257,16 +384,16 @@ const LandingPage: React.FC = () => {
               >
                 <button
                   onClick={() => toggleFaq(index)}
-                  className={`w-full text-left p-4 rounded-lg flex justify-between items-center ${
+                  className={`w-full text-left p-4 rounded-lg flex justify-between items-start ${
                     activeFaq === index 
                       ? 'bg-blue-50 text-blue-700 shadow-md' 
                       : 'bg-slate-50 hover:bg-slate-100 text-slate-800'
                   } transition-all duration-200`}
                 >
-                  <span className="font-medium text-lg">{faq.question}</span>
+                  <span className="font-medium text-base md:text-lg pr-4">{faq.question}</span>
                   <ChevronDown 
                     size={20}
-                    className={`transform transition-transform duration-200 ${activeFaq === index ? 'rotate-180' : ''}`}
+                    className={`transform transition-transform duration-200 flex-shrink-0 mt-1 ${activeFaq === index ? 'rotate-180' : ''}`}
                   />
                 </button>
                 <div
@@ -275,7 +402,7 @@ const LandingPage: React.FC = () => {
                   }`}
                 >
                   <div className="p-4 bg-white border border-slate-100 rounded-b-lg">
-                    <p className="text-slate-700">{faq.answer}</p>
+                    <p className="text-sm md:text-base text-slate-700">{faq.answer}</p>
                   </div>
                 </div>
               </motion.div>
@@ -285,18 +412,18 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Call to Action */}
-      <section className="bg-blue-700 py-16 text-white relative overflow-hidden">
+      <section className="bg-blue-700 py-12 md:py-16 text-white relative overflow-hidden">
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 md:mb-6">
               Prêt à automatiser vos réclamations ?
             </h2>
-            <p className="text-xl text-blue-100 mb-8">
+            <p className="text-lg md:text-xl text-blue-100 mb-6 md:mb-8">
               Rejoignez des centaines d'utilisateurs qui ont déjà automatisé leurs réclamations et qui gagnent plus sans effort supplémentaire.
             </p>
             <Link 
               to="/register"
-              className="bg-white text-blue-700 hover:bg-blue-50 transition-colors px-8 py-4 rounded-lg font-bold text-lg"
+              className="bg-white text-blue-700 hover:bg-blue-50 transition-colors px-6 md:px-8 py-3 md:py-4 rounded-lg font-bold text-base md:text-lg inline-block"
             >
               Commencer gratuitement
             </Link>
@@ -308,33 +435,33 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900 text-white py-10">
+      <footer className="bg-slate-900 text-white py-8 md:py-10">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center mb-8">
-            <div className="flex items-center mb-6 md:mb-0">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-6 md:mb-8">
+            <div className="flex items-center mb-4 md:mb-0">
               <Wallet className="text-blue-400 mr-2" size={24} />
-              <span className="font-bold text-xl">TronPick Auto-Claim</span>
+              <span className="font-bold text-lg md:text-xl">TronPick Auto-Claim</span>
             </div>
-            <div className="flex space-x-6">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-6">
               <a 
                 href="https://web.facebook.com/61577170414462" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="flex items-center hover:text-blue-400 transition-colors"
+                className="flex items-center justify-center sm:justify-start hover:text-blue-400 transition-colors"
               >
                 <Facebook size={20} className="mr-2" />
                 <span>Facebook</span>
               </a>
               <a 
                 href="mailto:eritiavina31@gmail.com" 
-                className="flex items-center hover:text-blue-400 transition-colors"
+                className="flex items-center justify-center sm:justify-start hover:text-blue-400 transition-colors"
               >
                 <Mail size={20} className="mr-2" />
                 <span>Contact</span>
               </a>
             </div>
           </div>
-          <div className="border-t border-slate-700 pt-6 text-center text-slate-400 text-sm">
+          <div className="border-t border-slate-700 pt-4 md:pt-6 text-center text-slate-400 text-sm">
             <p>&copy; {new Date().getFullYear()} TronPick Auto-Claim. Tous droits réservés.</p>
             <p className="mt-2">
               Email: <a href="mailto:eritiavina31@gmail.com" className="text-blue-400 hover:underline">eritiavina31@gmail.com</a>
