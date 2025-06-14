@@ -195,7 +195,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onRegister, isLoading = fal
           </div>
 
           <div className="mt-6 bg-blue-50 text-blue-800 rounded-lg p-3 text-sm">
-            🎁 Bonus d'inscription: <strong>50 jetons gratuits</strong>
+            🎁 Bonus d'inscription: <strong>24 jetons gratuits</strong>
           </div>
 
           <div className="mt-4 text-center">
