@@ -4,7 +4,7 @@ import { parseTronAccount } from './utils';
 
 const api = axios.create({
   baseURL: '/api', // Récupéré depuis le fichier .env
-  timeout: 10000,
+  timeout: 50000,
 });
 
 // Add Bearer token to all requests
@@ -50,7 +50,7 @@ export const fetchAccounts = async (): Promise<TronAccount[]> => {
 
 export const addAccount = async (account: Omit<TronAccount, 'id' | 'addedAt'>): Promise<TronAccount> => {
   console.log('Adding account:', account);
-  const response = await api.post('/tron-accounts', account);
+  const response = await api.post('/tron-accounts', account, { timeout: 120000 });
   return parseTronAccount(response.data);
 };
 

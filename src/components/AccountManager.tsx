@@ -20,6 +20,7 @@ const AccountManager: React.FC<AccountManagerProps> = ({
   const [showAddForm, setShowAddForm] = useState(false);
   const [showPrivateKey, setShowPrivateKey] = useState<string | null>(null);
   const [editingAccountId, setEditingAccountId] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     address: '',
     privateKey: '',
@@ -35,31 +36,32 @@ const AccountManager: React.FC<AccountManagerProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    if (editingAccountId) {
-      // Update existing account
-      await handleUpdateAccount();
-    } else {
-      // Add new account
-      // Validate address format (basic validation)
-      if (addMethod != 'cookie' && (!formData.address.includes('@') || !formData.address.includes('.'))) {
-        if (showToast) showToast('error', 'Email invalide. Veuillez entrer une adresse email valide.');
-        return;
-      }
+    try {
+      if (editingAccountId) {
+        // Update existing account
+        await handleUpdateAccount();
+      } else {
+        // Add new account
+        // Validate address format (basic validation)
+        if (addMethod != 'cookie' && (!formData.address.includes('@') || !formData.address.includes('.'))) {
+          if (showToast) showToast('error', 'Email invalide. Veuillez entrer une adresse email valide.');
+          return;
+        }
 
-      // Validate cookie if using cookie method
-      if (addMethod === 'cookie' && (!formData.cookie.trim() || !validateCookie(formData.cookie))) {
-        if (showToast) showToast('error', 'Cookie invalide. Veuillez entrer un cookie valide.');
-        return;
-      }
+        // Validate cookie if using cookie method
+        if (addMethod === 'cookie' && (!formData.cookie.trim() || !validateCookie(formData.cookie))) {
+          if (showToast) showToast('error', 'Cookie invalide. Veuillez entrer un cookie valide.');
+          return;
+        }
 
-      // Check if address already exists
-      if (accounts.some(acc => acc.address === formData.address)) {
-        if (showToast) showToast('error', 'Cet email existe déjà dans vos comptes.');
-        return;
-      }
+        // Check if address already exists
+        if (accounts.some(acc => acc.address === formData.address && acc.baseUrl === formData.baseUrl)) {
+          if (showToast) showToast('error', 'Cet email existe déjà dans vos comptes.');
+          return;
+        }
 
-      try {
         const today = new Date();
         const [minutes, seconds] = formData.lastClaim.split(':').map(Number);
         // Ajouter les minutes et secondes à la date actuelle
@@ -79,10 +81,18 @@ const AccountManager: React.FC<AccountManagerProps> = ({
         onAddAccount(newAccount);
         resetForm();
         if (showToast) showToast('success', 'Compte ajouté avec succès!');
-      } catch (error) {
-        if (showToast) showToast('error', 'L\'ajout du compte prend du temps que prevue. Rafraichir la page apres quelque minute.');
-        console.error('Failed to add account:', error);
       }
+    } catch (error: any) {
+      console.error('Failed to add account:', error);
+      
+      // Handle 400 errors with detailed error messages
+      if (error.response?.status === 400 && error.response?.data?.detail) {
+        if (showToast) showToast('error', error.response.data.detail);
+      } else {
+        if (showToast) showToast('error', 'L\'ajout du compte prend du temps que prevue. Rafraichir la page apres quelque minute.');
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
   const validateCookie = (cookie: string): boolean => {
@@ -121,9 +131,15 @@ const AccountManager: React.FC<AccountManagerProps> = ({
 
       resetForm();
       if (showToast) showToast('success', 'Compte mis à jour avec succès!');
-    } catch (error) {
-      if (showToast) showToast('error', 'Échec de la mise à jour du compte');
+    } catch (error: any) {
       console.error('Failed to update account:', error);
+      
+      // Handle 400 errors with detailed error messages
+      if (error.response?.status === 400 && error.response?.data?.detail) {
+        if (showToast) showToast('error', error.response.data.detail);
+      } else {
+        if (showToast) showToast('error', 'Échec de la mise à jour du compte');
+      }
     }
   };
 
@@ -382,8 +398,17 @@ const AccountManager: React.FC<AccountManagerProps> = ({
                 </div>
 
                 <div className="flex gap-2 flex-col md:flex-row">
-                  <button type="submit" className="btn btn-success">
-                    {editingAccountId ? (
+                  <button 
+                    type="submit" 
+                    className="btn btn-success"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                        {editingAccountId ? 'Mise à jour...' : 'Ajout en cours...'}
+                      </>
+                    ) : editingAccountId ? (
                       <>
                         <Edit size={18} className="mr-1" />
                         Mettre à jour le compte
@@ -399,6 +424,7 @@ const AccountManager: React.FC<AccountManagerProps> = ({
                     type="button"
                     className="btn btn-outline border-slate-300 text-slate-700 hover:bg-slate-100"
                     onClick={resetForm}
+                    disabled={isSubmitting}
                   >
                     Annuler
                   </button>
