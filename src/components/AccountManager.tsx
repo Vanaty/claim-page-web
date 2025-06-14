@@ -361,18 +361,18 @@ const AccountManager: React.FC<AccountManagerProps> = ({
                           <div>
                             <label className="form-label mb-0 block text-sm md:text-base">Activer le Game Auto</label>
                             <p className="text-slate-600 text-xs md:text-sm">
-                              Jeu lancé toutes les heures
+                              Jeu lancé toutes les heures si presence de STAMINA
                             </p>
                           </div>
                         </div>
                         
                         <div className="relative inline-flex items-center cursor-pointer">
                           <input 
-                            type="checkbox" 
-                            className="sr-only peer" 
-                            checked={formData.canGame === 1}
-                            onChange={(e) => handleToggleChange('canGame', e.target.checked)}
-                            id="game-toggle"
+                          type="checkbox" 
+                          className="sr-only peer" 
+                          checked={formData.canGame === 1}
+                          onChange={(e) => handleToggleChange('canGame', e.target.checked)}
+                          id="game-toggle"
                           />
                           <div className="w-9 md:w-11 h-5 md:h-6 bg-slate-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 md:after:h-5 after:w-4 md:after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                         </div>

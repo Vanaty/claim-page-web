@@ -5,6 +5,7 @@ import AccountCard from './AccountCard';
 import { motion } from 'framer-motion';
 import { fetchAccounts } from '../services/apiService';
 import { useUniqueData } from '../hooks/useUniqueData';
+import { parseTronAccount } from '../services/utils';
 
 interface DashboardProps {
   user: User;
@@ -42,6 +43,8 @@ const Dashboard: React.FC<DashboardProps> = ({ user, accounts, onUpdateAccounts 
         if (!isMounted) return; // Don't update if component unmounted
         
         try {
+          const canClaim = uniqueAccounts.some(acc => acc.nextClaim <= new Date());
+          if (!canClaim) return;
           const accounts = await fetchAccounts();
           const parsedAccounts = accounts.map(parseTronAccount);
           // Remove duplicates based on ID
