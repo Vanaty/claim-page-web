@@ -6,9 +6,10 @@ import { requestPasswordReset } from '../services/apiService';
 interface LoginFormProps {
   onLogin: (username: string, password: string) => void;
   onRegister: (username: string, email: string, password: string) => void;
+  onBack?: () => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, onBack }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -24,13 +25,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister }) => {
   } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit =  (e: React.FormEvent) => {
     e.preventDefault();
+    // Ajout d'un log pour debug
+    console.log('handleSubmit', { isLogin, formData });
     if (isLogin) {
       onLogin(formData.username, formData.password);
     } else {
       onRegister(formData.username, formData.email, formData.password);
-      setIsLogin(false);
     }
   };
 
@@ -193,6 +195,18 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister }) => {
               {!isLogin && (
                 <div className="mt-6 bg-blue-50 text-blue-800 rounded-lg p-3 text-sm">
                   🎁 Bonus d'inscription: <strong>50 jetons gratuits</strong>
+                </div>
+              )}
+
+              {onBack && (
+                <div className="mt-6 text-center">
+                  <button
+                    type="button"
+                    className="text-slate-400 hover:text-blue-700 underline text-xs"
+                    onClick={onBack}
+                  >
+                    Retour à l'accueil
+                  </button>
                 </div>
               )}
             </motion.div>

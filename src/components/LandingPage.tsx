@@ -56,6 +56,21 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLoginClick }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200">
+      {/* Header avec bouton Se connecter */}
+      <header className="bg-white shadow-md">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex items-center">
+            <Wallet className="text-blue-700 mr-2" size={24} />
+            <span className="font-bold text-xl text-blue-800">TronPick Auto-Claim</span>
+          </div>
+          <button
+            className="btn btn-outline-primary"
+            onClick={onLoginClick}
+          >
+            Se connecter
+          </button>
+        </div>
+      </header>
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="container mx-auto px-4 py-16 md:py-24">

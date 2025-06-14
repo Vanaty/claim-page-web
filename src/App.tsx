@@ -19,7 +19,7 @@ function App() {
   const [accounts, setAccounts] = useState<TronAccount[]>([]);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'accounts' | 'settings' | 'transfer' | 'admin'>('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [resetToken, setResetToken] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string>('user');
   const [showLoginForm, setShowLoginForm] = useState(false);
@@ -59,15 +59,25 @@ function App() {
         const savedUser = localStorage.getItem('tronpick_user');
         const token = localStorage.getItem('tronpick_token');
         if (savedUser && token) {
-          const userData = await fetchUser();
-          setUser(userData);
-          // Get user role from JWT token
-          const role = getRoleUser(token);
-          setUserRole(role);
-          
-          const accounts = await fetchAccounts();
-          const parsedAccounts = accounts.map(parseTronAccount);
-          setAccounts(parsedAccounts);
+          try {
+            const userData = await fetchUser();
+            console.log('Fetched user data:', userData);
+            setUser(userData);
+            // Get user role from JWT token
+            const role = getRoleUser(token);
+            setUserRole(role);
+
+            const accounts = await fetchAccounts();
+            const parsedAccounts = accounts.map(parseTronAccount);
+            setAccounts(parsedAccounts);
+          } catch (error) {
+            // Si fetchUser échoue, on nettoie le localStorage et on reste sur la page de login
+            console.error('fetchUser failed, clearing localStorage:', error);
+            localStorage.removeItem('tronpick_user');
+            localStorage.removeItem('tronpick_token');
+            setUser(null);
+            setShowLoginForm(true);
+          }
         }
       } catch (error) {
         console.error('Failed to load initial data:', error);
@@ -82,26 +92,25 @@ function App() {
     try {
       setIsLoading(true);
       const userData = await loginUser(username, password);
+      console.log('User data received:', userData); // Journal pour vérifier les données
       setUser(userData.user);
       localStorage.setItem('tronpick_user', JSON.stringify(userData.user));
       localStorage.setItem('tronpick_token', userData.token.access_token);
-      
-      // Get user role from JWT token
+      console.log('localStorage updated:', localStorage.getItem('tronpick_user'), localStorage.getItem('tronpick_token')); // Vérifiez le localStorage
+  
       const role = getRoleUser(userData.token.access_token);
       setUserRole(role);
-      
+  
       const accounts = await fetchAccounts();
       const parsedAccounts = accounts.map(parseTronAccount);
       setAccounts(parsedAccounts);
       showToast('success', 'Connexion réussie');
-      
-      // Redirigez vers le tableau de bord après la connexion
       setShowLoginForm(false);
       setActiveTab('dashboard');
     } catch (error) {
-      setShowLoginForm(true);
       console.error('Login failed:', error);
       showToast('error', 'Échec de la connexion. Veuillez vérifier vos identifiants.');
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
@@ -122,7 +131,6 @@ function App() {
       showToast('success', 'Inscription réussie. Bienvenue !');
     } catch (error) {
       console.error('Registration failed:', error);
-      setShowLoginForm(true);
       showToast('error', 'Échec de l\'inscription. Veuillez réessayer.');
     } finally {
       setIsLoading(false);
@@ -147,30 +155,6 @@ function App() {
     setAccounts(prev => prev.filter(acc => acc.id !== accountId));
   };
 
-  const updateAccountTokens = async (accountId: string, tokensUsed: number) => {
-    try {
-      const response: ClaimResult = await apiUpdateAccountTokens(accountId);
-      setAccounts(prev =>
-        prev.map(acc =>
-          acc.id === accountId
-            ? { 
-                ...acc, 
-                balance: acc.balance + (response.amount || 0), 
-                lastClaim: new Date(), 
-                nextClaim: response.nextClaimTime || new Date(Date.now() + 60 * 60 * 1000) 
-              }
-            : acc
-        )
-      );
-      if (user) {
-        setUser({ ...user, tokens: user.tokens - tokensUsed });
-      }
-    } catch (error) {
-      showToast('error', 'Échec de la mise à jour des jetons du compte. Veuillez réessayer.');
-      console.error('Failed to update account tokens:', error);
-    }
-  };
-
   const updateAccounts = (updatedAccounts: TronAccount[]) => {
     setAccounts(updatedAccounts.map(parseTronAccount));
   };
@@ -190,6 +174,10 @@ function App() {
     setShowLoginForm(true);
   };
 
+  const handleBackToLanding = () => {
+    setShowLoginForm(false);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -205,12 +193,12 @@ function App() {
     return <ResetPasswordForm token={resetToken} onSuccess={handleResetPasswordSuccess} />;
   }
 
-  if (!user && !showLoginForm) {
-    return <LandingPage onLoginClick={handleLoginClick} />;
+  if (showLoginForm) {
+    return <LoginForm  onLogin={handleLogin} onRegister={handleRegister} onBack={handleBackToLanding} />;
   }
 
-  if (showLoginForm) {
-    return <LoginForm onLogin={handleLogin} onRegister={handleRegister} />;
+  if (!user && !showLoginForm) {
+    return <LandingPage onLoginClick={handleLoginClick} />;
   }
 
   const toggleMobileMenu = () => {
