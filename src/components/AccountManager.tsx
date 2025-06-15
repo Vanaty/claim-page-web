@@ -97,8 +97,8 @@ const AccountManager: React.FC<AccountManagerProps> = ({
   };
   const validateCookie = (cookie: string): boolean => {
     // Basic validation for cookie format
-    // name=value; name2=value2; ...
-    const cookiePattern = /^[^=]+=[^;]+(; [^=]+=[^;]+)*$/;
+    // cookie_name1=value; name_2=value2; ...
+    const cookiePattern = /^[a-zA-Z0-9_]+=[^;]+(;[a-zA-Z0-9_]+=[^;]+)*$/;
     return cookiePattern.test(cookie.trim());
   }
   const handleUpdateAccount = async () => {
