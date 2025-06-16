@@ -76,6 +76,7 @@ const AccountManager: React.FC<AccountManagerProps> = ({
           timeZoneOffset: today.getTimezoneOffset() / -60,
           status: 'active',
           nextClaim: today,
+          canGame: formData.canGame,
           cookies: addMethod === 'cookie' ? formData.cookie : '',
         });
         onAddAccount(newAccount);
