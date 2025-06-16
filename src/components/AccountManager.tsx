@@ -153,8 +153,8 @@ const AccountManager: React.FC<AccountManagerProps> = ({
       lastClaim: '', // We don't prefill this
       proxy: accountToEdit.proxy || '',
       baseUrl: accountToEdit.baseUrl as BaseUrlOption || 'tronpick.io',
-      canGame: accountToEdit.canGame || 0,
-      cookie: '',
+      canGame: accountToEdit.canGame ?? 0,
+      cookie: accountToEdit.cookies || '',
       password: ''
     });
 
@@ -186,12 +186,15 @@ const AccountManager: React.FC<AccountManagerProps> = ({
     }));
   };
 
+
   // Handle toggle switch change
   const handleToggleChange = (name: string, checked: boolean) => {
     setFormData(prev => ({
       ...prev,
       [name]: checked ? 1 : 0
     }));
+    console.log(`Toggle ${name} changed to ${checked ? 'enabled' : 'disabled'}`);
+    console.log(formData);
   };
 
   const togglePrivateKeyVisibility = (accountId: string) => {
@@ -258,7 +261,7 @@ const AccountManager: React.FC<AccountManagerProps> = ({
                     <select
                       className="form-input"
                       value={addMethod}
-                      onChange={(e) => setAddMethod(e.target.value as 'cookie' | 'login')}
+                      onChange={(e) => {setAddMethod(e.target.value as 'cookie' | 'login');}}
                     >
                       <option value="cookie">Via Cookie</option>
                       <option value="login">Via Login</option>
@@ -366,7 +369,7 @@ const AccountManager: React.FC<AccountManagerProps> = ({
                   </div>
 
                   {/* Add canGame toggle for account update */}
-                  {editingAccountId && (
+                  {/* {editingAccountId && ( */}
                     <div>
                       <div className="flex items-center justify-between p-3 md:p-4 bg-blue-50 rounded-lg">
                         <div className="flex items-start flex-1">
@@ -389,11 +392,11 @@ const AccountManager: React.FC<AccountManagerProps> = ({
                           onChange={(e) => handleToggleChange('canGame', e.target.checked)}
                           id="game-toggle"
                           />
-                          <div className="w-9 md:w-11 h-5 md:h-6 bg-slate-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 md:after:h-5 after:w-4 md:after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                          <div onClick={(e) => handleToggleChange('canGame', formData.canGame !== 1)} className="w-9 md:w-11 h-5 md:h-6 bg-slate-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 md:after:h-5 after:w-4 md:after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                         </div>
                       </div>
                     </div>
-                  )}
+                  {/* )} */}
                 </div>
 
                 <div className="flex gap-2 flex-col md:flex-row">
