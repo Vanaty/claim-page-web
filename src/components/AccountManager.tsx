@@ -26,7 +26,7 @@ const AccountManager: React.FC<AccountManagerProps> = ({
     privateKey: '',
     balance: 0,
     lastClaim: '',
-    proxy: '',
+    proxy: 'http://129.151.178.48:8888',
     baseUrl: 'tronpick.io' as BaseUrlOption,
     canGame: 0,
     cookie: '',
