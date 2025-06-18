@@ -6,7 +6,7 @@ export async function onRequest({ request, env }) {
   }
 
   const url = new URL(request.url)
-  const backendUrl = `${env.VITE_API_BASE_URL}${url.pathname}${url.search}`
+  const backendUrl = `${env.VITE_API_BASE_URL}${url.pathname.replace('/api','')}${url.search}`
 
   const newRequest = new Request(backendUrl, {
     method: request.method,
