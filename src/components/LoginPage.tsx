@@ -14,9 +14,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, isLoading = false }) => 
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!acceptTerms) {
+      return;
+    }
     onLogin(formData.username, formData.password);
   };
 
@@ -93,10 +97,25 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, isLoading = false }) => 
               </div>
             </div>
 
-            <button 
-              type="submit" 
-              className="btn btn-primary w-full mt-6"
-              disabled={isLoading}
+            <div className="mt-4">
+              <label className="flex items-start space-x-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={acceptTerms}
+                  onChange={(e) => setAcceptTerms(e.target.checked)}
+                  className="mt-1 rounded border-slate-300 text-blue-600 focus:border-blue-500 focus:ring-blue-500"
+                  disabled={isLoading}
+                />
+                <span className="text-slate-600 leading-relaxed">
+                  J'utilise ce service à mes propres risques.
+                </span>
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              className={`btn w-full mt-6 ${acceptTerms ? 'btn-primary' : 'bg-slate-300 text-slate-500 cursor-not-allowed'}`}
+              disabled={isLoading || !acceptTerms}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
@@ -107,6 +126,12 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, isLoading = false }) => 
                 'Se connecter'
               )}
             </button>
+
+            {!acceptTerms && (
+              <p className="text-xs text-red-500 mt-2 text-center">
+                Vous devez accepter les conditions d'utilisation pour vous connecter
+              </p>
+            )}
           </form>
 
           <div className="mt-6 text-center space-y-3">
@@ -116,7 +141,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, isLoading = false }) => 
             >
               Pas de compte ? Créez-en un
             </Link>
-            
+
             <Link
               to="/forgot-password"
               className="text-sm text-slate-500 hover:text-slate-700 transition-colors block"

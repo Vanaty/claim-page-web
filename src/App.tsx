@@ -100,9 +100,9 @@ function App() {
       updateAccounts(parsedAccounts); // Use the callback to ensure uniqueness
       
       showToast('success', 'Connexion réussie. Bienvenue !');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login failed:', error);
-      showToast('error', 'Échec de la connexion. Veuillez vérifier vos identifiants.');
+      showToast('error', 'Échec de la connexion.'+ error.response?.data?.detail || 'Veuillez réessayer.');
     } finally {
       setIsLoading(false);
     }
