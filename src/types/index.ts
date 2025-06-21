@@ -18,9 +18,10 @@ export type BaseUrlOption =
   | 'suipick.io'
   | 'freetron.in'
   | 'freexrp.in'
-  | 'freexrp.in'
   | 'usdpick.io'
   | 'freetoncoin.in'
+  | 'freesui.in'
+  | 'freeshib.in'
   | 'freebnb.in';
 
 export interface TronAccount {
