@@ -15,7 +15,13 @@ export type BaseUrlOption =
   | 'solpick.io'
   | 'polpick.io'
   | 'tonpick.game'
-  | 'suipick.io';
+  | 'suipick.io'
+  | 'freetron.in'
+  | 'freexrp.in'
+  | 'freexrp.in'
+  | 'usdpick.io'
+  | 'freetoncoin.in'
+  | 'freebnb.in';
 
 export interface TronAccount {
   id: string;
@@ -68,4 +74,12 @@ export interface PasswordResetResponse {
 export interface PasswordChangeRequest {
   token: string;
   newPassword: string;
+}
+
+export interface SiteKey {
+  id?: string;
+  site_name: string;
+  site_key: string;
+  created_at?: Date;
+  updated_at?: Date;
 }

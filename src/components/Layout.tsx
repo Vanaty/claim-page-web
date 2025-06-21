@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Wallet, LogOut, Menu, X, TrendingUp, Plus, Send, Settings, ShieldAlert } from 'lucide-react';
+import { User, Wallet, LogOut, Menu, X, TrendingUp, Plus, Send, Settings, ShieldAlert, Key } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User as UserType } from '../types';
@@ -31,9 +31,13 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
     { path: '/settings', icon: Settings, label: 'Paramètres' },
   ];
 
-  if (userRole === 'admin') {
-    navItems.push({ path: '/admin', icon: ShieldAlert, label: 'Administration' });
-  }
+  const adminNavItems = [
+    { path: '/admin', icon: ShieldAlert, label: 'Comptes' },
+    { path: '/admin/sitekeys', icon: Key, label: 'Clés de Site' },
+  ];
+
+  // Combine nav items based on user role
+  const allNavItems = userRole === 'admin' ? [...navItems, ...adminNavItems] : navItems;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200">
@@ -116,7 +120,7 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
       {/* Tab Navigation */}
       <div className="container mx-auto px-4 py-6">
         <div className="flex overflow-x-auto md:overflow-visible space-x-2 md:space-x-4 pb-2 md:pb-0 mb-6">
-          {navItems.map((item) => {
+          {allNavItems.map((item) => {
             const Icon = item.icon;
             return (
               <Link

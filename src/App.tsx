@@ -15,6 +15,7 @@ import AccountManager from './components/AccountManager';
 import TokenTransfer from './components/TokenTransfer';
 import Setting from './components/Setting';
 import AdminPanel from './components/AdminPanel';
+import SiteKeyManager from './components/SiteKeyManager';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -273,10 +274,16 @@ function App() {
                     } 
                   />
                   {userRole === 'admin' && (
-                    <Route 
-                      path="/admin" 
-                      element={<AdminPanel showToast={showToast} />} 
-                    />
+                    <>
+                      <Route 
+                        path="/admin" 
+                        element={<AdminPanel showToast={showToast} />} 
+                      />
+                      <Route 
+                        path="/admin/sitekeys" 
+                        element={<SiteKeyManager showToast={showToast} />} 
+                      />
+                    </>
                   )}
                   <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>

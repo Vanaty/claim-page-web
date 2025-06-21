@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { User, TronAccount, LoginResponse, ClaimResult, TransferAlert, PasswordResetRequest, PasswordResetResponse, PasswordChangeRequest } from '../types';
+import { User, TronAccount, LoginResponse, ClaimResult, TransferAlert, PasswordResetRequest, PasswordResetResponse, PasswordChangeRequest, SiteKey } from '../types';
 import { parseTronAccount } from './utils';
 
 const api = axios.create({
@@ -96,4 +96,25 @@ export const resetPassword = async (token: string, newPassword: string): Promise
 export const fetchAllAccounts = async (): Promise<TronAccount[]> => {
   const response = await api.get('/admin/accounts');
   return response.data.map((account: any) => parseTronAccount(account));
+};
+
+// SiteKey API calls
+export const fetchSiteKeys = async (): Promise<SiteKey[]> => {
+  const response = await api.get('/admin/sitekeys');
+  return response.data;
+};
+
+export const createSiteKey = async (siteKey: Omit<SiteKey, 'id' | 'created_at' | 'updated_at'>): Promise<SiteKey> => {
+  const response = await api.post('/admin/sitekey', siteKey);
+  return response.data;
+};
+
+export const updateSiteKey = async (id: string, siteKey: Partial<SiteKey>): Promise<SiteKey> => {
+  siteKey.id = id; // Ensure the ID is included in the data
+  const response = await api.post(`/admin/sitekey`, siteKey);
+  return response.data;
+};
+
+export const deleteSiteKey = async (id: string): Promise<void> => {
+  await api.delete(`/admin/sitekey/${id}`);
 };
