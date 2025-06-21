@@ -354,10 +354,6 @@ const AccountManager: React.FC<AccountManagerProps> = ({
                       <option value="freetron.in">freetron.in</option>
                       <option value="freexrp.in">freexrp.in</option>
                       <option value="usdpick.io">usdpick.io</option>
-                      <option value="freetoncoin.in">freetoncoin.in</option>
-                      <option value="freebnb.in">freebnb.in</option>
-                      <option value="freesui.in">freesui.in</option>
-                      <option value="freeshib.in">freeshib.in</option>
                     </select>
                     <small className="text-slate-500 text-xs mt-1 block">Sélectionnez la plateforme pour ce compte</small>
                   </div>
