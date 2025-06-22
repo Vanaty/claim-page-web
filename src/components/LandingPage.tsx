@@ -430,7 +430,7 @@ const LandingPage: React.FC = () => {
             </div>
           </div>
           <div className="border-t border-slate-700 pt-4 md:pt-6 text-center text-slate-400 text-sm">
-            <p>&copy; {new Date().getFullYear()} Auto-Claim. Tous droits réservés.</p>
+            <p>&copy; {new Date().getFullYear()} Auto-Claim.</p>
           </div>
         </div>
       </footer>
