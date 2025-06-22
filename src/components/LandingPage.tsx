@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Wallet, Zap, Clock, Shield, ArrowRight, Users, ChevronDown, Mail, Facebook, Menu, X } from 'lucide-react';
+import { Wallet, Zap, Clock, Shield, ArrowRight, Users, ChevronDown, Menu, X } from 'lucide-react';
 
 const LandingPage: React.FC = () => {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
@@ -21,8 +21,8 @@ const LandingPage: React.FC = () => {
 
   const faqs = [
     {
-      question: "Qu'est-ce que TronPick Auto-Claim ?",
-      answer: "TronPick Auto-Claim est un service automatisé qui vous permet de réclamer vos récompenses sur les plateformes de la famille Pick (TronPick, LitePick, DogePick, etc.) sans avoir à le faire manuellement."
+      question: "Qu'est-ce qu'Auto-Claim ?",
+      answer: "Auto-Claim est un service automatisé qui vous permet de réclamer vos récompenses sur les plateformes de crypto-monnaies sans avoir à le faire manuellement."
     },
     {
       question: "Comment fonctionne l'auto-claim ?",
@@ -34,11 +34,7 @@ const LandingPage: React.FC = () => {
     },
     {
       question: "Combien de jetons sont nécessaires pour utiliser le service ?",
-      answer: "Le service consomme 1 jeton par réclamation automatique. Vous pouvez acheter des packs de jetons ou bénéficier de 50 jetons gratuits à l'inscription."
-    },
-    {
-      question: "Sur quelles plateformes fonctionne l'Auto-Claim ?",
-      answer: "Notre service est compatible avec TronPick.io, LitePick.io, DogePick.io, BnbPick.io, SolPick.io, PolPick.io, TonPick.game et SuiPick.io."
+      answer: "Le service consomme 1 jeton par réclamation automatique. Vous pouvez acheter des packs de jetons ou bénéficier de 24 jetons gratuits à l'inscription."
     }
   ];
 
@@ -69,7 +65,7 @@ const LandingPage: React.FC = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2">
               <Wallet className="text-blue-700" size={28} />
-              <span className="font-bold text-xl text-slate-900">TronPick Auto-Claim</span>
+              <span className="font-bold text-xl text-slate-900">Auto-Claim</span>
             </Link>
 
             {/* Desktop Navigation */}
@@ -82,9 +78,6 @@ const LandingPage: React.FC = () => {
               </a>
               <a href="#faq" className="text-slate-600 hover:text-blue-700 transition-colors">
                 FAQ
-              </a>
-              <a href="mailto:eritiavina31@gmail.com" className="text-slate-600 hover:text-blue-700 transition-colors">
-                Contact
               </a>
             </nav>
 
@@ -151,13 +144,6 @@ const LandingPage: React.FC = () => {
                 >
                   FAQ
                 </a>
-                <a 
-                  href="mailto:eritiavina31@gmail.com" 
-                  className="text-slate-600 hover:text-blue-700 transition-colors px-2 py-1"
-                  onClick={closeMobileMenu}
-                >
-                  Contact
-                </a>
                 <div className="flex flex-col space-y-3 pt-4 border-t border-slate-200">
                   <Link 
                     to="/login" 
@@ -191,10 +177,10 @@ const LandingPage: React.FC = () => {
               transition={{ duration: 0.5 }}
             >
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-4">
-                Automatisez vos gains sur <span className="text-blue-700">TronPick</span>
+                Automatisez vos gains avec <span className="text-blue-700">Auto-Claim</span>
               </h1>
               <p className="text-lg md:text-xl text-slate-600 mb-6 md:mb-8">
-                Réclamez automatiquement vos récompenses sur les plateformes de la famille Pick sans effort. Plus besoin de connexions manuelles.
+                Réclamez automatiquement vos récompenses sur vos plateformes préférées sans effort. Plus besoin de connexions manuelles.
               </p>
               <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
                 <Link 
@@ -269,7 +255,7 @@ const LandingPage: React.FC = () => {
       <section id="features" className="bg-white py-12 md:py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 md:mb-16">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 mb-4">Pourquoi choisir TronPick Auto-Claim</h2>
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 mb-4">Pourquoi choisir Auto-Claim</h2>
             <p className="text-base md:text-lg text-slate-600 max-w-2xl mx-auto">
               Notre plateforme vous fait économiser du temps et maximiser vos gains sans effort.
             </p>
@@ -440,32 +426,11 @@ const LandingPage: React.FC = () => {
           <div className="flex flex-col md:flex-row justify-between items-center mb-6 md:mb-8">
             <div className="flex items-center mb-4 md:mb-0">
               <Wallet className="text-blue-400 mr-2" size={24} />
-              <span className="font-bold text-lg md:text-xl">TronPick Auto-Claim</span>
-            </div>
-            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-6">
-              <a 
-                href="https://web.facebook.com/61577170414462" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center justify-center sm:justify-start hover:text-blue-400 transition-colors"
-              >
-                <Facebook size={20} className="mr-2" />
-                <span>Facebook</span>
-              </a>
-              <a 
-                href="mailto:eritiavina31@gmail.com" 
-                className="flex items-center justify-center sm:justify-start hover:text-blue-400 transition-colors"
-              >
-                <Mail size={20} className="mr-2" />
-                <span>Contact</span>
-              </a>
+              <span className="font-bold text-lg md:text-xl">Auto-Claim</span>
             </div>
           </div>
           <div className="border-t border-slate-700 pt-4 md:pt-6 text-center text-slate-400 text-sm">
-            <p>&copy; {new Date().getFullYear()} TronPick Auto-Claim. Tous droits réservés.</p>
-            <p className="mt-2">
-              Email: <a href="mailto:eritiavina31@gmail.com" className="text-blue-400 hover:underline">eritiavina31@gmail.com</a>
-            </p>
+            <p>&copy; {new Date().getFullYear()} Auto-Claim. Tous droits réservés.</p>
           </div>
         </div>
       </footer>

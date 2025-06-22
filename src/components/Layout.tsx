@@ -48,7 +48,7 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
             {/* Logo */}
             <Link to="/dashboard" className="flex items-center">
               <Wallet className="text-blue-700 mr-2" size={24} />
-              <span className="font-bold text-xl text-blue-800">TronPick Auto-Claim</span>
+              <span className="font-bold text-xl text-blue-800">Auto-Claim</span>
             </Link>
             
             {/* Desktop Navigation */}

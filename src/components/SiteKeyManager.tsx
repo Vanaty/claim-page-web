@@ -93,14 +93,14 @@ const SiteKeyManager: React.FC<SiteKeyManagerProps> = ({ showToast }) => {
     setShowForm(true);
   };
 
-  const handleDelete = async (id: string, siteName: string) => {
+  const handleDelete = async (siteName: string) => {
     if (!window.confirm(`Êtes-vous sûr de vouloir supprimer la clé pour "${siteName}" ?`)) {
       return;
     }
 
     try {
-      await deleteSiteKey(id);
-      setSiteKeys(prev => prev.filter(sk => sk.id !== id));
+      await deleteSiteKey(siteName);
+      setSiteKeys(prev => prev.filter(sk => sk.site_name !== siteName));
       if (showToast) {
         showToast('success', 'Clé de site supprimée avec succès');
       }
@@ -347,7 +347,7 @@ const SiteKeyManager: React.FC<SiteKeyManagerProps> = ({ showToast }) => {
                     </button>
                     <button
                       className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-full transition-colors"
-                      onClick={() => siteKey.id && handleDelete(siteKey.id, siteKey.site_name)}
+                      onClick={() => handleDelete(siteKey.site_name)}
                       title="Supprimer"
                     >
                       <Trash2 size={16} />

@@ -115,6 +115,6 @@ export const updateSiteKey = async (id: string, siteKey: Partial<SiteKey>): Prom
   return response.data;
 };
 
-export const deleteSiteKey = async (id: string): Promise<void> => {
-  await api.delete(`/admin/sitekey/${id}`);
+export const deleteSiteKey = async (site_name: string): Promise<void> => {
+  await api.delete(`/admin/sitekey/${site_name}`);
 };
