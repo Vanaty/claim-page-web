@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { User, TronAccount, LoginResponse, ClaimResult, TransferAlert, PasswordResetRequest, PasswordResetResponse, PasswordChangeRequest, SiteKey } from '../types';
+import { User, TronAccount,AccountHistory, LoginResponse, ClaimResult, TransferAlert, PasswordResetRequest, PasswordResetResponse, PasswordChangeRequest, SiteKey } from '../types';
 import { parseTronAccount } from './utils';
 
 const api = axios.create({
@@ -78,8 +78,16 @@ export const transferTokens = async (recipientId: string, amount: number): Promi
 
 export const updateAccount = async (accountId: string, accountData: Partial<TronAccount>): Promise<TronAccount> => {
   accountData.id = accountId; // Ensure the account ID is included in the data
-  const response = await api.put(`/tron-accounts`, accountData);
+  const response = await api.put(`/tron-accounts/${accountId}`, accountData);
   return parseTronAccount(response.data);
+};
+
+export const fetchAccountHistory = async (accountId: string): Promise<AccountHistory[]> => {
+  const response = await api.get(`/tron-accounts/${accountId}/history`);
+  return response.data.map((entry: any) => ({
+    ...entry,
+    date: new Date(entry.date + "Z")
+  }));
 };
 
 export const requestPasswordReset = async (email: string): Promise<PasswordResetResponse> => {

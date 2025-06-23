@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Wallet, Clock, TrendingUp, Zap, Globe } from 'lucide-react';
+import { Wallet, Clock, TrendingUp, Zap, Globe, BarChart3, ChevronDown, ChevronUp } from 'lucide-react';
 import { TronAccount } from '../types';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import AccountHistoryChart from './AccountHistoryChart';
 
 interface AccountCardProps {
   account: TronAccount;
@@ -14,6 +15,7 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, onClaim, canClaim, s
   const [timeLeft, setTimeLeft] = useState<string>('');
   const [canClaimNow, setCanClaimNow] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
   useEffect(() => {
     const updateTimer = () => {
@@ -87,10 +89,10 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, onClaim, canClaim, s
       className="glass-card h-full overflow-hidden"
       whileHover={{ scale: 1.02 }}
       transition={{ duration: 0.2 }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="p-5">
+      <div className="p-4">
         <div className="flex justify-between items-start mb-4">
           <div>
             <div className="flex items-center mb-1">
@@ -164,7 +166,37 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, onClaim, canClaim, s
             Dernier claim: {new Date(account.lastClaim).toLocaleString('fr-FR')}
           </div>
         )}
+        
+        {/* History Toggle Button */}
+        <button
+          onClick={() => setShowHistory(!showHistory)}
+          className="w-full mt-3 py-2 text-xs text-slate-600 hover:text-slate-800 hover:bg-slate-50 rounded-lg flex items-center justify-center transition-colors"
+        >
+          <BarChart3 size={14} className="mr-2" />
+          {showHistory ? 'Masquer l\'historique' : 'Voir l\'historique'}
+          {showHistory ? <ChevronUp size={14} className="ml-1" /> : <ChevronDown size={14} className="ml-1" />}
+        </button>
       </div>
+
+      {/* History Chart Section */}
+      <AnimatePresence>
+        {showHistory && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="border-t border-slate-100 overflow-hidden"
+          >
+            <div className="p-4">
+              <AccountHistoryChart 
+                accountId={account.id}
+                accountAddress={account.address}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

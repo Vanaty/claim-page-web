@@ -41,6 +41,14 @@ export interface TronAccount {
   cookies?: string;
 }
 
+// Add new interface for account history
+export interface AccountHistory {
+  date: Date;
+  balance: number;
+  claimAmount?: number;
+  action: 'claim' | 'balance_update' | 'game';
+}
+
 export interface ClaimResult {
   success: boolean;
   amount?: number;

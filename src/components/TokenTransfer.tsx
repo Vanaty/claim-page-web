@@ -158,8 +158,11 @@ const TokenTransfer: React.FC<TokenTransferProps> = ({ user, onTokensTransferred
         
         <div className="mt-4 bg-blue-50 p-4 rounded-lg">
           <h4 className="font-medium text-blue-700 mb-2">Comment ça marche ?</h4>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-slate-600 mb-2">
             Les transferts de jetons sont instantanés et irréversibles. Assurez-vous que l'ID du destinataire est correct avant de confirmer le transfert.
+          </p>
+          <p className="text-sm text-slate-600 font-medium text-orange-600">
+            ⚠️ Note : Les bonus ne peuvent pas être transférés
           </p>
         </div>
       </div>
