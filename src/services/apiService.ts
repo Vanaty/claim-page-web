@@ -126,3 +126,26 @@ export const updateSiteKey = async (id: string, siteKey: Partial<SiteKey>): Prom
 export const deleteSiteKey = async (site_name: string): Promise<void> => {
   await api.delete(`/admin/sitekey/${site_name}`);
 };
+
+export const createPayment = async (tokenPackageId: string, amount: number): Promise<any> => {
+  const response = await api.post('/payment/create', { 
+    'package_id': tokenPackageId, 
+    amount
+  });
+  return response.data;
+};
+
+export const getTokenPackages = async (): Promise<any[]> => {
+  const response = await api.get('payment/packages');
+  return response.data;
+};
+
+export const checkPaymentStatus = async (orderId: string): Promise<any> => {
+  const response = await api.get(`/payment/verify/${orderId}`);
+  return response.data;
+};
+
+export const getUserPaymentHistory = async (): Promise<any[]> => {
+  const response = await api.get('/payment/history');
+  return response.data;
+}
