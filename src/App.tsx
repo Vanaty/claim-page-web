@@ -16,6 +16,9 @@ import TokenTransfer from './components/TokenTransfer';
 import Setting from './components/Setting';
 import AdminPanel from './components/AdminPanel';
 import SiteKeyManager from './components/SiteKeyManager';
+import TokenPurchase from './components/TokenPurchase';
+import PaymentSuccess from './components/PaymentSuccess';
+import SupportContact from './components/SupportContact';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -156,6 +159,12 @@ function App() {
     }
   };
 
+  const handleTokenPurchase = (amount: number) => {
+    if (user) {
+      setUser({ ...user, tokens: user.tokens + amount });
+    }
+  };
+
   const handleResetPasswordSuccess = () => {
     setResetToken(null);
     showToast('success', 'Mot de passe réinitialisé avec succès');
@@ -223,6 +232,10 @@ function App() {
             )
           } 
         />
+        <Route 
+          path="/support" 
+          element={<SupportContact showToast={showToast} />} 
+        />
 
         {/* Protected routes */}
         <Route 
@@ -268,10 +281,24 @@ function App() {
                     } 
                   />
                   <Route 
+                    path="/buy-tokens" 
+                    element={
+                      <TokenPurchase
+                        user={user}
+                        onTokensPurchased={handleTokenPurchase}
+                        showToast={showToast}
+                      />
+                    } 
+                  />
+                  <Route 
                     path="/settings" 
                     element={
                       <Setting user={user} showToast={showToast} />
                     } 
+                  />
+                  <Route 
+                    path="/support" 
+                    element={<SupportContact showToast={showToast} />} 
                   />
                   {userRole === 'admin' && (
                     <>
@@ -285,6 +312,7 @@ function App() {
                       />
                     </>
                   )}
+                  <Route path="/payment/success/:orderId" element={<PaymentSuccess />} />
                   <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
               </Layout>
