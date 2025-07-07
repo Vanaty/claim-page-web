@@ -35,6 +35,10 @@ const LandingPage: React.FC = () => {
     {
       question: "Combien de jetons sont nécessaires pour utiliser le service ?",
       answer: "Le service consomme 1 jeton par réclamation automatique. Vous pouvez acheter des packs de jetons ou bénéficier de 24 jetons gratuits à l'inscription."
+    },
+    {
+      question: "Comment acheter des jetons ?",
+      answer: "Vous pouvez acheter des jetons directement depuis notre plateforme en utilisant des crypto-monnaies populaires comme TRX, USDT ou BTC. Nous proposons différents packs adaptés à vos besoins."
     }
   ];
 
@@ -79,6 +83,9 @@ const LandingPage: React.FC = () => {
               <a href="#faq" className="text-slate-600 hover:text-blue-700 transition-colors">
                 FAQ
               </a>
+              <Link to="/support" className="text-slate-600 hover:text-blue-700 transition-colors">
+                Support
+              </Link>
             </nav>
 
             {/* Desktop Auth Buttons */}
@@ -144,6 +151,13 @@ const LandingPage: React.FC = () => {
                 >
                   FAQ
                 </a>
+                <Link 
+                  to="/support" 
+                  className="text-slate-600 hover:text-blue-700 transition-colors px-2 py-1"
+                  onClick={closeMobileMenu}
+                >
+                  Support
+                </Link>
                 <div className="flex flex-col space-y-3 pt-4 border-t border-slate-200">
                   <Link 
                     to="/login" 
@@ -206,13 +220,13 @@ const LandingPage: React.FC = () => {
             >
               <div className="glass-card p-4 md:p-6 rounded-xl shadow-xl transform rotate-1 max-w-md mx-auto md:max-w-none">
                 <div className="bg-blue-700 rounded-lg p-4 text-white text-center mb-4">
-                  <Wallet size={32} md:size={40} className="mx-auto mb-2" />
+                  <Wallet size={32} className="mx-auto mb-2 md:w-10 md:h-10" />
                   <h3 className="text-lg md:text-xl font-semibold">Système Auto-Claim</h3>
                 </div>
                 <div className="space-y-3 md:space-y-4">
                   <div className="flex items-center">
                     <div className="bg-green-100 p-2 rounded-full flex-shrink-0">
-                      <Zap size={16} md:size={18} className="text-green-600" />
+                      <Zap size={18} className="text-green-600" />
                     </div>
                     <div className="ml-3 flex-1 min-w-0">
                       <span className="font-medium text-slate-800 text-sm md:text-base">Claim automatique</span>
