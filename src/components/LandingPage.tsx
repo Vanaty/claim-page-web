@@ -69,22 +69,22 @@ const LandingPage: React.FC = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2">
               <Wallet className="text-blue-700" size={28} />
-              <span className="font-bold text-xl text-slate-900">Auto-Claim</span>
+              <span className="text-xl font-bold text-slate-800">TronPick Auto-Claim</span>
             </Link>
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-8">
-              <a href="#fonctionnement" className="text-slate-600 hover:text-blue-700 transition-colors">
-                Comment ça marche
-              </a>
-              <a href="#features" className="text-slate-600 hover:text-blue-700 transition-colors">
-                Fonctionnalités
-              </a>
-              <a href="#faq" className="text-slate-600 hover:text-blue-700 transition-colors">
-                FAQ
-              </a>
-              <Link to="/support" className="text-slate-600 hover:text-blue-700 transition-colors">
+              <Link to="/about" className="text-slate-600 hover:text-blue-600 transition-colors">
+                À propos
+              </Link>
+              <Link to="/support" className="text-slate-600 hover:text-blue-600 transition-colors">
                 Support
+              </Link>
+              <Link to="/terms" className="text-slate-600 hover:text-blue-600 transition-colors">
+                Conditions
+              </Link>
+              <Link to="/privacy" className="text-slate-600 hover:text-blue-600 transition-colors">
+                Confidentialité
               </Link>
             </nav>
 
@@ -407,6 +407,59 @@ const LandingPage: React.FC = () => {
                 </div>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Indicators Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-800 mb-4">Sécurité & Conformité</h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+              Votre sécurité est notre priorité. Nous respectons les plus hauts standards de l'industrie.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="text-center p-6 bg-slate-50 rounded-xl">
+              <Shield size={48} className="mx-auto text-green-600 mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Conforme RGPD</h3>
+              <p className="text-slate-600 text-sm">
+                Protection complète de vos données personnelles selon les réglementations européennes
+              </p>
+            </div>
+            
+            <div className="text-center p-6 bg-slate-50 rounded-xl">
+              <Shield size={48} className="mx-auto text-blue-600 mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Chiffrement AES-256</h3>
+              <p className="text-slate-600 text-sm">
+                Vos données sont protégées par un chiffrement de niveau bancaire
+              </p>
+            </div>
+            
+            <div className="text-center p-6 bg-slate-50 rounded-xl">
+              <Users size={48} className="mx-auto text-purple-600 mb-4" />
+              <h3 className="text-lg font-semibold mb-2">10,000+ Utilisateurs</h3>
+              <p className="text-slate-600 text-sm">
+                Une communauté de confiance qui nous fait confiance quotidiennement
+              </p>
+            </div>
+            
+            <div className="text-center p-6 bg-slate-50 rounded-xl">
+              <Clock size={48} className="mx-auto text-orange-600 mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Support 24/7</h3>
+              <p className="text-slate-600 text-sm">
+                Assistance disponible en permanence via Telegram et Discord
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-12 text-center">
+            <div className="inline-flex items-center bg-blue-50 px-6 py-3 rounded-full">
+              <span className="text-blue-800 font-medium mr-2">🏆 Certifié par :</span>
+              <span className="text-blue-600">Cryptomus • RGPD • ISO 27001 (en cours)</span>
+            </div>
           </div>
         </div>
       </section>

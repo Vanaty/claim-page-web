@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CreditCard, Package, Check, AlertCircle, Clock, RefreshCw, History, ChevronDown, ChevronUp } from 'lucide-react';
+import { CreditCard, Package, Check, AlertCircle, Clock, RefreshCw, History, ChevronDown, ChevronUp, Link } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { createPayment, getTokenPackages, checkPaymentStatus,getUserPaymentHistory } from '../services/apiService';
 import { User } from '../types';
@@ -111,7 +111,7 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
             setCheckingPayment(true);
             const result = await checkPaymentStatus(paymentData.payment_id);
 
-            if (result.status === 'paid' || result.status === 'confirmed') {
+            if (result.status === 'paid' || result.status === 'confirmed' || result.status === 'completed') {
                 setPaymentStatus('completed');
                 onTokensPurchased(selectedPackage?.tokens || 0);
                 if (showToast) {
@@ -486,7 +486,7 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
 
             <div className="mt-8 glass-card p-6">
                 <h4 className="font-semibold text-slate-800 mb-4">Paiement sécurisé avec Cryptomus</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-600">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-600 mb-6">
                     <div className="flex items-start">
                         <Check size={16} className="text-green-600 mr-2 mt-0.5 flex-shrink-0" />
                         <span>Accepte Bitcoin, Ethereum, USDT et plus de 20 cryptomonnaies</span>
@@ -503,6 +503,25 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
                         <Check size={16} className="text-green-600 mr-2 mt-0.5 flex-shrink-0" />
                         <span>Support client 24/7</span>
                     </div>
+                    <div className="flex items-start">
+                        <Check size={16} className="text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span>Processeur de paiement certifié PCI DSS</span>
+                    </div>
+                    <div className="flex items-start">
+                        <Check size={16} className="text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                        <span>Conformité anti-blanchiment (AML/KYC)</span>
+                    </div>
+                </div>
+
+                <div className="bg-blue-50 p-4 rounded-lg text-sm">
+                    <h5 className="font-semibold text-blue-800 mb-2">Informations importantes :</h5>
+                    <ul className="list-disc pl-5 text-blue-700 space-y-1">
+                        <li>TronPick Auto-Claim SAS - SIRET: 12345678901234</li>
+                        <li>Paiements traités par Cryptomus (processeur certifié)</li>
+                        <li>Politique de remboursement : voir nos <Link to="/terms" className="underline">conditions d'utilisation</Link></li>
+                        <li>Support disponible : support@tronpick-autoclaim.com</li>
+                        <li>Les jetons sont crédités instantanément après confirmation</li>
+                    </ul>
                 </div>
             </div>
         </div>

@@ -19,6 +19,10 @@ import SiteKeyManager from './components/SiteKeyManager';
 import TokenPurchase from './components/TokenPurchase';
 import PaymentSuccess from './components/PaymentSuccess';
 import SupportContact from './components/SupportContact';
+import TermsOfService from './components/TermsOfService';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import AboutUs from './components/AboutUs';
+import Footer from './components/Footer';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -36,7 +40,6 @@ function App() {
     const id = Date.now().toString();
     setToasts(prev => [...prev, { id, type, message, onClose: removeToast }]);
 
-    // Auto-remove toast after 5 seconds
     setTimeout(() => {
       removeToast(id);
     }, 5000);
@@ -49,7 +52,6 @@ function App() {
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        // Check if there's a password reset token in the URL
         const urlParams = new URLSearchParams(window.location.search);
         const tokenR = urlParams.get('reset-token');
         if (tokenR) {
@@ -186,7 +188,7 @@ function App() {
   }
 
   return (
-    <>
+    <div className="App min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Toast Container */}
       <ToastContainer toasts={toasts} />
       
@@ -236,6 +238,9 @@ function App() {
           path="/support" 
           element={<SupportContact showToast={showToast} />} 
         />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/about" element={<AboutUs />} />
 
         {/* Protected routes */}
         <Route 
@@ -322,7 +327,10 @@ function App() {
           } 
         />
       </Routes>
-    </>
+
+      {/* Add Footer */}
+      <Footer />
+    </div>
   );
 }
 
