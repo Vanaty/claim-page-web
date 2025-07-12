@@ -463,44 +463,6 @@ const LandingPage: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* Call to Action */}
-      <section className="bg-blue-700 py-12 md:py-16 text-white relative overflow-hidden">
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center max-w-3xl mx-auto">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 md:mb-6">
-              Prêt à automatiser vos réclamations ?
-            </h2>
-            <p className="text-lg md:text-xl text-blue-100 mb-6 md:mb-8">
-              Rejoignez des centaines d'utilisateurs qui ont déjà automatisé leurs réclamations et qui gagnent plus sans effort supplémentaire.
-            </p>
-            <Link 
-              to="/register"
-              className="bg-white text-blue-700 hover:bg-blue-50 transition-colors px-6 md:px-8 py-3 md:py-4 rounded-lg font-bold text-base md:text-lg inline-block"
-            >
-              Commencer gratuitement
-            </Link>
-          </div>
-        </div>
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 right-0 bottom-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iLjUiPjxwYXRoIGQ9Ik0zNiAxOGMxLjIyOCAwIDIuNDQyLS40MDggMy42NzItMS4yMjUgMy4yNC0xLjg5IDMuNjQtOS4zMjUgMy42NC0xNi43NzUgMCAwIDAgNS41IDIuMjUgNS41czIuMjUuMjI2IDIuMjUtMS9jMC0uNzEyLjY3LTEuNDU3IDEuMjQ3LTEuOTgyQzUwLjc2OC45MDYgNTIuNSAwIDUyLjUgMCA1Mi41IDAgNTAuNzY4LjkwNiA0OS4wNTkgMi41MThjLjU3Ny41MjUgMS4yNDYgMS4yNyAxLjI0NiAxLjk4MiAwIDEuMjI2IDAgMS41IDIuMjUgMS41czIuMjUtNS41IDIuMjUtNS41YzAgNy40NS40IDEzLjg4NSAzLjY0IDE2Ljc3NUMzOS41NTkgMTMuODg1IDQwIDcuNDUgNDAgMGMwIDAgMCA1LjUgMi4yNSA1LjVTNDQuNS41IDQ0LjUuNWMwLTIgMS41LTMgMS41LTMgMCAwLTEuNSAxLTEuNSAzczAgMi41IDIuMjUgMi41UzQ5IC41IDQ5IC41YzAtMi45LTIuNS00LjUtMi41LTQuNSAwIDAtMS40MDQuNTI0LTIuMzgyIDEuNTI2QzQ0Ljc0MyAxLjQ1IDQ1LjUgNS41IDQ1LjUgNS41YzAgNy40NS40IDEzLjg4NSAzLjY0IDE2Ljc3NUM0NS4zMTYgMTkuMDkyIDQzIDIxLjQ1IDQzIDI0LjVjMCA0Ljk3IDQuMDMgOSA5IDlzOS00LjAzIDktOWMwLTIuOTUzLTEuNDI0LTUuNTc0LTMuNjI3LTcuMjAzIDMuMzcyLTIuNzUzIDMuNjI3LTguOTc2IDMuNjI3LTE2LjI5NyAwIDAgMCA1LjUgMi4yNSA1LjVTNjUuNTcgMSA2NS41Ljc1YzAgMC0xLjUgMS4yNS0xLjUgMy4yNXMwIDIuNSAyLjI1IDIuNSA2LjUtMiA2LjUtNCAwLS41IDAtLjVTNjcuNy4yNyA2MC4zNzIgMi4wOTdjLjU3OC41MjUgMS4yNDggMS4yNyAxLjI0OCAxLjk4MiAwIDEuMjI2IDAgMS41IDIuMjUgMS41czIuMjUtNS41IDIuMjUtNS41YzAgNy40NS40IDEzLjg4NSAzLjY0IDE2Ljc3NUM2Ni41NTggMTMuODg1IDY3IDcuNDUgNjcgMGMwIDAgMCA1LjUgMi4yNSA1LjVTNzEuNS4yNSA3MS41LjI1YzAtMiAxLjUtMyAxLjUtMyAwIDAtMS41IDEtMS41IDNzMCAyLjUgMi4yNSAyLjVTNzYgLjI1IDc2IC4yNWMwLTIuOS0yLjUtNC41LTIuNS00LjUgMCAwLTEuNDA1LjUyNC0yLjM4MiAxLjUyNkM3MS43NDIgMS40NSA3Mi41IDUuNSA3Mi41IDUuNWMwIDcuNDUuNCAxMy44ODUgMy42NCAxNi43NzVBOC45NzggOC45NzggMCAwIDAgNzMgMzFjMCA0Ljk3IDQuMDMgOSA5IDlzOS00LjAzIDktOWMwLTQuMDk2LTIuNzQ4LTcuNTQ1LTYuNS04LjYyNSAzLjA5NS0zLjM4OCAzLjUtOS45NjkgMy41LTE2Ljg3NCAwIDAgMCA1LjUgMi4yNSA1LjVTOTIuNSAxIDkyLjUuNzVjMCAwLTEuNSAxLjI1LTEuNSAzLjI1czAgMi41IDIuMjUgMi41IDQuMjUtMS41IDQuMjUtMS41di0xYzAtMi0yLTMtMi0zIDAgMC0xLjQwNC41MjQtMi4zODIgMS41MjZDOTMuNzQzIDEuNDUgOTQuNSA1LjUgOTQuNSA1LjVjMCA3LjQ1LjQgMTMuODg1IDMuNjQgMTYuNzc1QTguOTM5IDguOTM5IDAgMCAwIDk2IDE4YzQuOTcgMCA5LTQuMDMgOS05cy00LjAzLTktOS05Yy0yLjk1MyAwLTUuNTczIDEuNDI0LTcuMjAzIDMuNjI3QzgxLjA0NiA3LjczMyA3Mi45NjggOSA2NiA5IDU5LjEwMyA5IDUxLjIyNCA4LjI0MyA0NC4yOTcgMy42MjcgNDIuNTc0IDEuMzcgMzkuODU1IDAgMzYgMHptMjEtOWM0LjQgMCA4IDMuNiA4IDhzLTMuNiA4LTggOC04LTMuNi04LThIMzZjMCA0LjQgMy42IDggOCA4czgtMy42IDgtOGgtNGMwIDIuMi0xLjggNC00IDRzLTQtMS44LTQtNC0xLjgtNC00LTQtNCAxLjgtNCA0YzAgMi4yIDEuOCA0IDQgNHM0LTEuOCA0LTRoLTJzLjMgMiAyIDJjMiAwIDItMiAyLTIgMC0xLjEuOS0yIDItMnMyIC45IDIgMiAwIDItMiAyYy0xLjcgMC0yLTItMi0yaC0yYzAgMi4yIDEuOCA0IDQgNHM0LTEuOCA0LTQtMS44LTQtNC00LTQgMS44LTQgNGMwIDEuMS0uOSAyLTIgMnMtMi0uOS0yLTJjMC0yLjItMS44LTQtNC00cy00IDEuOC00IDRINDNjMC0zLjMtMi43LTYtNi02cy02IDIuNy02IDZoLTRjMC00LjQgMy42LTggOC04aDIyeiIvPjwvZz48L2c+PC9zdmc+')] bg-center"></div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-slate-900 text-white py-8 md:py-10">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center mb-6 md:mb-8">
-            <div className="flex items-center mb-4 md:mb-0">
-              <Wallet className="text-blue-400 mr-2" size={24} />
-              <span className="font-bold text-lg md:text-xl">Auto-Claim</span>
-            </div>
-          </div>
-          <div className="border-t border-slate-700 pt-4 md:pt-6 text-center text-slate-400 text-sm">
-            <p>&copy; {new Date().getFullYear()} Auto-Claim.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

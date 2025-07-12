@@ -92,3 +92,12 @@ export interface SiteKey {
   created_at?: Date;
   updated_at?: Date;
 }
+
+export interface SupportedCurrency {
+  code: string;
+  name: string;
+  network: string;
+  rate: number; // Taux de change par rapport à USD
+  icon?: string;
+  fees?: number;
+}

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { User, TronAccount,AccountHistory, LoginResponse, ClaimResult, TransferAlert, PasswordResetRequest, PasswordResetResponse, PasswordChangeRequest, SiteKey } from '../types';
+import { User, TronAccount,AccountHistory, LoginResponse, ClaimResult, TransferAlert, PasswordResetRequest, PasswordResetResponse, PasswordChangeRequest, SiteKey, SupportedCurrency } from '../types';
 import { parseTronAccount } from './utils';
 
 const api = axios.create({
@@ -127,25 +127,30 @@ export const deleteSiteKey = async (site_name: string): Promise<void> => {
   await api.delete(`/admin/sitekey/${site_name}`);
 };
 
-export const createPayment = async (tokenPackageId: string, amount: number): Promise<any> => {
-  const response = await api.post('/payment/create', { 
-    'package_id': tokenPackageId, 
-    amount
+export const createPayment = async (tokenPackageId: string, coin: string): Promise<any> => {
+  const response = await api.post('/payments/create', { 
+    'package_id': tokenPackageId,
+    'currency': coin
   });
   return response.data;
 };
 
 export const getTokenPackages = async (): Promise<any[]> => {
-  const response = await api.get('payment/packages');
+  const response = await api.get('payments/packages');
   return response.data;
 };
 
 export const checkPaymentStatus = async (orderId: string): Promise<any> => {
-  const response = await api.get(`/payment/verify/${orderId}`);
+  const response = await api.get(`/payments/verify/${orderId}`);
   return response.data;
 };
 
 export const getUserPaymentHistory = async (): Promise<any[]> => {
-  const response = await api.get('/payment/history');
+  const response = await api.get('/payments/history');
+  return response.data;
+}
+
+export const getSupportedCurrencies = async (): Promise<SupportedCurrency[]> => {
+  const response = await api.get('/payments/currencies');
   return response.data;
 }

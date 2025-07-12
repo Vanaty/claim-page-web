@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Shield, Eye, Lock, Calendar, Mail } from 'lucide-react';
+import { ArrowLeft, Shield, Eye, Lock, Calendar, Mail, UserCheck, Database, Cookie, Scale, Clock, Download } from 'lucide-react';
 
 const PrivacyPolicy: React.FC = () => {
   return (
@@ -13,7 +13,7 @@ const PrivacyPolicy: React.FC = () => {
           className="glass-card p-8"
         >
           <div className="flex items-center mb-6">
-            <Link to="/" className="mr-4 text-blue-600 hover:text-blue-800">
+            <Link to="/" className="mr-4 text-blue-600 hover:text-blue-800 transition-colors">
               <ArrowLeft size={24} />
             </Link>
             <div className="flex items-center">
@@ -31,7 +31,7 @@ const PrivacyPolicy: React.FC = () => {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>
               <p className="mb-4">
-                TronPick Auto-Claim ("nous", "notre", "nos") s'engage à protéger et respecter votre vie privée. 
+                Auto-Claim s'engage à protéger et respecter votre vie privée. 
                 Cette politique explique comment nous collectons, utilisons et protégeons vos informations personnelles.
               </p>
               <div className="bg-blue-50 p-4 rounded-lg mb-4">
@@ -77,7 +77,36 @@ const PrivacyPolicy: React.FC = () => {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">3. Comment nous utilisons vos informations</h2>
+              <h2 className="text-2xl font-semibold mb-4 flex items-center">
+                <Scale size={24} className="mr-2 text-blue-600" />
+                3. Base légale du traitement
+              </h2>
+              <p className="mb-4">
+                Conformément au RGPD, nous traitons vos données personnelles sur la base de :
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-purple-800 mb-2">Exécution du contrat :</h4>
+                  <ul className="list-disc pl-6 text-purple-700 text-sm">
+                    <li>Création et gestion de votre compte</li>
+                    <li>Fourniture du service d'auto-claim</li>
+                    <li>Traitement des paiements</li>
+                  </ul>
+                </div>
+                
+                <div className="bg-indigo-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-indigo-800 mb-2">Intérêt légitime :</h4>
+                  <ul className="list-disc pl-6 text-indigo-700 text-sm">
+                    <li>Sécurité et prévention des fraudes</li>
+                    <li>Amélioration de nos services</li>
+                    <li>Support technique</li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4">4. Comment nous utilisons vos informations</h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div className="bg-green-50 p-4 rounded-lg">
@@ -103,7 +132,69 @@ const PrivacyPolicy: React.FC = () => {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">4. Sécurité des données</h2>
+              <h2 className="text-2xl font-semibold mb-4 flex items-center">
+                <Clock size={24} className="mr-2 text-blue-600" />
+                5. Conservation des données
+              </h2>
+              <p className="mb-4">
+                Nous conservons vos données personnelles aussi longtemps que nécessaire pour les finalités décrites :
+              </p>
+              <div className="bg-orange-50 p-4 rounded-lg mb-4">
+                <div className="flex items-start">
+                  <Database size={20} className="text-orange-600 mr-2 mt-1 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-orange-800 mb-2">Périodes de conservation :</h4>
+                    <ul className="list-disc pl-6 text-orange-700 text-sm space-y-1">
+                      <li><strong>Données de compte :</strong> Tant que votre compte est actif + 3 ans après suppression</li>
+                      <li><strong>Logs de transaction :</strong> 5 ans pour des raisons comptables et fiscales</li>
+                      <li><strong>Données de support :</strong> 2 ans après résolution du problème</li>
+                      <li><strong>Données techniques :</strong> 12 mois maximum</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 flex items-center">
+                <Cookie size={24} className="mr-2 text-blue-600" />
+                6. Cookies et technologies similaires
+              </h2>
+              <p className="mb-4">
+                Nous utilisons des cookies et technologies similaires pour améliorer votre expérience :
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-gray-800 mb-2">Essentiels :</h4>
+                  <ul className="list-disc pl-6 text-gray-700 text-sm">
+                    <li>Authentification</li>
+                    <li>Sécurité CSRF</li>
+                    <li>Préférences</li>
+                  </ul>
+                </div>
+                
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-blue-800 mb-2">Fonctionnels :</h4>
+                  <ul className="list-disc pl-6 text-blue-700 text-sm">
+                    <li>Session utilisateur</li>
+                    <li>Configuration UI</li>
+                    <li>Langue</li>
+                  </ul>
+                </div>
+                
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-green-800 mb-2">Analytiques :</h4>
+                  <ul className="list-disc pl-6 text-green-700 text-sm">
+                    <li>Statistiques d'usage</li>
+                    <li>Performance</li>
+                    <li>Erreurs</li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4">7. Sécurité des données</h2>
               <p className="mb-4">
                 Nous mettons en œuvre des mesures de sécurité techniques et organisationnelles appropriées 
                 pour protéger vos informations personnelles contre tout accès, modification, divulgation ou destruction non autorisés.
@@ -118,7 +209,6 @@ const PrivacyPolicy: React.FC = () => {
                       <li>Chiffrement AES-256 pour les données sensibles</li>
                       <li>Hachage sécurisé des mots de passe avec bcrypt</li>
                       <li>Connexions HTTPS/TLS uniquement</li>
-                      <li>Authentification à deux facteurs disponible</li>
                       <li>Surveillance continue des intrusions</li>
                       <li>Sauvegardes chiffrées régulières</li>
                     </ul>
@@ -128,75 +218,63 @@ const PrivacyPolicy: React.FC = () => {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">5. Partage des informations</h2>
+              <h2 className="text-2xl font-semibold mb-4">8. Partage des informations</h2>
               <p className="mb-4">
-                Nous ne partageons vos informations personnelles qu'dans les cas suivants :
+                Nous ne partageons vos informations personnelles que dans les cas suivants :
               </p>
               <ul className="list-disc pl-6 mb-4">
                 <li><strong>Avec votre consentement :</strong> Lorsque vous nous autorisez explicitement</li>
-                <li><strong>Prestataires de services :</strong> Cryptomus pour le traitement des paiements (données limitées)</li>
                 <li><strong>Obligations légales :</strong> Si requis par la loi ou pour protéger nos droits</li>
                 <li><strong>Urgences :</strong> Pour protéger la sécurité des utilisateurs</li>
               </ul>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">6. Vos droits</h2>
+              <h2 className="text-2xl font-semibold mb-4 flex items-center">
+                <UserCheck size={24} className="mr-2 text-blue-600" />
+                9. Vos droits (RGPD)
+              </h2>
               <p className="mb-4">
-                Conformément au RGPD et autres réglementations applicables, vous disposez des droits suivants :
+                Conformément au RGPD, vous disposez des droits suivants concernant vos données personnelles :
               </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div className="bg-slate-50 p-4 rounded-lg">
-                  <h4 className="font-semibold mb-2">Droits d'accès et de contrôle :</h4>
-                  <ul className="list-disc pl-6 text-sm">
-                    <li>Accès à vos données personnelles</li>
-                    <li>Rectification des données inexactes</li>
-                    <li>Suppression de vos données</li>
-                    <li>Limitation du traitement</li>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="bg-teal-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-teal-800 mb-2">Droits d'accès et contrôle :</h4>
+                  <ul className="list-disc pl-6 text-teal-700 text-sm space-y-1">
+                    <li><strong>Accès :</strong> Obtenir une copie de vos données</li>
+                    <li><strong>Rectification :</strong> Corriger les données inexactes</li>
+                    <li><strong>Effacement :</strong> Supprimer vos données ("droit à l'oubli")</li>
+                    <li><strong>Limitation :</strong> Restreindre le traitement</li>
                   </ul>
                 </div>
                 
-                <div className="bg-slate-50 p-4 rounded-lg">
-                  <h4 className="font-semibold mb-2">Droits de portabilité :</h4>
-                  <ul className="list-disc pl-6 text-sm">
-                    <li>Portabilité des données</li>
-                    <li>Opposition au traitement</li>
-                    <li>Retrait du consentement</li>
-                    <li>Dépôt de plainte auprès de la CNIL</li>
+                <div className="bg-cyan-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-cyan-800 mb-2">Droits de portabilité :</h4>
+                  <ul className="list-disc pl-6 text-cyan-700 text-sm space-y-1">
+                    <li><strong>Portabilité :</strong> Récupérer vos données dans un format structuré</li>
+                    <li><strong>Opposition :</strong> Vous opposer au traitement</li>
+                    <li><strong>Réclamation :</strong> Contacter l'autorité de protection des données</li>
+                    <li><strong>Retrait :</strong> Retirer votre consentement à tout moment</li>
                   </ul>
+                </div>
+              </div>
+              
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="flex items-start">
+                  <Download size={20} className="text-blue-600 mr-2 mt-1 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-semibold text-blue-800 mb-2">Exercer vos droits :</h4>
+                    <p className="text-blue-700 text-sm">
+                      Pour exercer ces droits, contactez-nous via l'adresse email ci-dessous. 
+                      Nous répondrons dans un délai maximum de 30 jours. Une vérification d'identité pourra être demandée.
+                    </p>
+                  </div>
                 </div>
               </div>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">7. Conservation des données</h2>
-              <p className="mb-4">
-                Nous conservons vos informations personnelles uniquement pendant la durée nécessaire aux fins 
-                pour lesquelles elles ont été collectées :
-              </p>
-              <ul className="list-disc pl-6 mb-4">
-                <li><strong>Données de compte :</strong> Tant que votre compte est actif</li>
-                <li><strong>Logs de transaction :</strong> 3 ans pour des raisons comptables</li>
-                <li><strong>Données de support :</strong> 2 ans après la résolution</li>
-                <li><strong>Données de sécurité :</strong> 1 an pour l'analyse des incidents</li>
-              </ul>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">8. Cookies et technologies similaires</h2>
-              <p className="mb-4">
-                Nous utilisons des cookies et technologies similaires pour améliorer votre expérience utilisateur :
-              </p>
-              <ul className="list-disc pl-6 mb-4">
-                <li><strong>Cookies essentiels :</strong> Pour le fonctionnement du service</li>
-                <li><strong>Cookies de préférence :</strong> Pour mémoriser vos paramètres</li>
-                <li><strong>Cookies de sécurité :</strong> Pour protéger votre compte</li>
-              </ul>
-            </section>
-
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">9. Transferts internationaux</h2>
+              <h2 className="text-2xl font-semibold mb-4">10. Transferts internationaux</h2>
               <p className="mb-4">
                 Nos serveurs sont localisés dans l'Union Européenne. Si des transferts internationaux sont nécessaires, 
                 nous nous assurons qu'ils respectent les réglementations en vigueur avec des garanties appropriées.
@@ -204,7 +282,7 @@ const PrivacyPolicy: React.FC = () => {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">10. Modifications de cette politique</h2>
+              <h2 className="text-2xl font-semibold mb-4">11. Modifications de cette politique</h2>
               <p className="mb-4">
                 Nous pouvons mettre à jour cette politique de confidentialité occasionnellement. 
                 Nous vous notifierons de tout changement important par email ou via notre plateforme.
@@ -212,22 +290,48 @@ const PrivacyPolicy: React.FC = () => {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">11. Contact</h2>
+              <h2 className="text-2xl font-semibold mb-4 flex items-center">
+                <Mail size={24} className="mr-2 text-blue-600" />
+                12. Contact et délégué à la protection des données
+              </h2>
               <p className="mb-4">
                 Pour toute question concernant cette politique de confidentialité ou pour exercer vos droits :
               </p>
-              <div className="bg-slate-50 p-4 rounded-lg">
-                <div className="flex items-start">
-                  <Mail size={20} className="text-slate-600 mr-2 mt-1 flex-shrink-0" />
-                  <div>
-                    <ul className="space-y-2">
-                      <li><strong>Email :</strong> privacy@tronpick-autoclaim.com</li>
-                      <li><strong>Support :</strong> support@tronpick-autoclaim.com</li>
-                      <li><strong>Telegram :</strong> @AutoClaimSupport</li>
-                      <li><strong>Adresse :</strong> TronPick Auto-Claim, Protection des données personnelles</li>
-                    </ul>
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-slate-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-slate-800 mb-3">Contact principal :</h4>
+                  <ul className="space-y-2">
+                    <li className="flex items-center">
+                      <Mail size={16} className="mr-2 text-slate-600" />
+                      <span><strong>Email :</strong> privacy@{window.location.hostname}</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Mail size={16} className="mr-2 text-slate-600" />
+                      <span><strong>Support :</strong> support@{window.location.hostname}</span>
+                    </li>
+                    <li><strong>Telegram :</strong> @AutoClaimSupport</li>
+                    <li><strong>Délai de réponse :</strong> 48-72h maximum</li>
+                  </ul>
                 </div>
+                
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-blue-800 mb-3">Délégué à la protection des données (DPO) :</h4>
+                  <ul className="space-y-2">
+                    <li className="flex items-center">
+                      <Mail size={16} className="mr-2 text-blue-600" />
+                      <span><strong>Email DPO :</strong> dpo@{window.location.hostname}</span>
+                    </li>
+                    <li><strong>Adresse :</strong> Auto-Claim DPO<br />Protection des données personnelles<br />Union Européenne</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="mt-4 p-4 bg-amber-50 rounded-lg border-l-4 border-amber-400">
+                <p className="text-amber-800 text-sm">
+                  <strong>Autorité de contrôle :</strong> Si vous n'êtes pas satisfait de notre réponse, 
+                  vous pouvez également déposer une réclamation auprès de la Commission Nationale de l'Informatique et des Libertés (CNIL) 
+                  ou de l'autorité de protection des données de votre pays de résidence.
+                </p>
               </div>
             </section>
           </div>

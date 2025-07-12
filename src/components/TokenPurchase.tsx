@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { CreditCard, Package, Check, AlertCircle, Clock, RefreshCw, History, ChevronDown, ChevronUp, Link } from 'lucide-react';
+import { CreditCard, Package, Check, AlertCircle, Clock, RefreshCw, History, ChevronDown, ChevronUp, Link, Copy, DollarSign } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { createPayment, getTokenPackages, checkPaymentStatus,getUserPaymentHistory } from '../services/apiService';
-import { User } from '../types';
+import { createPayment, getTokenPackages, checkPaymentStatus, getUserPaymentHistory, getSupportedCurrencies } from '../services/apiService';
+import { User,SupportedCurrency } from '../types';
 
 interface TokenPackage {
     id: string;
@@ -21,7 +21,9 @@ interface PaymentHistory {
     currency: string;
     token_amount: number;
     status: string;
-    payment_url: string;
+    payment_url?: string;
+    memo?: string;
+    deposit_address?: string;
     created_at: string;
     completed_at: string;
     expires_at: string;
@@ -36,6 +38,8 @@ interface TokenPurchaseProps {
 const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, showToast }) => {
     const [packages, setPackages] = useState<TokenPackage[]>([]);
     const [selectedPackage, setSelectedPackage] = useState<TokenPackage | null>(null);
+    const [supportedCurrencies, setSupportedCurrencies] = useState<SupportedCurrency[]>([]);
+    const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [paymentData, setPaymentData] = useState<any>(null);
     const [paymentStatus, setPaymentStatus] = useState<'pending' | 'processing' | 'completed' | 'failed' | null>(null);
@@ -43,9 +47,14 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
     const [paymentHistory, setPaymentHistory] = useState<PaymentHistory[]>([]);
     const [showHistory, setShowHistory] = useState(false);
     const [loadingHistory, setLoadingHistory] = useState(false);
+    const [showCurrencySelection, setShowCurrencySelection] = useState(false);
+    const [transactionIdToCheck, setTransactionIdToCheck] = useState('');
+    const [transactionStatus, setTransactionStatus] = useState<any>(null);
+    const [checkingTransaction, setCheckingTransaction] = useState(false);
 
     useEffect(() => {
         loadTokenPackages();
+        loadSupportedCurrencies();
     }, []);
 
     const loadTokenPackages = async () => {
@@ -66,27 +75,63 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
         }
     };
 
+    const loadSupportedCurrencies = async () => {
+        try {
+            const currencies = await getSupportedCurrencies();
+            setSupportedCurrencies(currencies);
+            const defaultCurrency = currencies.find(c => c.code === 'USDT') || currencies[0];
+            setSelectedCurrency(defaultCurrency);
+        } catch (error) {
+            // Fallback currencies pour le développement
+            const fallbackCurrencies = [
+                { code: 'USDT', name: 'Tether USD', network: 'TRC-20', rate: 1, icon: '₮' },
+                { code: 'TRX', name: 'TRON', network: 'TRON', rate: 0.12, icon: '⚡' },
+                { code: 'BNB', name: 'Binance Coin', network: 'BSC', rate: 620, icon: '🔶' },
+                { code: 'ETH', name: 'Ethereum', network: 'ERC-20', rate: 3200, icon: '⟐' }
+            ];
+            setSupportedCurrencies(fallbackCurrencies);
+            setSelectedCurrency(fallbackCurrencies[0]);
+            console.error('Failed to load supported currencies:', error);
+            if (showToast) {
+                showToast('error', 'Erreur lors du chargement des devises supportées');
+            }
+        }
+    };
+
+    const calculateCryptoAmount = (usdPrice: number) => {
+        if (!selectedCurrency) return 0;
+        return (usdPrice / selectedCurrency.rate).toFixed(6);
+    };
+
     const handlePurchase = async (packageData: TokenPackage) => {
+        if (!selectedCurrency) {
+            if (showToast) {
+                showToast('error', 'Veuillez sélectionner une devise');
+            }
+            return;
+        }
+
         try {
             console.log('Selected package:', packageData);
+            console.log('Selected currency:', selectedCurrency);
             setIsLoading(true);
             setSelectedPackage(packageData);
 
-            // Le backend s'occupe de créer le paiement Cryptomus
-            const response = await createPayment(packageData.id, packageData.price);
+            // Le backend s'occupe de créer le paiement crypto avec la devise sélectionnée
+            const response = await createPayment(packageData.id, selectedCurrency.code);
 
             // Vérifier si la création du paiement a réussi
-            if (response.success && response.payment_url) {
+            if (response.success && (response.deposit_address || response.memo)) {
                 setPaymentData(response);
                 setPaymentStatus('pending');
 
                 if (showToast) {
-                    showToast('info', 'Paiement créé. Suivez les instructions pour compléter le paiement.');
+                    showToast('info', 'Paiement crypto créé. Suivez les instructions pour envoyer les fonds.');
                 }
             } else {
                 // Échec de la création du paiement
                 setPaymentStatus('failed');
-                const errorMessage = response.message || 'Impossible de créer le paiement';
+                const errorMessage = response.message || 'Impossible de créer le paiement crypto';
                 if (showToast) {
                     showToast('error', errorMessage);
                 }
@@ -172,6 +217,39 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
         }
     };
 
+    const checkTransactionStatus = async () => {
+        if (!transactionIdToCheck.trim()) return;
+
+        try {
+            setCheckingTransaction(true);
+            const result = await checkPaymentStatus(transactionIdToCheck.trim());
+
+            if (result.status === 'paid' || result.status === 'confirmed' || result.status === 'completed') {
+                setTransactionStatus(result);
+                if (showToast) {
+                    showToast('success', 'Le paiement a été confirmé avec succès');
+                }
+            } else if (result.status === 'failed' || result.status === 'cancelled') {
+                setTransactionStatus(result);
+                if (showToast) {
+                    showToast('error', 'Le paiement a échoué ou a été annulé');
+                }
+            } else {
+                setTransactionStatus(result);
+                if (showToast) {
+                    showToast('info', 'Le paiement est en cours de traitement');
+                }
+            }
+        } catch (error) {
+            console.error('Transaction status check failed:', error);
+            if (showToast) {
+                showToast('error', 'Erreur lors de la vérification de l\'ID de transaction');
+            }
+        } finally {
+            setCheckingTransaction(false);
+        }
+    };
+
     const getStatusColor = (status: string) => {
         switch (status.toLowerCase()) {
             case 'paid':
@@ -214,6 +292,67 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
         <div>
             <h2 className="text-2xl font-bold text-slate-800 mb-6">Acheter des jetons</h2>
 
+            {/* Currency Selection */}
+            <div className="glass-card p-6 mb-6">
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold flex items-center">
+                        <DollarSign size={20} className="mr-2" />
+                        Devise de paiement
+                    </h3>
+                    <button
+                        onClick={() => setShowCurrencySelection(!showCurrencySelection)}
+                        className="text-blue-600 hover:text-blue-800 flex items-center"
+                    >
+                        Changer {showCurrencySelection ? <ChevronUp size={16} className="ml-1" /> : <ChevronDown size={16} className="ml-1" />}
+                    </button>
+                </div>
+
+                {selectedCurrency && (
+                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg mb-4">
+                        <div className="flex items-center">
+                            <span className="text-2xl mr-3">{selectedCurrency.icon}</span>
+                            <div>
+                                <div className="font-semibold">{selectedCurrency.name} ({selectedCurrency.code})</div>
+                                <div className="text-sm text-slate-600">Réseau: {selectedCurrency.network}</div>
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <div className="text-sm text-slate-600">Taux de change</div>
+                            <div className="font-semibold">1 USD = {(1/selectedCurrency.rate).toFixed(6)} {selectedCurrency.code}</div>
+                        </div>
+                    </div>
+                )}
+
+                {showCurrencySelection && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                        {supportedCurrencies.map((currency) => (
+                            <button
+                                key={currency.code}
+                                onClick={() => {
+                                    setSelectedCurrency(currency);
+                                    setShowCurrencySelection(false);
+                                }}
+                                className={`p-3 rounded-lg border-2 transition-all ${
+                                    selectedCurrency?.code === currency.code
+                                        ? 'border-blue-500 bg-blue-50'
+                                        : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                                }`}
+                            >
+                                <div className="flex items-center justify-center mb-2">
+                                    <img className="w-6 h-6" src={`/assets/icons/${currency.code.toLowerCase()}.png`} alt={`Icon ${currency.code}`} />
+                                </div>
+                                <div className="text-sm font-semibold">{currency.code}</div>
+                                <div className="text-xs text-slate-600">{currency.network}</div>
+                                <div className="text-xs text-slate-500 mt-1">
+                                    1 USD = {(1/currency.rate).toFixed(6)}
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* Balance Card */}
             <div className="mb-6">
                 <div className="glass-card p-6 mb-4">
                     <div className="flex items-center justify-between">
@@ -236,21 +375,73 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
                                 <div className="flex items-center justify-center mb-4">
                                     <Clock size={48} className="mr-2" />
                                     <div>
-                                        <h3 className="text-lg font-semibold mb-2">Paiement en attente</h3>
+                                        <h3 className="text-lg font-semibold mb-2">Paiement crypto en attente</h3>
                                         <p className="text-slate-600">
-                                            Cliquez sur le lien ci-dessous pour effectuer le paiement
+                                            Envoyez le montant exact vers l'adresse ci-dessous avec le memo requis
                                         </p>
+                                        {selectedCurrency && (
+                                            <p className="text-sm text-slate-500 mt-1">
+                                                Devise sélectionnée: {selectedCurrency.name} ({selectedCurrency.code}) - {selectedCurrency.network}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
 
                                 <div className="bg-slate-50 p-4 rounded-lg mb-4">
                                     <div className="grid grid-cols-1 gap-4 text-sm">
                                         <div>
-                                            <label className="font-semibold text-slate-700">Montant à payer:</label>
-                                            <div className="text-lg font-mono bg-white p-2 rounded border mt-1">
-                                                {paymentData.amount} {paymentData.currency}
+                                            <label className="font-semibold text-slate-700">Montant à envoyer:</label>
+                                            <div className="text-lg font-mono bg-white p-3 rounded border mt-1 flex items-center justify-between">
+                                                <div className="flex items-center">
+                                                    {selectedCurrency && <span className="text-xl mr-2">{selectedCurrency.icon}</span>}
+                                                    <span>{paymentData.amount} {paymentData.currency}</span>
+                                                </div>
+                                                <button
+                                                    onClick={() => copyToClipboard(paymentData.amount.toString())}
+                                                    className="text-blue-600 hover:text-blue-800"
+                                                >
+                                                    <Copy size={16} />
+                                                </button>
                                             </div>
+                                            {selectedCurrency && (
+                                                <div className="text-xs text-slate-500 mt-1">
+                                                    Réseau: {selectedCurrency.network}
+                                                </div>
+                                            )}
                                         </div>
+
+                                        {paymentData.deposit_address && (
+                                            <div>
+                                                <label className="font-semibold text-slate-700">Adresse de dépôt:</label>
+                                                <div className="text-sm font-mono bg-white p-3 rounded border mt-1 flex items-center justify-between break-all">
+                                                    <span>{paymentData.deposit_address}</span>
+                                                    <button
+                                                        onClick={() => copyToClipboard(paymentData.deposit_address)}
+                                                        className="text-blue-600 hover:text-blue-800 ml-2 flex-shrink-0"
+                                                    >
+                                                        <Copy size={16} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {paymentData.memo && (
+                                            <div>
+                                                <label className="font-semibold text-slate-700">Memo (OBLIGATOIRE):</label>
+                                                <div className="text-sm font-mono bg-yellow-50 p-3 rounded border border-yellow-300 mt-1 flex items-center justify-between">
+                                                    <span className="text-yellow-800">{paymentData.memo}</span>
+                                                    <button
+                                                        onClick={() => copyToClipboard(paymentData.memo)}
+                                                        className="text-yellow-600 hover:text-yellow-800 ml-2"
+                                                    >
+                                                        <Copy size={16} />
+                                                    </button>
+                                                </div>
+                                                <p className="text-xs text-yellow-600 mt-1">
+                                                    ⚠️ Le memo est obligatoire pour identifier votre paiement
+                                                </p>
+                                            </div>
+                                        )}
 
                                         <div>
                                             <label className="font-semibold text-slate-700">Jetons à recevoir:</label>
@@ -261,21 +452,24 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
                                     </div>
                                 </div>
 
+                                <div className="bg-orange-50 border border-orange-200 p-4 rounded-lg mb-4">
+                                    <h5 className="font-semibold text-orange-800 mb-2">Instructions importantes :</h5>
+                                    <ul className="text-sm text-orange-700 space-y-1">
+                                        <li>• Envoyez exactement {paymentData.amount} {paymentData.currency}</li>
+                                        {selectedCurrency && (
+                                            <li>• Utilisez le réseau {selectedCurrency.network}</li>
+                                        )}
+                                        <li>• N'oubliez pas d'inclure le memo dans votre transaction</li>
+                                        <li>• La confirmation peut prendre 1-10 minutes</li>
+                                        <li>• Ne fermez pas cette page avant confirmation</li>
+                                    </ul>
+                                </div>
+
                                 <div className="space-y-2">
-                                    <a
-                                        href={paymentData.payment_url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="btn btn-primary mr-2 inline-flex items-center"
-                                    >
-                                        <CreditCard size={16} className="mr-2" />
-                                        Effectuer le paiement
-                                    </a>
-                                    
                                     <button
                                         onClick={checkPayment}
                                         disabled={checkingPayment}
-                                        className="btn btn-secondary ml-2"
+                                        className="btn btn-primary"
                                     >
                                         {checkingPayment ? (
                                             <>
@@ -292,7 +486,7 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
                                 </div>
 
                                 <div className="mt-4 text-xs text-slate-500">
-                                    {paymentData.payment_id && <p>ID de paiement: {paymentData.payment_id}</p>}
+                                    {paymentData.memo && <p>Memo: {paymentData.memo}</p>}
                                     {paymentData.expires_at && <p>Expire le: {new Date(paymentData.expires_at).toLocaleString()}</p>}
                                     {paymentData.message && <p>Message: {paymentData.message}</p>}
                                 </div>
@@ -358,11 +552,19 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
                                     +{pkg.bonus} jetons bonus
                                 </div>
                             )}
-                            <div className="text-2xl font-bold text-slate-800 mb-4">
-                                {pkg.price} {pkg.currency}
+                            <div className="text-2xl font-bold text-slate-800 mb-2">
+                                {pkg.price} USD
                             </div>
+                            
+                            {selectedCurrency && selectedCurrency.code !== 'USD' && (
+                                <div className="text-lg font-semibold text-blue-600 mb-2 flex items-center justify-center">
+                                    {selectedCurrency.icon && <span className="mr-1">{selectedCurrency.icon}</span>}
+                                    {calculateCryptoAmount(pkg.price)} {selectedCurrency.code}
+                                </div>
+                            )}
+                            
                             <div className="text-sm text-slate-500 mb-6">
-                                ≈ {(pkg.price / pkg.tokens).toFixed(3)} {pkg.currency} par jeton
+                                ≈ {(pkg.price / pkg.tokens).toFixed(3)} USD par jeton
                             </div>
 
                             <button
@@ -463,7 +665,16 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
                                                             Continuer le paiement
                                                         </a>
                                                     )}
-                                                    {payment.status === 'pending' && !payment.payment_url && (
+                                                    {payment.status === 'pending' && !payment.payment_url && payment.memo && (
+                                                        <div className="text-xs">
+                                                            <span className="text-slate-600">Memo:</span>
+                                                            <div className="font-mono text-blue-600 cursor-pointer" 
+                                                                 onClick={() => copyToClipboard(payment.memo!)}>
+                                                                {payment.memo}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    {payment.status === 'pending' && !payment.payment_url && !payment.memo && (
                                                         <span className="text-slate-400 text-xs">
                                                             En attente
                                                         </span>
@@ -484,43 +695,189 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
                 )}
             </div>
 
+            {/* Payment Verification by Transaction ID Section */}
             <div className="mt-8 glass-card p-6">
-                <h4 className="font-semibold text-slate-800 mb-4">Paiement sécurisé avec Cryptomus</h4>
+                <h4 className="font-semibold text-slate-800 mb-4 flex items-center">
+                    <RefreshCw size={20} className="mr-2" />
+                    Vérifier un paiement par ID de transaction
+                </h4>
+                <div className="bg-blue-50 p-4 rounded-lg mb-4">
+                    <p className="text-sm text-blue-700 mb-2">
+                        Vous avez effectué un paiement et souhaitez vérifier son statut ? 
+                        Entrez votre ID de transaction ci-dessous.
+                    </p>
+                    <p className="text-xs text-blue-600">
+                        L'ID de transaction se trouve dans votre historique de paiements ou dans l'email de confirmation.
+                    </p>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="flex-1">
+                        <input
+                            type="text"
+                            placeholder="Entrez votre ID de transaction"
+                            className="form-input w-full"
+                            value={transactionIdToCheck}
+                            onChange={(e) => setTransactionIdToCheck(e.target.value)}
+                        />
+                    </div>
+                    <button
+                        onClick={checkTransactionStatus}
+                        disabled={!transactionIdToCheck.trim() || checkingTransaction}
+                        className="btn btn-primary"
+                    >
+                        {checkingTransaction ? (
+                            <>
+                                <RefreshCw size={16} className="mr-2 animate-spin" />
+                                Vérification...
+                            </>
+                        ) : (
+                            <>
+                                <Check size={16} className="mr-2" />
+                                Vérifier
+                            </>
+                        )}
+                    </button>
+                </div>
+
+                {transactionStatus && (
+                    <div className="mt-4 p-4 rounded-lg border">
+                        <div className={`flex items-center mb-3 ${
+                            transactionStatus.status === 'paid' || transactionStatus.status === 'completed' || transactionStatus.status === 'confirmed'
+                                ? 'text-green-600'
+                                : transactionStatus.status === 'pending' || transactionStatus.status === 'processing'
+                                ? 'text-yellow-600'
+                                : 'text-red-600'
+                        }`}>
+                            {transactionStatus.status === 'paid' || transactionStatus.status === 'completed' || transactionStatus.status === 'confirmed' ? (
+                                <Check size={20} className="mr-2" />
+                            ) : transactionStatus.status === 'pending' || transactionStatus.status === 'processing' ? (
+                                <Clock size={20} className="mr-2" />
+                            ) : (
+                                <AlertCircle size={20} className="mr-2" />
+                            )}
+                            <span className="font-semibold">
+                                Statut: {getStatusText(transactionStatus.status)}
+                            </span>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span className="font-medium text-slate-700">ID de transaction:</span>
+                                <div className="font-mono text-slate-600 break-all">{transactionStatus.id}</div>
+                            </div>
+                            <div>
+                                <span className="font-medium text-slate-700">Montant:</span>
+                                <div className="text-slate-600">{transactionStatus.amount} {transactionStatus.currency}</div>
+                            </div>
+                            <div>
+                                <span className="font-medium text-slate-700">Jetons:</span>
+                                <div className="text-slate-600">{transactionStatus.token_amount} jetons</div>
+                            </div>
+                            <div>
+                                <span className="font-medium text-slate-700">Date de création:</span>
+                                <div className="text-slate-600">
+                                    {new Date(transactionStatus.created_at).toLocaleDateString('fr-FR', {
+                                        day: '2-digit',
+                                        month: '2-digit',
+                                        year: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })}
+                                </div>
+                            </div>
+                            {transactionStatus.completed_at && (
+                                <div>
+                                    <span className="font-medium text-slate-700">Date de completion:</span>
+                                    <div className="text-slate-600">
+                                        {new Date(transactionStatus.completed_at).toLocaleDateString('fr-FR', {
+                                            day: '2-digit',
+                                            month: '2-digit',
+                                            year: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+                            {transactionStatus.memo && (
+                                <div className="md:col-span-2">
+                                    <span className="font-medium text-slate-700">Memo:</span>
+                                    <div className="font-mono text-slate-600 bg-slate-50 p-2 rounded mt-1">
+                                        {transactionStatus.memo}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {(transactionStatus.status === 'pending' || transactionStatus.status === 'processing') && (
+                            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                                <p className="text-sm text-yellow-700">
+                                    ⏳ Votre paiement est en cours de traitement. 
+                                    Les confirmations blockchain peuvent prendre jusqu'à 10 minutes.
+                                </p>
+                            </div>
+                        )}
+
+                        {transactionStatus.status === 'failed' && (
+                            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded">
+                                <p className="text-sm text-red-700">
+                                    ❌ Ce paiement a échoué. Contactez le support si vous pensez qu'il s'agit d'une erreur.
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            <div className="mt-8 glass-card p-6">
+                <h4 className="font-semibold text-slate-800 mb-4">Paiement sécurisé par cryptomonnaies</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-600 mb-6">
                     <div className="flex items-start">
                         <Check size={16} className="text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                        <span>Accepte Bitcoin, Ethereum, USDT et plus de 20 cryptomonnaies</span>
+                        <span>Paiements en USDT, TRON, BNB et autres cryptos</span>
                     </div>
                     <div className="flex items-start">
                         <Check size={16} className="text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                        <span>Transactions sécurisées et vérifiées automatiquement</span>
+                        <span>Taux de change en temps réel</span>
                     </div>
                     <div className="flex items-start">
                         <Check size={16} className="text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                        <span>Confirmation en temps réel</span>
+                        <span>Support multi-réseaux (TRC-20, BSC, ERC-20)</span>
                     </div>
                     <div className="flex items-start">
                         <Check size={16} className="text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                        <span>Support client 24/7</span>
+                        <span>Transactions sécurisées et confirmées automatiquement</span>
                     </div>
                     <div className="flex items-start">
                         <Check size={16} className="text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                        <span>Processeur de paiement certifié PCI DSS</span>
+                        <span>Confirmation en 1-10 minutes</span>
                     </div>
                     <div className="flex items-start">
                         <Check size={16} className="text-green-600 mr-2 mt-0.5 flex-shrink-0" />
-                        <span>Conformité anti-blanchiment (AML/KYC)</span>
+                        <span>Frais de transaction optimisés par réseau</span>
                     </div>
                 </div>
 
                 <div className="bg-blue-50 p-4 rounded-lg text-sm">
-                    <h5 className="font-semibold text-blue-800 mb-2">Informations importantes :</h5>
+                    <h5 className="font-semibold text-blue-800 mb-2">Devises supportées :</h5>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+                        {supportedCurrencies.map((currency) => (
+                            <div key={currency.code} className="flex items-center text-blue-700">
+                                <span className="mr-2">{currency.icon}</span>
+                                <span className="text-xs">
+                                    {currency.code} ({currency.network})
+                                </span>
+                            </div>
+                        ))}
+                    </div>
                     <ul className="list-disc pl-5 text-blue-700 space-y-1">
-                        <li>TronPick Auto-Claim SAS - SIRET: 12345678901234</li>
-                        <li>Paiements traités par Cryptomus (processeur certifié)</li>
+                        <li>Paiements traités via blockchain avec taux de change en temps réel</li>
+                        <li>Utilisez le bon réseau selon la cryptomonnaie sélectionnée</li>
+                        <li>Le memo est obligatoire pour identifier votre transaction</li>
+                        <li>Support disponible : support@{window.location.hostname}</li>
+                        <li>Les jetons sont crédités après confirmation blockchain</li>
                         <li>Politique de remboursement : voir nos <Link to="/terms" className="underline">conditions d'utilisation</Link></li>
-                        <li>Support disponible : support@tronpick-autoclaim.com</li>
-                        <li>Les jetons sont crédités instantanément après confirmation</li>
                     </ul>
                 </div>
             </div>

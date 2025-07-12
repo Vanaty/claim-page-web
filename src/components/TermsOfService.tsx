@@ -31,7 +31,7 @@ const TermsOfService: React.FC = () => {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4">1. Acceptation des conditions</h2>
               <p className="mb-4">
-                En accédant et en utilisant TronPick Auto-Claim ("le Service"), vous acceptez d'être lié par ces conditions d'utilisation. 
+                En accédant et en utilisant Auto-Claim ("le Service"), vous acceptez d'être lié par ces conditions d'utilisation. 
                 Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser notre service.
               </p>
             </section>
@@ -39,7 +39,7 @@ const TermsOfService: React.FC = () => {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4">2. Description du service</h2>
               <p className="mb-4">
-                TronPick Auto-Claim est un service automatisé qui permet aux utilisateurs de réclamer automatiquement leurs récompenses 
+                Auto-Claim est un service automatisé qui permet aux utilisateurs de réclamer automatiquement leurs récompenses 
                 sur diverses plateformes de crypto-monnaies compatibles. Notre service utilise un système de jetons pour fonctionner.
               </p>
               <ul className="list-disc pl-6 mb-4">
@@ -71,7 +71,7 @@ const TermsOfService: React.FC = () => {
               <h2 className="text-2xl font-semibold mb-4">4. Système de jetons et paiements</h2>
               <p className="mb-4">
                 Notre service fonctionne avec un système de jetons. Chaque réclamation automatique consomme 1 jeton. 
-                Les paiements sont traités via Cryptomus, un processeur de paiement crypto sécurisé.
+                Les paiements sont traités via TRON, un processeur de paiement crypto sécurisé.
               </p>
               <div className="bg-green-50 p-4 rounded-lg mb-4">
                 <h4 className="font-semibold text-green-800 mb-2">Politique de remboursement :</h4>
@@ -119,7 +119,7 @@ const TermsOfService: React.FC = () => {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4">7. Limitation de responsabilité</h2>
               <p className="mb-4">
-                TronPick Auto-Claim fournit le service "en l'état" sans garantie expresse ou implicite. 
+                Auto-Claim fournit le service "en l'état" sans garantie expresse ou implicite. 
                 Nous ne sommes pas responsables des pertes financières résultant de l'utilisation du service.
               </p>
             </section>
