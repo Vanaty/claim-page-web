@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Check, AlertCircle, RefreshCw } from 'lucide-react';
-import { checkPaymentStatus } from '../services/apiService';
+import { checkPaymentStatusById } from '../services/apiService';
 
 const PaymentSuccess: React.FC = () => {
     const { orderId } = useParams<{ orderId: string }>();
@@ -17,7 +17,7 @@ const PaymentSuccess: React.FC = () => {
 
     const verifyPayment = async () => {
         try {
-            const result = await checkPaymentStatus(orderId!);
+            const result = await checkPaymentStatusById(orderId!);
             setPaymentInfo(result);
             
             if (result.status === 'paid' || result.status === 'confirmed') {

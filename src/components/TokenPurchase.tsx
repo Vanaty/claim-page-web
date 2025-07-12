@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CreditCard, Package, Check, AlertCircle, Clock, RefreshCw, History, ChevronDown, ChevronUp, Link, Copy, DollarSign } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { createPayment, getTokenPackages, checkPaymentStatus, getUserPaymentHistory, getSupportedCurrencies } from '../services/apiService';
 import { User,SupportedCurrency } from '../types';
 
@@ -36,6 +37,7 @@ interface TokenPurchaseProps {
 }
 
 const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, showToast }) => {
+    const navigate = useNavigate();
     const [packages, setPackages] = useState<TokenPackage[]>([]);
     const [selectedPackage, setSelectedPackage] = useState<TokenPackage | null>(null);
     const [supportedCurrencies, setSupportedCurrencies] = useState<SupportedCurrency[]>([]);
@@ -122,12 +124,16 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
 
             // Vérifier si la création du paiement a réussi
             if (response.success && (response.deposit_address || response.memo)) {
-                setPaymentData(response);
-                setPaymentStatus('pending');
-
-                if (showToast) {
-                    showToast('info', 'Paiement crypto créé. Suivez les instructions pour envoyer les fonds.');
-                }
+                // Redirect to payment interface with payment data
+                navigate(`/payment/${response.memo}`, {
+                    state: {
+                        paymentData: {
+                            ...response,
+                            tokens: packageData.tokens
+                        },
+                        selectedCurrency: selectedCurrency
+                    }
+                });
             } else {
                 // Échec de la création du paiement
                 setPaymentStatus('failed');
@@ -366,165 +372,6 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
                     </div>
                 </div>
             </div>
-
-            {paymentStatus && (
-                <div className="glass-card p-6 mb-6">
-                    <div className="text-center">
-                        {paymentStatus === 'pending' && paymentData && (
-                            <div className="text-blue-600">
-                                <div className="flex items-center justify-center mb-4">
-                                    <Clock size={48} className="mr-2" />
-                                    <div>
-                                        <h3 className="text-lg font-semibold mb-2">Paiement crypto en attente</h3>
-                                        <p className="text-slate-600">
-                                            Envoyez le montant exact vers l'adresse ci-dessous avec le memo requis
-                                        </p>
-                                        {selectedCurrency && (
-                                            <p className="text-sm text-slate-500 mt-1">
-                                                Devise sélectionnée: {selectedCurrency.name} ({selectedCurrency.code}) - {selectedCurrency.network}
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="bg-slate-50 p-4 rounded-lg mb-4">
-                                    <div className="grid grid-cols-1 gap-4 text-sm">
-                                        <div>
-                                            <label className="font-semibold text-slate-700">Montant à envoyer:</label>
-                                            <div className="text-lg font-mono bg-white p-3 rounded border mt-1 flex items-center justify-between">
-                                                <div className="flex items-center">
-                                                    {selectedCurrency && <span className="text-xl mr-2">{selectedCurrency.icon}</span>}
-                                                    <span>{paymentData.amount} {paymentData.currency}</span>
-                                                </div>
-                                                <button
-                                                    onClick={() => copyToClipboard(paymentData.amount.toString())}
-                                                    className="text-blue-600 hover:text-blue-800"
-                                                >
-                                                    <Copy size={16} />
-                                                </button>
-                                            </div>
-                                            {selectedCurrency && (
-                                                <div className="text-xs text-slate-500 mt-1">
-                                                    Réseau: {selectedCurrency.network}
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {paymentData.deposit_address && (
-                                            <div>
-                                                <label className="font-semibold text-slate-700">Adresse de dépôt:</label>
-                                                <div className="text-sm font-mono bg-white p-3 rounded border mt-1 flex items-center justify-between break-all">
-                                                    <span>{paymentData.deposit_address}</span>
-                                                    <button
-                                                        onClick={() => copyToClipboard(paymentData.deposit_address)}
-                                                        className="text-blue-600 hover:text-blue-800 ml-2 flex-shrink-0"
-                                                    >
-                                                        <Copy size={16} />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {paymentData.memo && (
-                                            <div>
-                                                <label className="font-semibold text-slate-700">Memo (OBLIGATOIRE):</label>
-                                                <div className="text-sm font-mono bg-yellow-50 p-3 rounded border border-yellow-300 mt-1 flex items-center justify-between">
-                                                    <span className="text-yellow-800">{paymentData.memo}</span>
-                                                    <button
-                                                        onClick={() => copyToClipboard(paymentData.memo)}
-                                                        className="text-yellow-600 hover:text-yellow-800 ml-2"
-                                                    >
-                                                        <Copy size={16} />
-                                                    </button>
-                                                </div>
-                                                <p className="text-xs text-yellow-600 mt-1">
-                                                    ⚠️ Le memo est obligatoire pour identifier votre paiement
-                                                </p>
-                                            </div>
-                                        )}
-
-                                        <div>
-                                            <label className="font-semibold text-slate-700">Jetons à recevoir:</label>
-                                            <div className="text-lg font-mono bg-white p-2 rounded border mt-1">
-                                                {paymentData.token_amount} jetons
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="bg-orange-50 border border-orange-200 p-4 rounded-lg mb-4">
-                                    <h5 className="font-semibold text-orange-800 mb-2">Instructions importantes :</h5>
-                                    <ul className="text-sm text-orange-700 space-y-1">
-                                        <li>• Envoyez exactement {paymentData.amount} {paymentData.currency}</li>
-                                        {selectedCurrency && (
-                                            <li>• Utilisez le réseau {selectedCurrency.network}</li>
-                                        )}
-                                        <li>• N'oubliez pas d'inclure le memo dans votre transaction</li>
-                                        <li>• La confirmation peut prendre 1-10 minutes</li>
-                                        <li>• Ne fermez pas cette page avant confirmation</li>
-                                    </ul>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <button
-                                        onClick={checkPayment}
-                                        disabled={checkingPayment}
-                                        className="btn btn-primary"
-                                    >
-                                        {checkingPayment ? (
-                                            <>
-                                                <RefreshCw size={16} className="mr-2 animate-spin" />
-                                                Vérification...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Check size={16} className="mr-2" />
-                                                Vérifier le paiement
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-
-                                <div className="mt-4 text-xs text-slate-500">
-                                    {paymentData.memo && <p>Memo: {paymentData.memo}</p>}
-                                    {paymentData.expires_at && <p>Expire le: {new Date(paymentData.expires_at).toLocaleString()}</p>}
-                                    {paymentData.message && <p>Message: {paymentData.message}</p>}
-                                </div>
-                            </div>
-                        )}
-
-                        {paymentStatus === 'completed' && (
-                            <div className="text-green-600">
-                                <Check size={48} className="mx-auto mb-4" />
-                                <h3 className="text-lg font-semibold mb-2">Paiement réussi !</h3>
-                                <p className="text-slate-600">
-                                    Vos jetons ont été ajoutés à votre compte
-                                </p>
-                            </div>
-                        )}
-
-                        {paymentStatus === 'failed' && (
-                            <div className="text-red-600">
-                                <AlertCircle size={48} className="mx-auto mb-4" />
-                                <h3 className="text-lg font-semibold mb-2">Paiement échoué</h3>
-                                <p className="text-slate-600 mb-4">
-                                    {paymentData?.message || 'Veuillez réessayer ou contacter le support'}
-                                </p>
-                                <button
-                                    onClick={() => {
-                                        setPaymentData(null);
-                                        setPaymentStatus(null);
-                                        setSelectedPackage(null);
-                                    }}
-                                    className="btn btn-secondary"
-                                >
-                                    Réessayer
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {packages.map((pkg) => (

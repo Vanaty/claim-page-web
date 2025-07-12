@@ -23,6 +23,7 @@ import TermsOfService from './components/TermsOfService';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import AboutUs from './components/AboutUs';
 import Footer from './components/Footer';
+import PaymentInterface from './components/PaymentInterface';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -318,6 +319,7 @@ function App() {
                     </>
                   )}
                   <Route path="/payment/success/:orderId" element={<PaymentSuccess />} />
+                  <Route path="/payment/:paymentId" element={<PaymentInterface />} />
                   <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
               </Layout>

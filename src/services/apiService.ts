@@ -145,6 +145,11 @@ export const checkPaymentStatus = async (orderId: string): Promise<any> => {
   return response.data;
 };
 
+export const checkPaymentStatusById = async (paymentId: string): Promise<any> => {
+  const response = await api.get(`/payments/status/${paymentId}`);
+  return response.data;
+}
+
 export const getUserPaymentHistory = async (): Promise<any[]> => {
   const response = await api.get('/payments/history');
   return response.data;
