@@ -6,35 +6,29 @@ import { ArrowLeft, Users, Target, Shield, Zap, Globe, Award, Heart, Mail, Messa
 const AboutUs: React.FC = () => {
   const teamMembers = [
     {
-      name: "Alexandre Martin",
+      name: "Vana-IT",
       role: "CEO & Fondateur",
-      description: "Expert en blockchain avec 8 ans d'expérience dans les crypto-monnaies",
+      description: "Expert en blockchain avec de l'expérience dans les crypto-monnaies",
       avatar: "👨‍💼"
     },
     {
-      name: "Sophie Laurent",
-      role: "CTO",
-      description: "Ingénieure logiciel spécialisée en sécurité et systèmes distribués",
-      avatar: "👩‍💻"
-    },
-    {
-      name: "Thomas Bernard",
+      name: "Eric Nas",
       role: "Lead Developer",
-      description: "Développeur full-stack passionné par l'automatisation et l'UX",
+      description: "Développeur full-stack passionné par l'automatisation et l'UX en sécurité et systèmes distribués",
       avatar: "👨‍💻"
     },
     {
-      name: "Marie Dubois",
+      name: "Rah Pasy",
       role: "Customer Success",
       description: "Responsable de l'expérience client et du support utilisateur",
-      avatar: "👩‍💼"
+      avatar: "👨‍💼"
     }
   ];
 
   const milestones = [
     {
       year: "2023",
-      title: "Lancement de TronPick Auto-Claim",
+      title: "Lancement de Auto-Claim",
       description: "Première version publique avec support TronPick.io"
     },
     {
