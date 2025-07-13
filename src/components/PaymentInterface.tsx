@@ -7,7 +7,7 @@ interface PaymentData {
     amount: number;
     currency: string;
     deposit_address?: string;
-    memo?: string;
+    payment_id?: string;
     tokens: number;
     expires_at: string;
 }
@@ -77,16 +77,16 @@ const PaymentInterface: React.FC = () => {
     };
 
     const checkPayment = async () => {
-        if (!paymentData?.memo) return;
+        if (!paymentData?.payment_id) return;
 
         try {
             setCheckingPayment(true);
-            const result = await checkPaymentStatusById(paymentData.memo);
+            const result = await checkPaymentStatusById(paymentData.payment_id);
 
             if (result.status === 'paid' || result.status === 'confirmed' || result.status === 'completed') {
                 setPaymentStatus('completed');
                 setTimeout(() => {
-                    navigate('/payment-success/' + paymentData.memo);
+                    navigate('/payment-success/' + paymentData.payment_id);
                 }, 2000);
             } else if (result.status === 'failed' || result.status === 'cancelled') {
                 setPaymentStatus('failed');
@@ -190,14 +190,34 @@ const PaymentInterface: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Payment Details */}
+                        {/* Payment Details with Warning */}
                         <div className="glass-card p-6 mb-6">
                             <h3 className="text-xl font-semibold mb-4">Détails du paiement</h3>
+                            
+                            {/* Exact Amount Warning */}
+                            <div className="bg-red-50 border border-red-200 p-4 rounded-lg mb-6">
+                                <div className="flex items-start">
+                                    <AlertCircle size={20} className="text-red-600 mr-3 mt-0.5 flex-shrink-0" />
+                                    <div>
+                                        <h4 className="font-semibold text-red-800 mb-2">⚠️ IMPORTANT - Montant exact requis</h4>
+                                        <p className="text-sm text-red-700 mb-2">
+                                            Nous devons recevoir <strong>exactement {paymentData.amount} {paymentData.currency}</strong> sur notre adresse.
+                                        </p>
+                                        <p className="text-sm text-red-700 mb-2">
+                                            <strong>Important :</strong> Vous devez inclure les frais de réseau dans votre transaction pour que nous recevions le montant exact. 
+                                            Le montant affiché ci-dessous est ce que nous devons recevoir, pas ce que vous devez envoyer.
+                                        </p>
+                                        <p className="text-sm text-red-700">
+                                            Si nous ne recevons pas exactement ce montant, la vérification automatique ne fonctionnera pas et votre paiement ne sera pas traité.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                             
                             <div className="grid grid-cols-1 gap-4">
                                 {/* Amount */}
                                 <div>
-                                    <label className="font-semibold text-slate-700">Montant à envoyer:</label>
+                                    <label className="font-semibold text-slate-700">Montant que nous devons recevoir (EXACTEMENT):</label>
                                     <div className="text-lg font-mono bg-white p-3 rounded border mt-1 flex items-center justify-between">
                                         <div className="flex items-center">
                                             {selectedCurrency && (
@@ -207,7 +227,7 @@ const PaymentInterface: React.FC = () => {
                                                     alt={`Icon ${selectedCurrency.code}`}
                                                 />
                                             )}
-                                            <span>{paymentData.amount} {paymentData.currency}</span>
+                                            <span className="font-bold text-red-600">{paymentData.amount} {paymentData.currency}</span>
                                         </div>
                                         <button
                                             onClick={() => copyToClipboard(paymentData.amount.toString())}
@@ -221,6 +241,9 @@ const PaymentInterface: React.FC = () => {
                                             Réseau: {selectedCurrency.network}
                                         </div>
                                     )}
+                                    <div className="text-xs text-orange-600 mt-2 font-medium">
+                                        ⚠️ N'oubliez pas d'ajouter les frais de réseau à votre transaction pour que nous recevions exactement ce montant
+                                    </div>
                                 </div>
 
                                 {/* Deposit Address */}
@@ -239,21 +262,21 @@ const PaymentInterface: React.FC = () => {
                                     </div>
                                 )}
 
-                                {/* Memo */}
-                                {paymentData.memo && (
+                                {/* Payment ID */}
+                                {paymentData.payment_id && (
                                     <div>
-                                        <label className="font-semibold text-slate-700">Memo (OBLIGATOIRE):</label>
-                                        <div className="text-sm font-mono bg-yellow-50 p-3 rounded border border-yellow-300 mt-1 flex items-center justify-between">
-                                            <span className="text-yellow-800">{paymentData.memo}</span>
+                                        <label className="font-semibold text-slate-700">ID de paiement:</label>
+                                        <div className="text-sm font-mono bg-blue-50 p-3 rounded border border-blue-300 mt-1 flex items-center justify-between">
+                                            <span className="text-blue-800">{paymentData.payment_id}</span>
                                             <button
-                                                onClick={() => copyToClipboard(paymentData.memo!)}
-                                                className="text-yellow-600 hover:text-yellow-800 ml-2"
+                                                onClick={() => copyToClipboard(paymentData.payment_id!)}
+                                                className="text-blue-600 hover:text-blue-800 ml-2"
                                             >
                                                 <Copy size={16} />
                                             </button>
                                         </div>
-                                        <p className="text-xs text-yellow-600 mt-1">
-                                            ⚠️ Le memo est obligatoire pour identifier votre paiement
+                                        <p className="text-xs text-blue-600 mt-1">
+                                            ID unique pour le suivi de votre paiement
                                         </p>
                                     </div>
                                 )}
@@ -273,13 +296,13 @@ const PaymentInterface: React.FC = () => {
                             <h3 className="text-lg font-semibold mb-4">Instructions de paiement</h3>
                             <div className="bg-orange-50 border border-orange-200 p-4 rounded-lg">
                                 <ul className="text-sm text-orange-700 space-y-2">
-                                    <li>• Envoyez exactement {paymentData.amount} {paymentData.currency}</li>
+                                    <li className="font-semibold">• Nous devons recevoir EXACTEMENT {paymentData.amount} {paymentData.currency} sur notre adresse</li>
+                                    <li className="font-semibold">• Incluez les frais de réseau dans votre transaction pour que nous recevions le montant exact</li>
                                     {selectedCurrency && (
                                         <li>• Utilisez le réseau {selectedCurrency.network}</li>
                                     )}
-                                    {paymentData.memo && (
-                                        <li>• N'oubliez pas d'inclure le memo dans votre transaction</li>
-                                    )}
+                                    <li>• Le montant affiché est ce que nous devons recevoir, pas ce que vous devez envoyer</li>
+                                    <li>• La vérification automatique se fait toutes les 30 secondes</li>
                                     <li>• La confirmation peut prendre 1-10 minutes</li>
                                     <li>• Ne fermez pas cette page avant confirmation</li>
                                     <li>• Le paiement expire automatiquement après le délai</li>

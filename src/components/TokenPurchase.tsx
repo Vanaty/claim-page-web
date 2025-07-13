@@ -23,7 +23,6 @@ interface PaymentHistory {
     token_amount: number;
     status: string;
     payment_url?: string;
-    memo?: string;
     deposit_address?: string;
     created_at: string;
     completed_at: string;
@@ -50,9 +49,6 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
     const [showHistory, setShowHistory] = useState(false);
     const [loadingHistory, setLoadingHistory] = useState(false);
     const [showCurrencySelection, setShowCurrencySelection] = useState(false);
-    const [transactionIdToCheck, setTransactionIdToCheck] = useState('');
-    const [transactionStatus, setTransactionStatus] = useState<any>(null);
-    const [checkingTransaction, setCheckingTransaction] = useState(false);
 
     useEffect(() => {
         loadTokenPackages();
@@ -123,9 +119,9 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
             const response = await createPayment(packageData.id, selectedCurrency.code);
 
             // Vérifier si la création du paiement a réussi
-            if (response.success && (response.deposit_address || response.memo)) {
+            if (response.success && response.deposit_address) {
                 // Redirect to payment interface with payment data
-                navigate(`/payment/${response.memo}`, {
+                navigate(`/payment/${response.payment_id}`, {
                     state: {
                         paymentData: {
                             ...response,
@@ -220,39 +216,6 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
         setShowHistory(!showHistory);
         if (!showHistory && paymentHistory.length === 0) {
             loadPaymentHistory();
-        }
-    };
-
-    const checkTransactionStatus = async () => {
-        if (!transactionIdToCheck.trim()) return;
-
-        try {
-            setCheckingTransaction(true);
-            const result = await checkPaymentStatus(transactionIdToCheck.trim());
-
-            if (result.status === 'paid' || result.status === 'confirmed' || result.status === 'completed') {
-                setTransactionStatus(result);
-                if (showToast) {
-                    showToast('success', 'Le paiement a été confirmé avec succès');
-                }
-            } else if (result.status === 'failed' || result.status === 'cancelled') {
-                setTransactionStatus(result);
-                if (showToast) {
-                    showToast('error', 'Le paiement a échoué ou a été annulé');
-                }
-            } else {
-                setTransactionStatus(result);
-                if (showToast) {
-                    showToast('info', 'Le paiement est en cours de traitement');
-                }
-            }
-        } catch (error) {
-            console.error('Transaction status check failed:', error);
-            if (showToast) {
-                showToast('error', 'Erreur lors de la vérification de l\'ID de transaction');
-            }
-        } finally {
-            setCheckingTransaction(false);
         }
     };
 
@@ -512,16 +475,7 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
                                                             Continuer le paiement
                                                         </a>
                                                     )}
-                                                    {payment.status === 'pending' && !payment.payment_url && payment.memo && (
-                                                        <div className="text-xs">
-                                                            <span className="text-slate-600">Memo:</span>
-                                                            <div className="font-mono text-blue-600 cursor-pointer" 
-                                                                 onClick={() => copyToClipboard(payment.memo!)}>
-                                                                {payment.memo}
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                    {payment.status === 'pending' && !payment.payment_url && !payment.memo && (
+                                                    {payment.status === 'pending' && !payment.payment_url && (
                                                         <span className="text-slate-400 text-xs">
                                                             En attente
                                                         </span>
@@ -536,141 +490,6 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
                             <div className="text-center py-8 text-slate-500">
                                 <Package size={48} className="mx-auto mb-2 opacity-50" />
                                 <p>Aucun paiement dans l'historique</p>
-                            </div>
-                        )}
-                    </div>
-                )}
-            </div>
-
-            {/* Payment Verification by Transaction ID Section */}
-            <div className="mt-8 glass-card p-6">
-                <h4 className="font-semibold text-slate-800 mb-4 flex items-center">
-                    <RefreshCw size={20} className="mr-2" />
-                    Vérifier un paiement par ID de transaction
-                </h4>
-                <div className="bg-blue-50 p-4 rounded-lg mb-4">
-                    <p className="text-sm text-blue-700 mb-2">
-                        Vous avez effectué un paiement et souhaitez vérifier son statut ? 
-                        Entrez votre ID de transaction ci-dessous.
-                    </p>
-                    <p className="text-xs text-blue-600">
-                        L'ID de transaction se trouve dans votre historique de paiements ou dans l'email de confirmation.
-                    </p>
-                </div>
-                
-                <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="flex-1">
-                        <input
-                            type="text"
-                            placeholder="Entrez votre ID de transaction"
-                            className="form-input w-full"
-                            value={transactionIdToCheck}
-                            onChange={(e) => setTransactionIdToCheck(e.target.value)}
-                        />
-                    </div>
-                    <button
-                        onClick={checkTransactionStatus}
-                        disabled={!transactionIdToCheck.trim() || checkingTransaction}
-                        className="btn btn-primary"
-                    >
-                        {checkingTransaction ? (
-                            <>
-                                <RefreshCw size={16} className="mr-2 animate-spin" />
-                                Vérification...
-                            </>
-                        ) : (
-                            <>
-                                <Check size={16} className="mr-2" />
-                                Vérifier
-                            </>
-                        )}
-                    </button>
-                </div>
-
-                {transactionStatus && (
-                    <div className="mt-4 p-4 rounded-lg border">
-                        <div className={`flex items-center mb-3 ${
-                            transactionStatus.status === 'paid' || transactionStatus.status === 'completed' || transactionStatus.status === 'confirmed'
-                                ? 'text-green-600'
-                                : transactionStatus.status === 'pending' || transactionStatus.status === 'processing'
-                                ? 'text-yellow-600'
-                                : 'text-red-600'
-                        }`}>
-                            {transactionStatus.status === 'paid' || transactionStatus.status === 'completed' || transactionStatus.status === 'confirmed' ? (
-                                <Check size={20} className="mr-2" />
-                            ) : transactionStatus.status === 'pending' || transactionStatus.status === 'processing' ? (
-                                <Clock size={20} className="mr-2" />
-                            ) : (
-                                <AlertCircle size={20} className="mr-2" />
-                            )}
-                            <span className="font-semibold">
-                                Statut: {getStatusText(transactionStatus.status)}
-                            </span>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <span className="font-medium text-slate-700">ID de transaction:</span>
-                                <div className="font-mono text-slate-600 break-all">{transactionStatus.id}</div>
-                            </div>
-                            <div>
-                                <span className="font-medium text-slate-700">Montant:</span>
-                                <div className="text-slate-600">{transactionStatus.amount} {transactionStatus.currency}</div>
-                            </div>
-                            <div>
-                                <span className="font-medium text-slate-700">Jetons:</span>
-                                <div className="text-slate-600">{transactionStatus.token_amount} jetons</div>
-                            </div>
-                            <div>
-                                <span className="font-medium text-slate-700">Date de création:</span>
-                                <div className="text-slate-600">
-                                    {new Date(transactionStatus.created_at).toLocaleDateString('fr-FR', {
-                                        day: '2-digit',
-                                        month: '2-digit',
-                                        year: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit'
-                                    })}
-                                </div>
-                            </div>
-                            {transactionStatus.completed_at && (
-                                <div>
-                                    <span className="font-medium text-slate-700">Date de completion:</span>
-                                    <div className="text-slate-600">
-                                        {new Date(transactionStatus.completed_at).toLocaleDateString('fr-FR', {
-                                            day: '2-digit',
-                                            month: '2-digit',
-                                            year: 'numeric',
-                                            hour: '2-digit',
-                                            minute: '2-digit'
-                                        })}
-                                    </div>
-                                </div>
-                            )}
-                            {transactionStatus.memo && (
-                                <div className="md:col-span-2">
-                                    <span className="font-medium text-slate-700">Memo:</span>
-                                    <div className="font-mono text-slate-600 bg-slate-50 p-2 rounded mt-1">
-                                        {transactionStatus.memo}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {(transactionStatus.status === 'pending' || transactionStatus.status === 'processing') && (
-                            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
-                                <p className="text-sm text-yellow-700">
-                                    ⏳ Votre paiement est en cours de traitement. 
-                                    Les confirmations blockchain peuvent prendre jusqu'à 10 minutes.
-                                </p>
-                            </div>
-                        )}
-
-                        {transactionStatus.status === 'failed' && (
-                            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded">
-                                <p className="text-sm text-red-700">
-                                    ❌ Ce paiement a échoué. Contactez le support si vous pensez qu'il s'agit d'une erreur.
-                                </p>
                             </div>
                         )}
                     </div>
@@ -721,7 +540,6 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
                     <ul className="list-disc pl-5 text-blue-700 space-y-1">
                         <li>Paiements traités via blockchain avec taux de change en temps réel</li>
                         <li>Utilisez le bon réseau selon la cryptomonnaie sélectionnée</li>
-                        <li>Le memo est obligatoire pour identifier votre transaction</li>
                         <li>Support disponible : support@{window.location.hostname}</li>
                         <li>Les jetons sont crédités après confirmation blockchain</li>
                         <li>Politique de remboursement : voir nos <Link to="/terms" className="underline">conditions d'utilisation</Link></li>
