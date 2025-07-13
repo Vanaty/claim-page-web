@@ -20,7 +20,7 @@ const PaymentSuccess: React.FC = () => {
             const result = await checkPaymentStatusById(orderId!);
             setPaymentInfo(result);
             
-            if (result.status === 'paid' || result.status === 'confirmed') {
+            if (result.status === 'paid' || result.status === 'confirmed' || result.status === 'completed') {
                 setStatus('success');
                 // Redirect to dashboard after 5 seconds
                 setTimeout(() => {
