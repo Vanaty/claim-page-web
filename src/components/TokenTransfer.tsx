@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Send, AlertCircle, History, RefreshCw, Calendar, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { Send, AlertCircle, History, RefreshCw, Calendar, ArrowUpRight, ArrowDownLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { transferTokens } from '../services/apiService';
+import { getTrasactionHistory, transferTokens } from '../services/apiService';
 import { User } from '../types';
 
 interface TokenTransferProps {
@@ -31,6 +31,8 @@ const TokenTransfer: React.FC<TokenTransferProps> = ({ user, onTokensTransferred
   const [transferHistory, setTransferHistory] = useState<TransferHistory[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   useEffect(() => {
     if (showHistory) {
@@ -43,18 +45,8 @@ const TokenTransfer: React.FC<TokenTransferProps> = ({ user, onTokensTransferred
       setLoadingHistory(true);
       // TODO: Replace with actual API call when endpoint is available
       // const history = await getTransferHistory();
-      
-      // Mock data for now - replace with actual API call
-      const mockHistory: TransferHistory[] = [
-        {
-          id: 1,
-          sender: "EricNas",
-          recipient: "eric",
-          amount: 30,
-          date: "2025-07-20T12:37:46.062195"
-        }
-      ];
-      setTransferHistory(mockHistory);
+      const history = await getTrasactionHistory();
+      setTransferHistory(history); 
     } catch (error) {
       console.error('Failed to load transfer history:', error);
       if (showToast) {
@@ -63,6 +55,16 @@ const TokenTransfer: React.FC<TokenTransferProps> = ({ user, onTokensTransferred
     } finally {
       setLoadingHistory(false);
     }
+  };
+
+  // Pagination calculations
+  const totalPages = Math.ceil(transferHistory.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentTransfers = transferHistory.slice(startIndex, endIndex);
+
+  const goToPage = (page: number) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -89,6 +91,8 @@ const TokenTransfer: React.FC<TokenTransferProps> = ({ user, onTokensTransferred
         onTokensTransferred(amount);
         setRecipientId('');
         setAmount(0);
+        // Reload history after successful transfer
+        loadTransferHistory();
       } else {
         setAlert({ type: 'error', message: data.message || 'Échec du transfert' });
         if (showToast) showToast('error', data.message || 'Échec du transfert');
@@ -244,75 +248,120 @@ const TokenTransfer: React.FC<TokenTransferProps> = ({ user, onTokensTransferred
                   <span className="text-slate-600">Chargement de l'historique...</span>
                 </div>
               ) : transferHistory.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-slate-200">
-                        <th className="text-left py-3 px-2">Date</th>
-                        <th className="text-left py-3 px-2">Type</th>
-                        <th className="text-left py-3 px-2">Utilisateur</th>
-                        <th className="text-left py-3 px-2">Montant</th>
-                        <th className="text-left py-3 px-2">ID Transaction</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {transferHistory.map((transfer) => {
-                        const isOutgoing = transfer.sender.toLowerCase() === user.email?.toLowerCase() || 
-                                          transfer.sender.toLowerCase() === user.username?.toLowerCase();
+                <div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-slate-200">
+                          <th className="text-left py-3 px-2">Date</th>
+                          <th className="text-left py-3 px-2">Type</th>
+                          <th className="text-left py-3 px-2">Utilisateur</th>
+                          <th className="text-left py-3 px-2">Montant</th>
+                          <th className="text-left py-3 px-2">ID Transaction</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {currentTransfers.map((transfer) => {
+                          const isOutgoing = transfer.sender.toLowerCase() === user.email?.toLowerCase() || 
+                                            transfer.sender.toLowerCase() === user.username?.toLowerCase();
+                          
+                          return (
+                            <tr key={transfer.id} className="border-b border-slate-100 hover:bg-slate-50">
+                              <td className="py-3 px-2">
+                                <div className="flex items-center text-slate-600">
+                                  <Calendar size={14} className="mr-2" />
+                                  {new Date(transfer.date).toLocaleDateString('fr-FR', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </div>
+                              </td>
+                              <td className="py-3 px-2">
+                                <div className={`flex items-center ${
+                                  isOutgoing ? 'text-red-600' : 'text-green-600'
+                                }`}>
+                                  {isOutgoing ? (
+                                    <>
+                                      <ArrowUpRight size={14} className="mr-1" />
+                                      <span>Envoyé</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <ArrowDownLeft size={14} className="mr-1" />
+                                      <span>Reçu</span>
+                                    </>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="py-3 px-2">
+                                <span className="font-medium">
+                                  {isOutgoing ? transfer.recipient : transfer.sender}
+                                </span>
+                              </td>
+                              <td className="py-3 px-2">
+                                <span className={`font-semibold ${
+                                  isOutgoing ? 'text-red-600' : 'text-green-600'
+                                }`}>
+                                  {isOutgoing ? '-' : '+'}{transfer.amount} jetons
+                                </span>
+                              </td>
+                              <td className="py-3 px-2">
+                                <span className="text-slate-500 font-mono text-xs">
+                                  #{transfer.id}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  {/* Pagination Controls */}
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-200">
+                      <div className="text-sm text-slate-600">
+                        Affichage {startIndex + 1}-{Math.min(endIndex, transferHistory.length)} sur {transferHistory.length} résultats
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => goToPage(currentPage - 1)}
+                          disabled={currentPage === 1}
+                          className="p-2 rounded-lg border border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50"
+                        >
+                          <ChevronLeft size={16} />
+                        </button>
                         
-                        return (
-                          <tr key={transfer.id} className="border-b border-slate-100 hover:bg-slate-50">
-                            <td className="py-3 px-2">
-                              <div className="flex items-center text-slate-600">
-                                <Calendar size={14} className="mr-2" />
-                                {new Date(transfer.date).toLocaleDateString('fr-FR', {
-                                  day: '2-digit',
-                                  month: '2-digit',
-                                  year: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
-                              </div>
-                            </td>
-                            <td className="py-3 px-2">
-                              <div className={`flex items-center ${
-                                isOutgoing ? 'text-red-600' : 'text-green-600'
-                              }`}>
-                                {isOutgoing ? (
-                                  <>
-                                    <ArrowUpRight size={14} className="mr-1" />
-                                    <span>Envoyé</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <ArrowDownLeft size={14} className="mr-1" />
-                                    <span>Reçu</span>
-                                  </>
-                                )}
-                              </div>
-                            </td>
-                            <td className="py-3 px-2">
-                              <span className="font-medium">
-                                {isOutgoing ? transfer.recipient : transfer.sender}
-                              </span>
-                            </td>
-                            <td className="py-3 px-2">
-                              <span className={`font-semibold ${
-                                isOutgoing ? 'text-red-600' : 'text-green-600'
-                              }`}>
-                                {isOutgoing ? '-' : '+'}{transfer.amount} jetons
-                              </span>
-                            </td>
-                            <td className="py-3 px-2">
-                              <span className="text-slate-500 font-mono text-xs">
-                                #{transfer.id}
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                        <div className="flex space-x-1">
+                          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                            <button
+                              key={page}
+                              onClick={() => goToPage(page)}
+                              className={`px-3 py-2 rounded-lg text-sm ${
+                                currentPage === page
+                                  ? 'bg-blue-600 text-white'
+                                  : 'border border-slate-300 hover:bg-slate-50'
+                              }`}
+                            >
+                              {page}
+                            </button>
+                          ))}
+                        </div>
+                        
+                        <button
+                          onClick={() => goToPage(currentPage + 1)}
+                          disabled={currentPage === totalPages}
+                          className="p-2 rounded-lg border border-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50"
+                        >
+                          <ChevronRight size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="text-center py-8 text-slate-500">

@@ -159,3 +159,8 @@ export const getSupportedCurrencies = async (): Promise<SupportedCurrency[]> => 
   const response = await api.get('/payments/currencies');
   return response.data;
 }
+
+export const getTrasactionHistory = async (): Promise<any[]> => {
+  const response = await api.get(`/users/transactions`);
+  return response.data;
+}
