@@ -270,7 +270,7 @@ const TokenTransfer: React.FC<TokenTransferProps> = ({ user, onTokensTransferred
                               <td className="py-3 px-2">
                                 <div className="flex items-center text-slate-600">
                                   <Calendar size={14} className="mr-2" />
-                                  {new Date(transfer.date).toLocaleDateString('fr-FR', {
+                                  {new Date(transfer.date+'Z').toLocaleDateString('fr-FR', {
                                     day: '2-digit',
                                     month: '2-digit',
                                     year: 'numeric',
