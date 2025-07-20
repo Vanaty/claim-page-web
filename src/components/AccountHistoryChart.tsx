@@ -80,7 +80,7 @@ const AccountHistoryChart: React.FC<AccountHistoryChartProps> = ({ accountId, ac
   }
 
   // Sort history by date and take last 10 entries
-  const sortedHistory = [...history].sort((a, b) => a.date.getTime() - b.date.getTime()).slice(-10);
+  const sortedHistory = [...history].sort((a, b) => a.date.getTime() - b.date.getTime()).slice(-24);
 
   if (sortedHistory.length === 0) {
     return (
@@ -181,7 +181,7 @@ const AccountHistoryChart: React.FC<AccountHistoryChartProps> = ({ accountId, ac
       <div className="flex items-center justify-between mb-3">
         <h4 className="text-sm font-medium text-slate-700 flex items-center">
           <TrendingUp size={14} className="mr-1 text-blue-600" />
-          Historique des 10 dernières actions
+          Historique des 24 dernières actions
         </h4>
         <div className="flex items-center gap-2">
           <span className="text-xs text-slate-500">{sortedHistory.length} entrées</span>
