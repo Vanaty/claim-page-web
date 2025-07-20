@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Send, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Send, AlertCircle, History, RefreshCw, Calendar, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { transferTokens } from '../services/apiService';
 import { User } from '../types';
@@ -15,11 +15,55 @@ interface TransferAlert {
   message: string;
 }
 
+interface TransferHistory {
+  id: number;
+  sender: string;
+  recipient: string;
+  amount: number;
+  date: string;
+}
+
 const TokenTransfer: React.FC<TokenTransferProps> = ({ user, onTokensTransferred, showToast }) => {
   const [recipientId, setRecipientId] = useState('');
   const [amount, setAmount] = useState<number>(0);
   const [alert, setAlert] = useState<TransferAlert | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [transferHistory, setTransferHistory] = useState<TransferHistory[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+
+  useEffect(() => {
+    if (showHistory) {
+      loadTransferHistory();
+    }
+  }, [showHistory]);
+
+  const loadTransferHistory = async () => {
+    try {
+      setLoadingHistory(true);
+      // TODO: Replace with actual API call when endpoint is available
+      // const history = await getTransferHistory();
+      
+      // Mock data for now - replace with actual API call
+      const mockHistory: TransferHistory[] = [
+        {
+          id: 1,
+          sender: "EricNas",
+          recipient: "eric",
+          amount: 30,
+          date: "2025-07-20T12:37:46.062195"
+        }
+      ];
+      setTransferHistory(mockHistory);
+    } catch (error) {
+      console.error('Failed to load transfer history:', error);
+      if (showToast) {
+        showToast('error', 'Erreur lors du chargement de l\'historique');
+      }
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,7 +111,7 @@ const TokenTransfer: React.FC<TokenTransferProps> = ({ user, onTokensTransferred
     <div>
       <h2 className="text-2xl font-bold text-slate-800 mb-6">Transfert de jetons</h2>
       
-      <div className="glass-card p-6">
+      <div className="glass-card p-6 mb-6">
         <AnimatePresence>
           {alert && !showToast && (
             <motion.div
@@ -165,6 +209,121 @@ const TokenTransfer: React.FC<TokenTransferProps> = ({ user, onTokensTransferred
             ⚠️ Note : Les bonus ne peuvent pas être transférés
           </p>
         </div>
+      </div>
+
+      {/* Transfer History Section */}
+      <div className="glass-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-slate-800 flex items-center">
+            <History size={20} className="mr-2" />
+            Historique des transferts
+          </h3>
+          <button
+            onClick={() => setShowHistory(!showHistory)}
+            className="flex items-center text-blue-600 hover:text-blue-800"
+          >
+            {showHistory ? 'Masquer' : 'Afficher'}
+            <RefreshCw 
+              size={16} 
+              className={`ml-1 ${loadingHistory ? 'animate-spin' : ''}`} 
+            />
+          </button>
+        </div>
+
+        <AnimatePresence>
+          {showHistory && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {loadingHistory ? (
+                <div className="flex items-center justify-center py-8">
+                  <RefreshCw size={24} className="animate-spin text-blue-600 mr-2" />
+                  <span className="text-slate-600">Chargement de l'historique...</span>
+                </div>
+              ) : transferHistory.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-slate-200">
+                        <th className="text-left py-3 px-2">Date</th>
+                        <th className="text-left py-3 px-2">Type</th>
+                        <th className="text-left py-3 px-2">Utilisateur</th>
+                        <th className="text-left py-3 px-2">Montant</th>
+                        <th className="text-left py-3 px-2">ID Transaction</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {transferHistory.map((transfer) => {
+                        const isOutgoing = transfer.sender.toLowerCase() === user.email?.toLowerCase() || 
+                                          transfer.sender.toLowerCase() === user.username?.toLowerCase();
+                        
+                        return (
+                          <tr key={transfer.id} className="border-b border-slate-100 hover:bg-slate-50">
+                            <td className="py-3 px-2">
+                              <div className="flex items-center text-slate-600">
+                                <Calendar size={14} className="mr-2" />
+                                {new Date(transfer.date).toLocaleDateString('fr-FR', {
+                                  day: '2-digit',
+                                  month: '2-digit',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </div>
+                            </td>
+                            <td className="py-3 px-2">
+                              <div className={`flex items-center ${
+                                isOutgoing ? 'text-red-600' : 'text-green-600'
+                              }`}>
+                                {isOutgoing ? (
+                                  <>
+                                    <ArrowUpRight size={14} className="mr-1" />
+                                    <span>Envoyé</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <ArrowDownLeft size={14} className="mr-1" />
+                                    <span>Reçu</span>
+                                  </>
+                                )}
+                              </div>
+                            </td>
+                            <td className="py-3 px-2">
+                              <span className="font-medium">
+                                {isOutgoing ? transfer.recipient : transfer.sender}
+                              </span>
+                            </td>
+                            <td className="py-3 px-2">
+                              <span className={`font-semibold ${
+                                isOutgoing ? 'text-red-600' : 'text-green-600'
+                              }`}>
+                                {isOutgoing ? '-' : '+'}{transfer.amount} jetons
+                              </span>
+                            </td>
+                            <td className="py-3 px-2">
+                              <span className="text-slate-500 font-mono text-xs">
+                                #{transfer.id}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-slate-500">
+                  <History size={48} className="mx-auto mb-2 opacity-50" />
+                  <p>Aucun transfert dans l'historique</p>
+                  <p className="text-xs mt-1">Vos transferts de jetons apparaîtront ici</p>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
