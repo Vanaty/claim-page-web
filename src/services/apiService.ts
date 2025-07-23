@@ -188,6 +188,6 @@ export const updateAnnouncement = async (id: string, announcement: any): Promise
   return response.data;
 };
 
-export const deleteAnnouncement = async (id: string): Promise<void> => {
-  await api.delete(`/announcements/${id}`);
+export const deleteAnnouncement = async (id: string): Promise<any> => {
+  return await api.delete(`/announcements/${id}`);
 };

@@ -59,10 +59,22 @@ const AnnouncementManager: React.FC<AnnouncementManagerProps> = ({ user, showToa
 
     try {
       if (editingId) {
-        await updateAnnouncement(editingId, formData);
-        showToast('success', 'Annonce mise à jour avec succès');
+        const response = await updateAnnouncement(editingId, formData);
+        if(response.success) {
+            showToast('success', 'Annonce mise à jour avec succès');
+        } else {
+            showToast('error', 'Erreur lors de la mise à jour de l\'annonce');
+            return;
+        }
       } else {
-        await createAnnouncement(formData);
+        const response = await createAnnouncement(formData);
+        if(response.success) {
+            showToast('success', 'Annonce créée avec succès');
+            user.tokens -= 300;
+        } else {
+            showToast('error', 'Erreur lors de la création de l\'annonce');
+            return;
+        }
         showToast('success', 'Annonce créée avec succès (-300 jetons)');
       }
       
