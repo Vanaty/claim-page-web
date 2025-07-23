@@ -70,7 +70,9 @@ const AnnouncementManager: React.FC<AnnouncementManagerProps> = ({ user, showToa
         const response = await createAnnouncement(formData);
         if(response.success) {
             showToast('success', 'Annonce créée avec succès');
-            user.tokens -= 300;
+            if(user.role === 'user') {
+                user.tokens -= 300;
+            }
         } else {
             showToast('error', 'Erreur lors de la création de l\'annonce');
             return;
@@ -103,8 +105,8 @@ const AnnouncementManager: React.FC<AnnouncementManagerProps> = ({ user, showToa
     if (!confirm('Êtes-vous sûr de vouloir supprimer cette annonce ?')) return;
     
     try {
-      await deleteAnnouncement(id);
-      showToast('success', 'Annonce supprimée');
+      const response = await deleteAnnouncement(id);
+      showToast((response.status) ? 'success': 'error', 'Annonce supprimée');
       loadAnnouncements();
     } catch (error) {
       showToast('error', 'Erreur lors de la suppression');
