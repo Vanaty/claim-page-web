@@ -513,26 +513,26 @@ const AnnouncementManager: React.FC<AnnouncementManagerProps> = ({ user, showToa
         </div>
         
         {announcements.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 mx-auto mb-4 bg-slate-100 rounded-full flex items-center justify-center">
-              <Plus className="text-slate-400" size={24} />
+          <div className="text-center py-8 md:py-12">
+            <div className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 bg-slate-100 rounded-full flex items-center justify-center">
+              <Plus className="text-slate-400" size={20} />
             </div>
-            <p className="text-slate-500 mb-2">Aucune annonce trouvée</p>
-            <p className="text-sm text-slate-400">Créez votre première annonce pour commencer</p>
+            <p className="text-slate-500 mb-2 text-sm md:text-base">Aucune annonce trouvée</p>
+            <p className="text-xs md:text-sm text-slate-400">Créez votre première annonce pour commencer</p>
           </div>
         ) : (
-          <div className="grid gap-4">
+          <div className="space-y-3 md:space-y-4">
             {announcements.map((announcement) => (
               <motion.div
                 key={announcement.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`glass-card p-4 transition-all hover:shadow-md ${!announcement.isActive ? 'opacity-60' : ''}`}
+                className={`glass-card p-3 md:p-4 transition-all hover:shadow-md ${!announcement.isActive ? 'opacity-60' : ''}`}
               >
-                <div className="flex justify-between items-start gap-4">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full flex-shrink-0 ${
                         announcement.type === 'success' ? 'bg-green-100 text-green-800' :
                         announcement.type === 'warning' ? 'bg-yellow-100 text-yellow-800' :
                         announcement.type === 'error' ? 'bg-red-100 text-red-800' :
@@ -540,45 +540,57 @@ const AnnouncementManager: React.FC<AnnouncementManagerProps> = ({ user, showToa
                       }`}>
                         {announcement.type === 'success' ? '✅' : 
                          announcement.type === 'warning' ? '⚠️' : 
-                         announcement.type === 'error' ? '❌' : 'ℹ️'} {announcement.type.toUpperCase()}
+                         announcement.type === 'error' ? '❌' : 'ℹ️'} 
+                        <span className="hidden xs:inline ml-1">{announcement.type.toUpperCase()}</span>
                       </span>
                       {!announcement.isActive && (
-                        <span className="px-2 py-1 text-xs bg-slate-100 text-slate-600 rounded-full">
-                          INACTIVE
+                        <span className="px-2 py-1 text-xs bg-slate-100 text-slate-600 rounded-full flex-shrink-0">
+                          <span className="hidden xs:inline">INACTIVE</span>
+                          <span className="xs:hidden">❌</span>
                         </span>
                       )}
-                      <span className="text-xs text-slate-400">
-                        {new Date(announcement.createdAt).toLocaleDateString('fr-FR')}
+                      <span className="text-xs text-slate-400 flex-shrink-0">
+                        {new Date(announcement.createdAt).toLocaleDateString('fr-FR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: window.innerWidth < 640 ? '2-digit' : 'numeric'
+                        })}
                       </span>
                     </div>
-                    <h3 className="font-semibold text-slate-800 mb-1 truncate">{announcement.title}</h3>
-                    <p className="text-slate-600 text-sm mb-2 line-clamp-2">{announcement.description}</p>
+                    <h3 className="font-semibold text-slate-800 mb-2 text-sm md:text-base leading-tight">
+                      {announcement.title}
+                    </h3>
+                    <p className="text-slate-600 text-xs md:text-sm mb-3 leading-relaxed">
+                      {announcement.description}
+                    </p>
                     {announcement.link && (
                       <a
                         href={announcement.link}
-                        className="text-blue-600 hover:text-blue-700 text-sm font-medium inline-flex items-center gap-1"
+                        className="text-blue-600 hover:text-blue-700 text-xs md:text-sm font-medium inline-flex items-center gap-1 break-all"
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        {announcement.linkText || 'En savoir plus'}
-                        <span className="text-xs">↗</span>
+                        <span className="truncate max-w-[200px] sm:max-w-none">
+                          {announcement.linkText || 'En savoir plus'}
+                        </span>
+                        <span className="text-xs flex-shrink-0">↗</span>
                       </a>
                     )}
                   </div>
-                  <div className="flex gap-2 flex-shrink-0">
+                  <div className="flex gap-1 sm:gap-2 flex-shrink-0 self-start sm:self-auto">
                     <button
                       onClick={() => handleEdit(announcement)}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors touch-manipulation"
                       title="Modifier"
                     >
-                      <Edit size={16} />
+                      <Edit size={16} className="sm:w-4 sm:h-4 w-5 h-5" />
                     </button>
                     <button
                       onClick={() => handleDelete(announcement.id)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors touch-manipulation"
                       title="Supprimer"
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={16} className="sm:w-4 sm:h-4 w-5 h-5" />
                     </button>
                   </div>
                 </div>

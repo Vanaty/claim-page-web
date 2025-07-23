@@ -124,16 +124,17 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
             </Link>
             
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-4">
-              <div className="flex items-center bg-blue-50 px-3 py-1 rounded-full">
-                <span className="token-balance mr-1">{user.tokens}</span>
-                <span className="text-slate-600 text-sm">Jetons</span>
+            <div className="flex items-center space-x-2 md:space-x-4">
+              <div className="flex items-center bg-blue-50 px-2 md:px-3 py-1 rounded-full">
+                <span className="token-balance mr-1 text-sm md:text-base">{user.tokens}</span>
+                <span className="text-slate-600 text-xs md:text-sm">Jetons</span>
               </div>
               
               <div className="relative group">
-                <button className="btn btn-outline-primary">
-                  <User size={16} className="mr-1" />
-                  <span>{user.username}</span>
+                <button className="btn btn-outline-primary text-sm md:text-base px-2 md:px-3">
+                  <User size={14} className="mr-1 md:mr-2" />
+                  <span className="hidden sm:inline">{user.username}</span>
+                  <span className="sm:hidden">{user.username.slice(0, 3)}...</span>
                 </button>
                 <div className="absolute right-0 w-48 mt-2 origin-top-right bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
                   <div className="py-1">
@@ -146,8 +147,8 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
               </div>
             </div>
             
-            {/* Mobile menu button */}
-            <div className="md:hidden">
+            {/* Mobile menu button - Only show for very small screens */}
+            <div className="xs:hidden">
               <button
                 onClick={toggleMobileMenu}
                 className="text-slate-700 hover:text-blue-700 focus:outline-none"
