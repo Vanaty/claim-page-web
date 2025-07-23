@@ -208,32 +208,32 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
 
         {/* Tab Navigation */}
         <div className="hidden md:block border-b border-slate-200 mb-6">
-          <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+            <nav className="-mb-px overflow-x-scroll flex space-x-6" aria-label="Tabs">
             {allNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = isActiveRoute(item.path);
               return (
-          <Link
+            <Link
             key={item.path}
             to={item.path}
             className={`group inline-flex items-center py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200
               ${
-                isActive
+              isActive
             ? 'border-blue-600 text-blue-700'
             : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
               }`}
-          >
+            >
             <Icon
               size={18}
               className={`mr-2 ${
-                isActive ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-500'
+              isActive ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-500'
               }`}
             />
             <span>{item.label}</span>
-          </Link>
+            </Link>
               );
             })}
-          </nav>
+            </nav>
         </div>
 
         {/* Page Content with Animation */}
