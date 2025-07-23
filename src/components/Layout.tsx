@@ -112,7 +112,7 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
             </Link>
             
             {/* Desktop Navigation */}
-            <div className="flex items-center space-x-2 md:space-x-4">
+            <div className="hidden md:flex items-center space-x-2 md:space-x-4">
               <div className="flex items-center bg-blue-50 px-2 md:px-3 py-1 rounded-full">
                 <span className="token-balance mr-1 text-sm md:text-base">{user.tokens}</span>
                 <span className="text-slate-600 text-xs md:text-sm">Jetons</span>
@@ -135,8 +135,8 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
               </div>
             </div>
             
-            {/* Mobile menu button - Only show for very small screens */}
-            <div className="xs:hidden">
+            {/* Mobile menu button */}
+            <div className="md:hidden flex items-center">
               <button
                 onClick={toggleMobileMenu}
                 className="text-slate-700 hover:text-blue-700 focus:outline-none"
@@ -161,13 +161,30 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden bg-white border-b border-slate-200"
           >
-            <div className="container mx-auto px-4 py-3 space-y-2">
+            <div className="container mx-auto px-4 py-3 space-y-1">
+              {allNavItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center w-full px-3 py-2 rounded-lg text-slate-700 hover:bg-slate-100 ${
+                      isActiveRoute(item.path) ? 'bg-slate-100 text-blue-700' : ''
+                    }`}
+                  >
+                    <Icon size={18} className="mr-3" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+              <div className="border-t border-slate-200 !my-2"></div>
               <div className="flex justify-between items-center p-2 bg-blue-50 rounded-lg">
                 <span className="text-sm text-slate-600">Jetons disponibles:</span>
                 <span className="token-balance">{user.tokens}</span>
               </div>
               <button 
-                onClick={onLogout} 
+                onClick={() => { onLogout(); setIsMobileMenuOpen(false); }} 
                 className="flex w-full items-center px-3 py-2 rounded-lg text-red-600 hover:bg-red-50"
               >
                 <LogOut size={16} className="mr-2" />
@@ -190,22 +207,33 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
         />
 
         {/* Tab Navigation */}
-        <div className="flex overflow-x-auto md:overflow-visible space-x-2 md:space-x-4 pb-2 md:pb-0 mb-6">
-          {allNavItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`nav-link flex items-center flex-shrink-0 ${
-                  isActiveRoute(item.path) ? 'active' : ''
-                }`}
-              >
-                <Icon size={18} className="mr-2" />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
+        <div className="hidden md:block border-b border-slate-200 mb-6">
+          <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+            {allNavItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = isActiveRoute(item.path);
+              return (
+          <Link
+            key={item.path}
+            to={item.path}
+            className={`group inline-flex items-center py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200
+              ${
+                isActive
+            ? 'border-blue-600 text-blue-700'
+            : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+              }`}
+          >
+            <Icon
+              size={18}
+              className={`mr-2 ${
+                isActive ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-500'
+              }`}
+            />
+            <span>{item.label}</span>
+          </Link>
+              );
+            })}
+          </nav>
         </div>
 
         {/* Page Content with Animation */}
