@@ -164,3 +164,30 @@ export const getTrasactionHistory = async (): Promise<any[]> => {
   const response = await api.get(`/users/transactions`);
   return response.data;
 }
+
+// Announcement API calls
+export const getAnnouncements = async (): Promise<any[]> => {
+  const response = await api.get('/announcements');
+  return response.data;
+};
+
+export const createAnnouncement = async (announcement: {
+  title: string;
+  description: string;
+  link?: string;
+  linkText?: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  isActive: boolean;
+}): Promise<any> => {
+  const response = await api.post('/admin/announcements', announcement);
+  return response.data;
+};
+
+export const updateAnnouncement = async (id: string, announcement: any): Promise<any> => {
+  const response = await api.put(`/admin/announcements/${id}`, announcement);
+  return response.data;
+};
+
+export const deleteAnnouncement = async (id: string): Promise<void> => {
+  await api.delete(`/admin/announcements/${id}`);
+};

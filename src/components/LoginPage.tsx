@@ -107,7 +107,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, isLoading = false }) => 
                   disabled={isLoading}
                 />
                 <span className="text-slate-600 leading-relaxed">
-                  J'utilise ce service à mes propres risques.
+                  J'ai lu et j'accepte les <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Conditions d'utilisation</a> et la <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Politique de confidentialité</a>.
                 </span>
               </label>
             </div>

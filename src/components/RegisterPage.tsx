@@ -18,6 +18,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onRegister, isLoading = fal
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordMatch, setPasswordMatch] = useState(true);
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -169,10 +170,26 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onRegister, isLoading = fal
               )}
             </div>
 
+            <div className="mt-4">
+              <label className="flex items-start space-x-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={acceptTerms}
+                  onChange={(e) => setAcceptTerms(e.target.checked)}
+                  className="mt-1 rounded border-slate-300 text-blue-600 focus:border-blue-500 focus:ring-blue-500"
+                  disabled={isLoading}
+                  required
+                />
+                <span className="text-slate-600 leading-relaxed">
+                  J'ai lu et j'accepte les <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Conditions d'utilisation</a> et la <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Politique de confidentialité</a>.
+                </span>
+              </label>
+            </div>
+
             <button 
               type="submit" 
               className="btn btn-primary w-full mt-6"
-              disabled={isLoading || !passwordMatch}
+              disabled={isLoading || !passwordMatch || !acceptTerms}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">

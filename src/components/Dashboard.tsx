@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Wallet, Clock, Zap } from 'lucide-react';
+import { TrendingUp, Wallet } from 'lucide-react';
 import { User, TronAccount } from '../types';
 import AccountCard from './AccountCard';
 import { motion } from 'framer-motion';

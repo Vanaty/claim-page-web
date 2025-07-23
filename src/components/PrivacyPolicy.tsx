@@ -325,14 +325,6 @@ const PrivacyPolicy: React.FC = () => {
                   </ul>
                 </div>
               </div>
-              
-              <div className="mt-4 p-4 bg-amber-50 rounded-lg border-l-4 border-amber-400">
-                <p className="text-amber-800 text-sm">
-                  <strong>Autorité de contrôle :</strong> Si vous n'êtes pas satisfait de notre réponse, 
-                  vous pouvez également déposer une réclamation auprès de la Commission Nationale de l'Informatique et des Libertés (CNIL) 
-                  ou de l'autorité de protection des données de votre pays de résidence.
-                </p>
-              </div>
             </section>
           </div>
         </motion.div>

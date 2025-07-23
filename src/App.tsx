@@ -24,6 +24,7 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import AboutUs from './components/AboutUs';
 import Footer from './components/Footer';
 import PaymentInterface from './components/PaymentInterface';
+import AnnouncementManager from './components/AnnouncementManager';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -316,8 +317,16 @@ function App() {
                         path="/admin/sitekeys" 
                         element={<SiteKeyManager showToast={showToast} />} 
                       />
+                      <Route 
+                        path="/admin/announcements" 
+                        element={<AnnouncementManager user={user} showToast={showToast} />} 
+                      />
                     </>
                   )}
+                  <Route 
+                    path="/announcements" 
+                    element={<AnnouncementManager user={user} showToast={showToast} />} 
+                  />
                   <Route path="/payment/success/:orderId" element={<PaymentSuccess />} />
                   <Route path="/payment/:paymentId" element={<PaymentInterface />} />
                   <Route path="*" element={<Navigate to="/dashboard" replace />} />

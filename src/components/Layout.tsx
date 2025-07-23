@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { User, Wallet, LogOut, Menu, X, TrendingUp, Plus, Send, Settings, ShieldAlert, Key, CreditCard } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User, Wallet, LogOut, Menu, X, TrendingUp, Plus, Send, Settings, ShieldAlert, Key, CreditCard, Newspaper, Gift, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User as UserType } from '../types';
+import { getAnnouncements } from '../services/apiService';
 
 interface LayoutProps {
   user: UserType;
@@ -14,7 +15,53 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, accountsCount }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [currentAnnouncementIndex, setCurrentAnnouncementIndex] = useState(0);
   const location = useLocation();
+
+  // Fetch announcements
+  useEffect(() => {
+    const fetchAnnouncementsData = async () => {
+      try {
+        const data = await getAnnouncements();
+        const activeAnnouncements = data.filter((ann: any) => ann.isActive);
+        setAnnouncements(activeAnnouncements);
+      } catch (error) {
+        console.error('Failed to fetch announcements:', error);
+        // Fallback to default announcement if API fails
+        setAnnouncements([{
+          id: 'default',
+          title: 'Achat de jetons par crypto avec bonus !',
+          description: 'Payez en USDT, TRX, DOGE et recevez jusqu\'à +150 jetons bonus selon votre pack !',
+          link: '/buy-tokens',
+          linkText: 'Voir les packs',
+          type: 'info',
+        }, {
+          id: 'default-2',
+          title: 'Nouveau système de paiement',
+          description: 'Payez en crypto et recevez des bonus exclusifs',
+          link: '/buy-tokens',
+          linkText: 'En savoir plus',
+          type: 'success',
+        }]);
+      }
+    };
+
+    fetchAnnouncementsData();
+  }, []);
+
+  // Auto-scroll announcements
+  useEffect(() => {
+    if (announcements.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentAnnouncementIndex((prev) => 
+        prev >= announcements.length - 1 ? 0 : prev + 1
+      );
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [announcements.length]);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -24,11 +71,33 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
     return location.pathname === path;
   };
 
+  const getAnnouncementColor = (type: string) => {
+    switch (type) {
+      case 'success': return 'from-emerald-500 to-teal-600';
+      case 'warning': return 'from-amber-500 to-orange-600';
+      case 'error': return 'from-rose-500 to-red-600';
+      default: return 'from-sky-500 to-indigo-600';
+    }
+  };
+
+  const nextAnnouncement = () => {
+    setCurrentAnnouncementIndex((prev) => 
+      prev >= announcements.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevAnnouncement = () => {
+    setCurrentAnnouncementIndex((prev) => 
+      prev <= 0 ? announcements.length - 1 : prev - 1
+    );
+  };
+
   const navItems = [
     { path: '/dashboard', icon: TrendingUp, label: 'Dashboard' },
     { path: '/accounts', icon: Plus, label: `Comptes (${accountsCount})` },
     { path: '/transfer', icon: Send, label: 'Transfert' },
     { path: '/buy-tokens', icon: CreditCard, label: 'Acheter des jetons' },
+    { path: '/announcements', icon: Newspaper, label: 'Annonces' },
     { path: '/settings', icon: Settings, label: 'Paramètres' },
   ];
 
@@ -39,6 +108,8 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
 
   // Combine nav items based on user role
   const allNavItems = userRole === 'admin' ? [...navItems, ...adminNavItems] : navItems;
+
+  const currentAnnouncement = announcements[currentAnnouncementIndex];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200">
@@ -118,8 +189,75 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
         )}
       </AnimatePresence>
 
-      {/* Tab Navigation */}
+      {/* Main Content */}
       <div className="container mx-auto px-4 py-6">
+        {/* Announcements Banner */}
+        {announcements.length > 0 && currentAnnouncement && (
+          <motion.div 
+            className={`bg-gradient-to-r ${getAnnouncementColor(currentAnnouncement.type)} rounded-lg p-4 mb-6 text-white relative overflow-hidden`}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            key={currentAnnouncementIndex}
+          >
+            <div className="flex flex-col md:flex-row items-center justify-between">
+              <div className="flex items-center mb-3 md:mb-0 flex-1">
+                <div className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full mr-3">
+                  NOUVEAU
+                </div>
+                <Gift size={20} className="mr-2" />
+                <span className="font-semibold">{currentAnnouncement.title}</span>
+              </div>
+              {currentAnnouncement.link && (
+                <Link 
+                  to={currentAnnouncement.link}
+                  className="bg-white text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center text-sm"
+                >
+                  <CreditCard size={16} className="mr-2" />
+                  {currentAnnouncement.linkText || 'En savoir plus'}
+                </Link>
+              )}
+            </div>
+            <p className="text-sm opacity-90 mt-2">
+              {currentAnnouncement.description}
+            </p>
+
+            {/* Navigation controls */}
+            {announcements.length > 1 && (
+              <>
+                <button
+                  onClick={prevAnnouncement}
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-20 hover:bg-opacity-30 rounded-full p-1 transition-all"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <button
+                  onClick={nextAnnouncement}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-20 hover:bg-opacity-30 rounded-full p-1 transition-all"
+                >
+                  <ChevronRight size={16} />
+                </button>
+                
+                {/* Dots indicator */}
+                <div className="flex justify-center mt-3 space-x-1">
+                  {announcements.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentAnnouncementIndex(index)}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        index === currentAnnouncementIndex 
+                          ? 'bg-white' 
+                          : 'bg-white bg-opacity-50'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </motion.div>
+        )}
+
+        {/* Tab Navigation */}
         <div className="flex overflow-x-auto md:overflow-visible space-x-2 md:space-x-4 pb-2 md:pb-0 mb-6">
           {allNavItems.map((item) => {
             const Icon = item.icon;

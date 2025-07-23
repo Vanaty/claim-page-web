@@ -265,6 +265,43 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
+      {/* New Feature Announcement */}
+      <section className="bg-gradient-to-r from-green-500 to-blue-600 py-8">
+        <div className="container mx-auto px-4">
+          <motion.div 
+            className="text-center text-white"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <div className="inline-flex items-center bg-white/20 px-4 py-2 rounded-full mb-4">
+              <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full mr-3">NOUVEAU</span>
+              <span className="font-semibold">Achat de jetons par crypto maintenant disponible !</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold mb-3">
+              Payez en crypto et recevez des bonus exclusifs
+            </h2>
+            <p className="text-lg md:text-xl mb-6 opacity-90 max-w-3xl mx-auto">
+              Achetez vos jetons avec USDT, TRX, DOGE et autres cryptos. 
+              Profitez de <span className="font-bold text-yellow-300">bonus jusqu'à +150 jetons</span> selon votre pack !
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link 
+                to="/register"
+                className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center"
+              >
+                Découvrir les packs
+                <ArrowRight className="ml-2" size={18} />
+              </Link>
+              <div className="text-sm opacity-80">
+                ✓ Paiement sécurisé ✓ Confirmation rapide ✓ Support multi-réseaux
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section id="features" className="bg-white py-12 md:py-16">
         <div className="container mx-auto px-4">
@@ -458,7 +495,7 @@ const LandingPage: React.FC = () => {
           <div className="mt-12 text-center">
             <div className="inline-flex items-center bg-blue-50 px-6 py-3 rounded-full">
               <span className="text-blue-800 font-medium mr-2">🏆 Certifié par :</span>
-              <span className="text-blue-600">Cryptomus • RGPD • ISO 27001 (en cours)</span>
+              <span className="text-blue-600">RGPD • ISO 27001 (en cours)</span>
             </div>
           </div>
         </div>

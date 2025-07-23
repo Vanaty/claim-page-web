@@ -139,12 +139,17 @@ const TermsOfService: React.FC = () => {
               </p>
               <div className="bg-slate-50 p-4 rounded-lg">
                 <ul className="space-y-2">
-                  <li><strong>Email :</strong> support@tronpick-autoclaim.com</li>
-                  <li><strong>Telegram :</strong> @AutoClaimSupport</li>
-                  <li><strong>Discord :</strong> Auto-Claim Community</li>
+                  <li><strong>Email :</strong> <a href={`mailto:support@${window.location.hostname}`} className="text-blue-600 hover:underline">support@{window.location.hostname}</a></li>
+                  <li>Pour les questions relatives à la confidentialité, contactez <a href={`mailto:privacy@${window.location.hostname}`} className="text-blue-600 hover:underline">privacy@{window.location.hostname}</a>.</li>
                 </ul>
               </div>
             </section>
+
+            <div className="mt-12 text-center">
+              <p className="text-sm text-slate-500">
+                &copy; {new Date().getFullYear()} Auto-Claim. Tous droits réservés.
+              </p>
+            </div>
           </div>
         </motion.div>
       </div>
