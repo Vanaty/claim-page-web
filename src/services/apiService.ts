@@ -179,15 +179,15 @@ export const createAnnouncement = async (announcement: {
   type: 'info' | 'success' | 'warning' | 'error';
   isActive: boolean;
 }): Promise<any> => {
-  const response = await api.post('/admin/announcements', announcement);
+  const response = await api.post('/announcements', announcement);
   return response.data;
 };
 
 export const updateAnnouncement = async (id: string, announcement: any): Promise<any> => {
-  const response = await api.put(`/admin/announcements/${id}`, announcement);
+  const response = await api.put(`/announcements/${id}`, announcement);
   return response.data;
 };
 
 export const deleteAnnouncement = async (id: string): Promise<void> => {
-  await api.delete(`/admin/announcements/${id}`);
+  await api.delete(`/announcements/${id}`);
 };
