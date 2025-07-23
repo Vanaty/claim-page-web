@@ -196,44 +196,65 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
       </AnimatePresence>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6">
         {/* Announcements Banner */}
-        <AnnouncementBanner
-          announcements={announcements}
-          currentAnnouncementIndex={currentAnnouncementIndex}
-          onNext={nextAnnouncement}
-          onPrev={prevAnnouncement}
-          onSetIndex={setCurrentAnnouncementIndex}
-        />
+        <div className="mb-4 sm:mb-6">
+          <AnnouncementBanner
+            announcements={announcements}
+            currentAnnouncementIndex={currentAnnouncementIndex}
+            onNext={nextAnnouncement}
+            onPrev={prevAnnouncement}
+            onSetIndex={setCurrentAnnouncementIndex}
+          />
+        </div>
 
-        {/* Tab Navigation */}
+        {/* Tab Navigation - Desktop only, mobile uses hamburger menu */}
         <div className="hidden md:block border-b border-slate-200 mb-6">
-            <nav className="-mb-px overflow-x-scroll flex space-x-6" aria-label="Tabs">
+          <nav className="-mb-px flex space-x-6 overflow-x-auto scrollbar-hide" aria-label="Tabs">
             {allNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = isActiveRoute(item.path);
               return (
-            <Link
-            key={item.path}
-            to={item.path}
-            className={`group inline-flex items-center py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200
-              ${
-              isActive
-            ? 'border-blue-600 text-blue-700'
-            : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
-              }`}
-            >
-            <Icon
-              size={18}
-              className={`mr-2 ${
-              isActive ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-500'
-              }`}
-            />
-            <span>{item.label}</span>
-            </Link>
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`group inline-flex items-center py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200 whitespace-nowrap
+                    ${
+                      isActive
+                        ? 'border-blue-600 text-blue-700'
+                        : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                    }`}
+                >
+                  <Icon
+                    size={18}
+                    className={`mr-2 ${
+                      isActive ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-500'
+                    }`}
+                  />
+                  <span>{item.label}</span>
+                </Link>
               );
             })}
-            </nav>
+          </nav>
+        </div>
+
+        {/* Mobile breadcrumb/current page indicator */}
+        <div className="md:hidden mb-4">
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-3">
+            {(() => {
+              const currentItem = allNavItems.find(item => isActiveRoute(item.path));
+              if (currentItem) {
+                const Icon = currentItem.icon;
+                return (
+                  <div className="flex items-center text-slate-700">
+                    <Icon size={20} className="mr-2 text-blue-600" />
+                    <span className="font-medium">{currentItem.label}</span>
+                  </div>
+                );
+              }
+              return null;
+            })()}
+          </div>
         </div>
 
         {/* Page Content with Animation */}
@@ -244,6 +265,7 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
+            className="min-h-[60vh]"
           >
             {children}
           </motion.div>
