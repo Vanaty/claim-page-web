@@ -102,7 +102,7 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200">
       {/* Header Navigation */}
-      <header className="bg-white shadow-md sticky top-0 z-20">
+      <header className="bg-white shadow-md sticky top-0 z-30">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -159,7 +159,7 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white border-b border-slate-200 sticky z-10 top-16 left-0 right-0 shadow-lg rounded-b-lg overflow-hidden"
+            className="md:hidden bg-white border-b border-slate-200 sticky z-20 top-16 left-0 right-0 shadow-lg rounded-b-lg overflow-hidden"
           >
             <div className="container mx-auto px-4 py-3 space-y-1">
               {allNavItems.map((item) => {
@@ -198,7 +198,7 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
       {/* Main Content */}
       <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6">
         {/* Announcements Banner */}
-        <div className="mb-4 sm:mb-6">
+        <div className="mb-4 sm:mb-6 sticky top-16 z-10">
           <AnnouncementBanner
             announcements={announcements}
             currentAnnouncementIndex={currentAnnouncementIndex}
