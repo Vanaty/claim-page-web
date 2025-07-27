@@ -255,7 +255,8 @@ const TokenTransfer: React.FC<TokenTransferProps> = ({ user, onTokensTransferred
                         <tr className="border-b border-slate-200">
                           <th className="text-left py-3 px-2">Date</th>
                           <th className="text-left py-3 px-2">Type</th>
-                          <th className="text-left py-3 px-2">Utilisateur</th>
+                          <th className="text-left py-3 px-2">Expéditeur</th>
+                          <th className="text-left py-3 px-2">Destinataire</th>
                           <th className="text-left py-3 px-2">Montant</th>
                           <th className="text-left py-3 px-2">ID Transaction</th>
                         </tr>
@@ -297,8 +298,13 @@ const TokenTransfer: React.FC<TokenTransferProps> = ({ user, onTokensTransferred
                                 </div>
                               </td>
                               <td className="py-3 px-2">
-                                <span className="font-medium">
-                                  {isOutgoing ? transfer.recipient : transfer.sender}
+                                <span className={`font-medium ${isOutgoing ? 'text-blue-600' : 'text-slate-600'}`}>
+                                  {transfer.sender}
+                                </span>
+                              </td>
+                              <td className="py-3 px-2">
+                                <span className={`font-medium ${!isOutgoing ? 'text-blue-600' : 'text-slate-600'}`}>
+                                  {transfer.recipient}
                                 </span>
                               </td>
                               <td className="py-3 px-2">
