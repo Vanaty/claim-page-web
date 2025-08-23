@@ -391,6 +391,14 @@ const AdminPanel: React.FC<AdminPanelProps> = () => {
                       Date Ajout <SortIcon column="addedAt" />
                     </div>
                   </th>
+                  <th 
+                    className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100"
+                    onClick={() => handleSort('nextClaim')}
+                  >
+                    <div className="flex items-center">
+                      Date Prochaine Réclamation <SortIcon column="nextClaim" />
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-slate-200">
@@ -424,6 +432,19 @@ const AdminPanel: React.FC<AdminPanelProps> = () => {
                       <div className="text-sm text-slate-500">
                         {account.addedAt 
                           ? new Date(account.addedAt).toLocaleString('fr-FR', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })
+                          : 'N/A'}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-slate-500">
+                        {account.nextClaim 
+                          ? new Date(account.nextClaim).toLocaleString('fr-FR', {
                               day: '2-digit',
                               month: '2-digit',
                               year: 'numeric',
