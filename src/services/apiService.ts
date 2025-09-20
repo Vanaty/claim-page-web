@@ -140,8 +140,11 @@ export const getTokenPackages = async (): Promise<any[]> => {
   return response.data;
 };
 
-export const checkPaymentStatus = async (orderId: string): Promise<any> => {
-  const response = await api.get(`/payments/verify/${orderId}`);
+export const checkPaymentStatus = async (orderId: string, txId: string): Promise<any> => {
+  const response = await api.put(`/payments/verify/${orderId}`, {
+    'txId': txId,
+    'payment_id': orderId
+  });
   return response.data;
 };
 

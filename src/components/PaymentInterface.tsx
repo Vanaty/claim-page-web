@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Clock, Copy, Check, AlertCircle, RefreshCw, ArrowLeft } from 'lucide-react';
-import { checkPaymentStatusById } from '../services/apiService';
+import { checkPaymentStatusById,checkPaymentStatus } from '../services/apiService';
 
 interface PaymentData {
     amount: number;
@@ -12,7 +12,7 @@ interface PaymentData {
     expires_at: string;
 }
 
-const PaymentInterface: React.FC = () => {
+const PaymentInterface: React.FC<{ showToast: (type: 'success' | 'error' | 'info', message: string) => void }> = ({ showToast }) => {
     const { paymentId } = useParams<{ paymentId: string }>();
     const navigate = useNavigate();
     const location = useLocation();
@@ -21,6 +21,7 @@ const PaymentInterface: React.FC = () => {
     
     const [timeLeft, setTimeLeft] = useState<number>(0);
     const [checkingPayment, setCheckingPayment] = useState(false);
+    const [txHash, setTxHash] = useState('');
     const [paymentStatus, setPaymentStatus] = useState<'pending' | 'completed' | 'failed' | 'expired'>('pending');
 
     useEffect(() => {
@@ -69,6 +70,30 @@ const PaymentInterface: React.FC = () => {
             return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
         return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    };
+
+    const handleVerifyPayment = (e: React.FormEvent) => {
+        e.preventDefault();
+        verifyPaymentByTxHash(txHash);
+    };
+
+    const verifyPaymentByTxHash = async (txHash: string) => {
+        if (!paymentData?.payment_id) return;
+        try {
+            setCheckingPayment(true);
+            const result = await checkPaymentStatus(paymentData.payment_id, txHash);
+            if (result.success && (result.status === 'paid' || result.status === 'confirmed' || result.status === 'completed')) {
+                setPaymentStatus('completed');
+                setTimeout(() => {
+                    navigate('/payment-success/' + paymentData.payment_id);
+                }, 2000);
+            }
+            showToast('info', result.message || 'Vérification terminée');
+        } catch (error) {
+            console.error('Payment verification failed:', error);
+        } finally {
+            setCheckingPayment(false);
+        }
     };
 
     const copyToClipboard = (text: string) => {
@@ -133,9 +158,28 @@ const PaymentInterface: React.FC = () => {
                             <div className="text-blue-600">
                                 <Clock size={48} className="mx-auto mb-4" />
                                 <h1 className="text-2xl font-bold mb-2">Paiement en attente</h1>
-                                <p className="text-slate-600 mb-4">
-                                    Suivez les instructions ci-dessous pour finaliser votre paiement
+                                {/* Formulaire pour le verification par transaction hash */}
+                                <p className="text-slate-500 text-sm mt-6 mb-3">
+                                    Si la vérification automatique prend du temps, vous pouvez vérifier manuellement :
                                 </p>
+                                <form onSubmit={handleVerifyPayment} className="flex justify-center max-w-lg mx-auto">
+                                    <input
+                                        type="text"
+                                        placeholder="Entrez le hash de la transaction (TxID)"
+                                        value={txHash}
+                                        onChange={(e) => setTxHash(e.target.value)}
+                                        className="w-full px-4 py-2 text-slate-700 bg-white border border-slate-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        required
+                                        disabled={checkingPayment}
+                                    />
+                                    <button 
+                                        type="submit" 
+                                        className="px-6 py-2 text-white bg-blue-600 rounded-r-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-blue-400 flex items-center"
+                                        disabled={checkingPayment || !txHash}
+                                    >
+                                        {checkingPayment ? <RefreshCw size={16} className="animate-spin" /> : 'Vérifier'}
+                                    </button>
+                                </form>
                             </div>
                         )}
 

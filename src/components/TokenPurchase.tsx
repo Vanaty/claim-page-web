@@ -151,12 +151,12 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
         }
     };
 
-    const checkPayment = async () => {
+    const checkPayment = async (txId: string) => {
         if (!paymentData?.payment_id) return;
 
         try {
             setCheckingPayment(true);
-            const result = await checkPaymentStatus(paymentData.payment_id);
+            const result = await checkPaymentStatus(paymentData.payment_id, txId);
 
             if (result.status === 'paid' || result.status === 'confirmed' || result.status === 'completed') {
                 setPaymentStatus('completed');
@@ -475,11 +475,24 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
                                                             Continuer le paiement
                                                         </a>
                                                     )}
+                                                    {payment.status === 'expired' && (
+                                                        <button
+                                                            onClick={() => {
+                                                                // setVerificationPayment(payment);
+                                                                // setIsVerificationModalOpen(true);
+                                                                if (showToast) showToast('info', 'Fonctionnalité de vérification manuelle à venir.');
+                                                            }}
+                                                            className="text-orange-600 hover:text-orange-800 text-xs"
+                                                        >
+                                                            Vérifier manuellement
+                                                        </button>
+                                                    )}
                                                     {payment.status === 'pending' && !payment.payment_url && (
                                                         <span className="text-slate-400 text-xs">
                                                             En attente
                                                         </span>
                                                     )}
+
                                                 </td>
                                             </tr>
                                         ))}

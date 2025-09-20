@@ -328,7 +328,7 @@ function App() {
                     element={<AnnouncementManager user={user} showToast={showToast} />} 
                   />
                   <Route path="/payment/success/:orderId" element={<PaymentSuccess />} />
-                  <Route path="/payment/:paymentId" element={<PaymentInterface />} />
+                  <Route path="/payment/:paymentId" element={<PaymentInterface showToast={showToast} />} />
                   <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
               </Layout>
