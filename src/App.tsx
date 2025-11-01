@@ -25,6 +25,7 @@ import AboutUs from './components/AboutUs';
 import Footer from './components/Footer';
 import PaymentInterface from './components/PaymentInterface';
 import AnnouncementManager from './components/AnnouncementManager';
+import WheelOfFortune from './components/WheelOfFortune';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -329,6 +330,7 @@ function App() {
                   />
                   <Route path="/payment/success/:orderId" element={<PaymentSuccess />} />
                   <Route path="/payment/:paymentId" element={<PaymentInterface showToast={showToast} />} />
+                  <Route path="/wheel/:paymentId" element={<WheelOfFortune showToast={showToast} />} />
                   <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
               </Layout>

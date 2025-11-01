@@ -14,7 +14,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, isLoading = false }) => 
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(true);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,7 +97,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, isLoading = false }) => 
               </div>
             </div>
 
-            <div className="mt-4">
+            {/* <div className="mt-4">
               <label className="flex items-start space-x-2 text-sm">
                 <input
                   type="checkbox"
@@ -110,7 +110,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, isLoading = false }) => 
                   J'ai lu et j'accepte les <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Conditions d'utilisation</a> et la <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Politique de confidentialité</a>.
                 </span>
               </label>
-            </div>
+            </div> */}
 
             <button
               type="submit"

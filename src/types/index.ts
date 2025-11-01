@@ -101,3 +101,27 @@ export interface SupportedCurrency {
   icon?: string;
   fees?: number;
 }
+
+export interface WheelPrize {
+  id: string;
+  name: string;
+  value: number;
+  type: 'tokens' | 'bad_luck';
+  color?: string;
+}
+
+export interface WheelData {
+  prizes: WheelPrize[];
+  spinsRemaining: number;
+  canSpin: boolean;
+}
+
+export interface WheelSpinRequest {
+  userId: string;
+}
+
+export interface WheelSpinResult {
+  result: WheelPrize;
+  signature: string;
+  spinsRemaining: number;
+}

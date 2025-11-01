@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { User, TronAccount,AccountHistory, LoginResponse, ClaimResult, TransferAlert, PasswordResetRequest, PasswordResetResponse, PasswordChangeRequest, SiteKey, SupportedCurrency } from '../types';
+import { User, TronAccount,AccountHistory, LoginResponse, ClaimResult, TransferAlert, PasswordResetRequest, PasswordResetResponse, PasswordChangeRequest, SiteKey, SupportedCurrency, WheelData, WheelSpinRequest, WheelSpinResult } from '../types';
 import { parseTronAccount } from './utils';
 
 const api = axios.create({
@@ -193,4 +193,15 @@ export const updateAnnouncement = async (id: string, announcement: any): Promise
 
 export const deleteAnnouncement = async (id: string): Promise<any> => {
   return await api.delete(`/announcements/${id}`);
+};
+
+// Wheel of Fortune API functions
+export const fetchWheelData = async (): Promise<WheelData> => {
+  const response = await api.get('/wheel/data');
+  return response.data;
+};
+
+export const spinWheel = async (userId: string): Promise<WheelSpinResult> => {
+  const response = await api.post('/wheel/spin', { userId });
+  return response.data;
 };
