@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { User as UserType } from '../types';
 import { getAnnouncements } from '../services/apiService';
 import AnnouncementBanner from './AnnouncementBanner';
+import ChristmasDecorations from './ChristmasDecorations';
+import { useChristmasMode } from '../hooks/useChristmasMode';
 
 interface LayoutProps {
   user: UserType;
@@ -19,6 +21,7 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [currentAnnouncementIndex, setCurrentAnnouncementIndex] = useState(0);
   const location = useLocation();
+  const { isChristmasMode, getChristmasAnnouncement, getChristmasStyles } = useChristmasMode();
 
   // Fetch announcements
   useEffect(() => {
@@ -26,11 +29,18 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
       try {
         const data = await getAnnouncements();
         const activeAnnouncements = data.filter((ann: any) => ann.isActive);
-        setAnnouncements(activeAnnouncements);
+        
+        // En mode Noël, ajouter l'annonce spéciale de Noël en premier
+        if (isChristmasMode) {
+          const christmasAnnouncement = getChristmasAnnouncement();
+          setAnnouncements([christmasAnnouncement, ...activeAnnouncements]);
+        } else {
+          setAnnouncements(activeAnnouncements);
+        }
       } catch (error) {
         console.error('Failed to fetch announcements:', error);
         // Fallback to default announcement if API fails
-        setAnnouncements([{
+        let fallbackAnnouncements = [{
           id: 'default',
           title: 'Achat de jetons par crypto avec bonus !',
           description: 'Payez en USDT, TRX, DOGE et recevez jusqu\'à +150 jetons bonus selon votre pack !',
@@ -44,12 +54,20 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
           link: '/buy-tokens',
           linkText: 'En savoir plus',
           type: 'success',
-        }]);
+        }];
+
+        // En mode Noël, remplacer par l'annonce de Noël
+        if (isChristmasMode) {
+          const christmasAnnouncement = getChristmasAnnouncement();
+          fallbackAnnouncements = [christmasAnnouncement, ...fallbackAnnouncements];
+        }
+
+        setAnnouncements(fallbackAnnouncements);
       }
     };
 
     fetchAnnouncementsData();
-  }, []);
+  }, [isChristmasMode, getChristmasAnnouncement]);
 
   // Auto-scroll announcements
   useEffect(() => {
@@ -99,16 +117,23 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
   // Combine nav items based on user role
   const allNavItems = userRole === 'admin' ? [...navItems, ...adminNavItems] : navItems;
 
+  const christmasStyles = getChristmasStyles();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200">
+    <div className={`min-h-screen ${isChristmasMode ? christmasStyles.backgroundColor : 'bg-gradient-to-br from-slate-50 to-slate-200'}`}>
+      {/* Christmas Decorations */}
+      <ChristmasDecorations isActive={isChristmasMode} />
+      
       {/* Header Navigation */}
-      <header className="bg-white shadow-md sticky top-0 z-30">
+      <header className={`${isChristmasMode ? 'bg-gradient-to-r from-red-100 to-green-100' : 'bg-white'} shadow-md sticky top-0 z-30`}>
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/dashboard" className="flex items-center">
-              <Wallet className="text-blue-700 mr-2" size={24} />
-              <span className="font-bold text-xl text-blue-800">Auto-Claim</span>
+              <Wallet className={`${isChristmasMode ? 'text-red-600' : 'text-blue-700'} mr-2`} size={24} />
+              <span className={`font-bold text-xl ${isChristmasMode ? 'text-green-800' : 'text-blue-800'}`}>
+                {isChristmasMode ? '🎄 Auto-Claim 🎅' : 'Auto-Claim'}
+              </span>
             </Link>
             
             {/* Desktop Navigation */}

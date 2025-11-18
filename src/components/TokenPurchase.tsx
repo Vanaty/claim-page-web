@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { createPayment, getTokenPackages, checkPaymentStatus, getUserPaymentHistory, getSupportedCurrencies } from '../services/apiService';
 import { User,SupportedCurrency } from '../types';
+import { useChristmasMode } from '../hooks/useChristmasMode';
 
 interface TokenPackage {
     id: string;
@@ -49,6 +50,8 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
     const [showHistory, setShowHistory] = useState(false);
     const [loadingHistory, setLoadingHistory] = useState(false);
     const [showCurrencySelection, setShowCurrencySelection] = useState(false);
+    
+    const { isChristmasMode, getChristmasStyles } = useChristmasMode();
 
     useEffect(() => {
         loadTokenPackages();
@@ -257,9 +260,30 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
         }
     };
 
+    const christmasStyles = getChristmasStyles();
+
     return (
         <div>
-            <h2 className="text-2xl font-bold text-slate-800 mb-6">Acheter des jetons</h2>
+            {/* Christmas Header */}
+            {isChristmasMode && (
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="mb-6 text-center"
+                >
+                    <div className="text-6xl mb-2">🎄🎁🎅</div>
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-red-600 to-green-600 bg-clip-text text-transparent mb-2">
+                        Offres Spéciales de Noël !
+                    </h1>
+                    <p className="text-lg text-slate-600">
+                        Bonus exceptionnels sur tous les packs de jetons ! 🎉
+                    </p>
+                </motion.div>
+            )}
+
+            <h2 className={`text-2xl font-bold ${isChristmasMode ? 'text-green-800' : 'text-slate-800'} mb-6`}>
+                {isChristmasMode ? '🎄 Acheter des jetons de Noël 🎁' : 'Acheter des jetons'}
+            </h2>
 
             {/* Currency Selection */}
             <div className="glass-card p-6 mb-6">
@@ -340,26 +364,35 @@ const TokenPurchase: React.FC<TokenPurchaseProps> = ({ user, onTokensPurchased, 
                 {packages.map((pkg) => (
                     <motion.div
                         key={pkg.id}
-                        className={`glass-card p-6 relative ${pkg.popular ? 'border-2 border-blue-500' : ''}`}
+                        className={`glass-card p-6 relative ${pkg.popular ? (isChristmasMode ? 'border-2 border-red-500' : 'border-2 border-blue-500') : ''} ${isChristmasMode ? 'bg-gradient-to-br from-red-50 to-green-50' : ''}`}
                         whileHover={{ y: -5 }}
                         transition={{ duration: 0.2 }}
                     >
                         {pkg.popular && (
                             <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                                <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                    Populaire
+                                <span className={`${isChristmasMode ? 'bg-red-500' : 'bg-blue-500'} text-white px-3 py-1 rounded-full text-sm font-semibold`}>
+                                    {isChristmasMode ? '🎁 Offre Noël' : 'Populaire'}
                                 </span>
                             </div>
                         )}
 
+                        {/* Christmas decorations */}
+                        {isChristmasMode && (
+                            <div className="absolute top-2 right-2 text-2xl animate-pulse">
+                                🎄
+                            </div>
+                        )}
+
                         <div className="text-center">
-                            <h3 className="text-xl font-bold text-slate-800 mb-2">{pkg.name}</h3>
-                            <div className="text-3xl font-bold text-blue-600 mb-2">
+                            <h3 className={`text-xl font-bold ${isChristmasMode ? 'text-green-800' : 'text-slate-800'} mb-2`}>
+                                {isChristmasMode ? '🎅 ' : ''}{pkg.name}{isChristmasMode ? ' 🎁' : ''}
+                            </h3>
+                            <div className={`text-3xl font-bold ${isChristmasMode ? 'text-red-600' : 'text-blue-600'} mb-2`}>
                                 {pkg.tokens} jetons
                             </div>
                             {pkg.bonus && (
-                                <div className="text-sm text-green-600 font-semibold mb-2">
-                                    +{pkg.bonus} jetons bonus
+                                <div className={`text-sm ${isChristmasMode ? 'text-red-600' : 'text-green-600'} font-semibold mb-2`}>
+                                    {isChristmasMode ? '🎁 ' : '+'}{pkg.bonus} jetons bonus{isChristmasMode ? ' de Noël !' : ''}
                                 </div>
                             )}
                             <div className="text-2xl font-bold text-slate-800 mb-2">

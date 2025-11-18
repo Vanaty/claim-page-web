@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { fetchAccounts } from '../services/apiService';
 import { useUniqueData } from '../hooks/useUniqueData';
 import { parseTronAccount } from '../services/utils';
+import { useChristmasMode } from '../hooks/useChristmasMode';
 
 interface DashboardProps {
   user: User;
@@ -16,6 +17,7 @@ interface DashboardProps {
 const Dashboard: React.FC<DashboardProps> = ({ user, accounts, onUpdateAccounts }) => {
   const [isAutoClaiming, setIsAutoClaiming] = useState(true);
   const uniqueAccounts = useUniqueData(accounts);
+  const { isChristmasMode } = useChristmasMode();
   
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -82,9 +84,51 @@ const Dashboard: React.FC<DashboardProps> = ({ user, accounts, onUpdateAccounts 
 
   return (
     <div>
+      {/* Christmas Banner */}
+      {isChristmasMode && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 bg-gradient-to-r from-red-500 to-green-500 rounded-xl p-6 text-white relative overflow-hidden"
+        >
+          <div className="absolute inset-0 bg-white bg-opacity-10"></div>
+          <div className="relative z-10 text-center">
+            <div className="text-4xl mb-2">🎄🎅🎁</div>
+            <h3 className="text-xl font-bold mb-2">Joyeux Noël et Bonne Année ! 🎉</h3>
+            <p className="text-sm opacity-90">
+              Profitez de nos offres spéciales de Noël avec des bonus exceptionnels !
+            </p>
+          </div>
+          {/* Floating snowflakes */}
+          {Array.from({ length: 10 }, (_, i) => (
+            <motion.div
+              key={i}
+              className="absolute text-white text-opacity-30 pointer-events-none"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [-10, 10, -10],
+                rotate: [0, 180, 360],
+              }}
+              transition={{
+                duration: 3 + Math.random() * 2,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+              }}
+            >
+              ❄️
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
+
       {/* Auto-claim toggle */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <h2 className="text-2xl font-bold text-slate-800">Tableau de bord</h2>
+        <h2 className={`text-2xl font-bold ${isChristmasMode ? 'text-green-800' : 'text-slate-800'}`}>
+          {isChristmasMode ? '🎄 Tableau de bord 🎄' : 'Tableau de bord'}
+        </h2>
         
         <div className="flex items-center">
           <div className="relative inline-flex items-center cursor-pointer mr-4">

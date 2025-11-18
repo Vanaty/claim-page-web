@@ -1,3 +1,8 @@
+
+/* Import Christmas Mode Styles */
+@import './components/ChristmasMode.css';
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

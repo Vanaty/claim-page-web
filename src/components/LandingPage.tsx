@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Wallet, Zap, Clock, Shield, ArrowRight, Users, ChevronDown, Menu, X } from 'lucide-react';
+import { useChristmasMode } from '../hooks/useChristmasMode';
+import ChristmasDecorations from './ChristmasDecorations';
 
 const LandingPage: React.FC = () => {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isChristmasMode, getChristmasStyles } = useChristmasMode();
 
   const toggleFaq = (index: number) => {
     setActiveFaq(activeFaq === index ? null : index);
@@ -60,16 +63,23 @@ const LandingPage: React.FC = () => {
     }
   ];
 
+  const christmasStyles = getChristmasStyles();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200">
+    <div className={`min-h-screen ${isChristmasMode ? christmasStyles.backgroundColor : 'bg-gradient-to-br from-slate-50 to-slate-200'}`}>
+      {/* Christmas Decorations */}
+      <ChristmasDecorations isActive={isChristmasMode} />
+      
       {/* Header */}
-      <header className="bg-white/95 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-50">
+      <header className={`${isChristmasMode ? 'bg-gradient-to-r from-red-100/95 to-green-100/95' : 'bg-white/95'} backdrop-blur-sm border-b border-slate-200 sticky top-0 z-50`}>
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2">
-              <Wallet className="text-blue-700" size={28} />
-              <span className="text-xl font-bold text-slate-800">TronPick Auto-Claim</span>
+              <Wallet className={isChristmasMode ? "text-red-600" : "text-blue-700"} size={28} />
+              <span className={`text-xl font-bold ${isChristmasMode ? 'christmas-text' : 'text-slate-800'}`}>
+                {isChristmasMode ? '🎄 TronPick Auto-Claim 🎅' : 'TronPick Auto-Claim'}
+              </span>
             </Link>
 
             {/* Desktop Navigation */}

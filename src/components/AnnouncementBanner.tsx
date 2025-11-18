@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Gift, CreditCard, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useChristmasMode } from '../hooks/useChristmasMode';
 
 interface Announcement {
   id: string;
@@ -20,7 +21,11 @@ interface AnnouncementBannerProps {
   onSetIndex: (index: number) => void;
 }
 
-const getAnnouncementColor = (type: string) => {
+const getAnnouncementColor = (type: string, isChristmasMode: boolean) => {
+  if (isChristmasMode) {
+    return 'from-red-600 to-green-600';
+  }
+  
   switch (type) {
     case 'success': return 'from-emerald-500 to-teal-600';
     case 'warning': return 'from-amber-500 to-orange-600';
@@ -36,6 +41,7 @@ const AnnouncementBanner: React.FC<AnnouncementBannerProps> = ({
   onPrev,
   onSetIndex,
 }) => {
+  const { isChristmasMode } = useChristmasMode();
   const currentAnnouncement = announcements[currentAnnouncementIndex];
 
   if (!announcements.length || !currentAnnouncement) {
@@ -44,7 +50,7 @@ const AnnouncementBanner: React.FC<AnnouncementBannerProps> = ({
 
   return (
     <motion.div
-      className={`bg-gradient-to-r ${getAnnouncementColor(currentAnnouncement.type)} rounded-lg p-4 mb-6 text-white relative overflow-hidden`}
+      className={`bg-gradient-to-r ${getAnnouncementColor(currentAnnouncement.type, isChristmasMode)} rounded-lg p-4 mb-6 text-white relative overflow-hidden`}
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -52,11 +58,15 @@ const AnnouncementBanner: React.FC<AnnouncementBannerProps> = ({
     >
       <div className="flex flex-col md:flex-row items-center justify-between">
         <div className="flex items-center mb-3 md:mb-0 flex-1">
-          <div className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full mr-3">
-            NOUVEAU
+          <div className={`${isChristmasMode ? 'bg-green-600' : 'bg-red-500'} text-white text-xs font-bold px-2 py-1 rounded-full mr-3`}>
+            {isChristmasMode ? '🎄 NOËL' : 'NOUVEAU'}
           </div>
           <Gift size={20} className="mr-2" />
-          <span className="font-semibold">{currentAnnouncement.title}</span>
+          <span className="font-semibold">
+            {isChristmasMode && '🎅 '}
+            {currentAnnouncement.title}
+            {isChristmasMode && ' 🎁'}
+          </span>
         </div>
         {currentAnnouncement.link && (
           <Link
