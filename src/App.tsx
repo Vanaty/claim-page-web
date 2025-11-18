@@ -26,6 +26,7 @@ import Footer from './components/Footer';
 import PaymentInterface from './components/PaymentInterface';
 import AnnouncementManager from './components/AnnouncementManager';
 import WheelOfFortune from './components/WheelOfFortune';
+import { useChristmasMode } from './hooks/useChristmasMode';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -34,6 +35,9 @@ function App() {
   const [resetToken, setResetToken] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string>('user');
   const [accountsLoaded, setAccountsLoaded] = useState(false);
+  
+  // Christmas mode
+  const { isChristmasMode } = useChristmasMode();
   
   // Toast state
   const [toasts, setToasts] = useState<ToastProps[]>([]);
@@ -191,7 +195,7 @@ function App() {
   }
 
   return (
-    <div className="App min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className={`App min-h-screen ${isChristmasMode ? 'christmas-mode' : 'bg-gradient-to-br from-slate-50 to-slate-100'}`}>
       {/* Toast Container */}
       <ToastContainer toasts={toasts} />
       
