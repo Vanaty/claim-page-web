@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { User, Mail, Lock, Wallet, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useChristmasMode } from '../hooks/useChristmasMode';
+import ChristmasDecorations from './ChristmasDecorations';
 
 interface RegisterPageProps {
   onRegister: (username: string, email: string, password: string) => void;
@@ -19,6 +21,8 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onRegister, isLoading = fal
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordMatch, setPasswordMatch] = useState(true);
   const [acceptTerms, setAcceptTerms] = useState(false);
+  
+  const { isChristmasMode, getChristmasStyles } = useChristmasMode();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,24 +53,48 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onRegister, isLoading = fal
     }
   };
 
+  const christmasStyles = getChristmasStyles();
+
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-br from-blue-50 to-slate-100">
+    <div className={`min-h-screen flex items-center justify-center px-4 py-12 ${isChristmasMode ? christmasStyles.backgroundColor : 'bg-gradient-to-br from-blue-50 to-slate-100'}`}>
+      {/* Christmas Decorations */}
+      <ChristmasDecorations isActive={isChristmasMode} />
+      
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <div className="glass-card p-8">
+        <div className={`glass-card p-8 ${isChristmasMode ? 'christmas-card' : ''}`}>
+          {/* Christmas Header */}
+          {isChristmasMode && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center mb-4"
+            >
+              <div className="text-4xl mb-2">🎁🎄🎅</div>
+              <div className="text-lg font-semibold christmas-text mb-2">
+                Rejoignez la magie de Noël !
+              </div>
+            </motion.div>
+          )}
+          
           <div className="text-center mb-6">
             <Link to="/" className="inline-block mb-4">
-              <div className="bg-blue-100 text-blue-700 rounded-full w-16 h-16 flex items-center justify-center mx-auto">
+              <div className={`${isChristmasMode ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-700'} rounded-full w-16 h-16 flex items-center justify-center mx-auto ${isChristmasMode ? 'christmas-bounce' : ''}`}>
                 <Wallet size={32} />
               </div>
             </Link>
-            <h2 className="text-2xl font-bold text-slate-800">Inscription</h2>
+            <h2 className={`text-2xl font-bold ${isChristmasMode ? 'christmas-text' : 'text-slate-800'}`}>
+              {isChristmasMode ? '🎄 Inscription de Noël 🎁' : 'Inscription'}
+            </h2>
             <p className="text-slate-500 mt-1">
-              Créez votre compte TronPick Auto-Claim
+              {isChristmasMode 
+                ? '🎅 Créez votre compte et profitez des bonus de Noël ! ✨' 
+                : 'Créez votre compte TronPick Auto-Claim'
+              }
             </p>
           </div>
 
@@ -188,16 +216,16 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onRegister, isLoading = fal
 
             <button 
               type="submit" 
-              className="btn btn-primary w-full mt-6"
+              className={`btn w-full mt-6 ${isChristmasMode ? 'christmas-button text-white' : 'btn-primary'}`}
               disabled={isLoading || !passwordMatch || !acceptTerms}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                  Inscription en cours...
+                  {isChristmasMode ? '🎄 Inscription en cours... 🎁' : 'Inscription en cours...'}
                 </div>
               ) : (
-                'Créer un compte'
+                isChristmasMode ? '🎅 Rejoindre la magie de Noël ! 🎄' : 'Créer un compte'
               )}
             </button>
           </form>
@@ -205,15 +233,37 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onRegister, isLoading = fal
           <div className="mt-6 text-center">
             <Link
               to="/login"
-              className="text-blue-600 hover:text-blue-800 transition-colors text-sm"
+              className={`${isChristmasMode ? 'christmas-text hover:opacity-80' : 'text-blue-600 hover:text-blue-800'} transition-colors text-sm`}
             >
-              Déjà un compte ? Connectez-vous
+              {isChristmasMode ? '🎄 Déjà un compte ? Connectez-vous pour Noël ! 🎅' : 'Déjà un compte ? Connectez-vous'}
             </Link>
           </div>
 
-          <div className="mt-6 bg-blue-50 text-blue-800 rounded-lg p-3 text-sm">
-            🎁 Bonus d'inscription: <strong>24 jetons gratuits</strong>
+          <div className={`mt-6 ${isChristmasMode ? 'bg-gradient-to-r from-red-50 to-green-50 border border-red-200' : 'bg-blue-50'} rounded-lg p-3 text-sm`}>
+            {isChristmasMode ? (
+              <div className="christmas-text text-center">
+                🎁 <strong>Bonus de Noël:</strong> 24 jetons gratuits + bonus spéciaux ! 🎄
+              </div>
+            ) : (
+              <div className="text-blue-800">
+                🎁 Bonus d'inscription: <strong>24 jetons gratuits</strong>
+              </div>
+            )}
           </div>
+
+          {/* Christmas Special Message */}
+          {isChristmasMode && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="mt-4 text-center"
+            >
+              <div className="text-xs text-slate-600 bg-gradient-to-r from-green-50 to-red-50 px-3 py-2 rounded-lg border border-green-200">
+                ✨ Inscrivez-vous maintenant et découvrez nos offres exclusives de fin d'année ! ✨
+              </div>
+            </motion.div>
+          )}
 
           <div className="mt-4 text-center">
             <Link

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { User, Lock, Wallet, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useChristmasMode } from '../hooks/useChristmasMode';
+import ChristmasDecorations from './ChristmasDecorations';
 
 interface LoginPageProps {
   onLogin: (username: string, password: string) => void;
@@ -15,6 +17,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, isLoading = false }) => 
   });
   const [showPassword, setShowPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(true);
+  
+  const { isChristmasMode, getChristmasStyles } = useChristmasMode();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,24 +35,48 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, isLoading = false }) => 
     });
   };
 
+  const christmasStyles = getChristmasStyles();
+
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-br from-blue-50 to-slate-100">
+    <div className={`min-h-screen flex items-center justify-center px-4 py-12 ${isChristmasMode ? christmasStyles.backgroundColor : 'bg-gradient-to-br from-blue-50 to-slate-100'}`}>
+      {/* Christmas Decorations */}
+      <ChristmasDecorations isActive={isChristmasMode} />
+      
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <div className="glass-card p-8">
+        <div className={`glass-card p-8 ${isChristmasMode ? 'christmas-card' : ''}`}>
+          {/* Christmas Header */}
+          {isChristmasMode && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center mb-4"
+            >
+              <div className="text-4xl mb-2">🎄🎅🎁</div>
+              <div className="text-lg font-semibold christmas-text mb-2">
+                Joyeuses Fêtes !
+              </div>
+            </motion.div>
+          )}
+          
           <div className="text-center mb-6">
             <Link to="/" className="inline-block mb-4">
-              <div className="bg-blue-100 text-blue-700 rounded-full w-16 h-16 flex items-center justify-center mx-auto">
+              <div className={`${isChristmasMode ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-700'} rounded-full w-16 h-16 flex items-center justify-center mx-auto ${isChristmasMode ? 'christmas-bounce' : ''}`}>
                 <Wallet size={32} />
               </div>
             </Link>
-            <h2 className="text-2xl font-bold text-slate-800">Connexion</h2>
+            <h2 className={`text-2xl font-bold ${isChristmasMode ? 'christmas-text' : 'text-slate-800'}`}>
+              {isChristmasMode ? '🎄 Connexion de Noël 🎄' : 'Connexion'}
+            </h2>
             <p className="text-slate-500 mt-1">
-              Connectez-vous à votre compte TronPick Auto-Claim
+              {isChristmasMode 
+                ? '🎅 Connectez-vous pour profiter des offres de Noël ! 🎁' 
+                : 'Connectez-vous à votre compte TronPick Auto-Claim'
+              }
             </p>
           </div>
 
@@ -114,16 +142,16 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, isLoading = false }) => 
 
             <button
               type="submit"
-              className={`btn w-full mt-6 ${acceptTerms ? 'btn-primary' : 'bg-slate-300 text-slate-500 cursor-not-allowed'}`}
+              className={`btn w-full mt-6 ${isChristmasMode ? 'christmas-button text-white' : (acceptTerms ? 'btn-primary' : 'bg-slate-300 text-slate-500 cursor-not-allowed')}`}
               disabled={isLoading || !acceptTerms}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                  Connexion en cours...
+                  {isChristmasMode ? '🎄 Connexion en cours... 🎄' : 'Connexion en cours...'}
                 </div>
               ) : (
-                'Se connecter'
+                isChristmasMode ? '🎅 Se connecter pour Noël 🎁' : 'Se connecter'
               )}
             </button>
 
@@ -137,9 +165,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, isLoading = false }) => 
           <div className="mt-6 text-center space-y-3">
             <Link
               to="/register"
-              className="text-blue-600 hover:text-blue-800 transition-colors text-sm block"
+              className={`${isChristmasMode ? 'christmas-text hover:opacity-80' : 'text-blue-600 hover:text-blue-800'} transition-colors text-sm block`}
             >
-              Pas de compte ? Créez-en un
+              {isChristmasMode ? '🎁 Pas de compte ? Rejoignez la fête ! 🎄' : 'Pas de compte ? Créez-en un'}
             </Link>
 
             <Link
@@ -159,6 +187,20 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, isLoading = false }) => 
               Retour à l'accueil
             </Link>
           </div>
+
+          {/* Christmas Footer Message */}
+          {isChristmasMode && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="mt-4 text-center"
+            >
+              <div className="text-xs text-slate-600 bg-gradient-to-r from-red-50 to-green-50 px-3 py-2 rounded-lg">
+                ✨ Profitez de nos offres spéciales de fin d'année ! ✨
+              </div>
+            </motion.div>
+          )}
         </div>
       </motion.div>
     </div>
