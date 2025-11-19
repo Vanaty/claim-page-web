@@ -7,9 +7,10 @@ export const useChristmasMode = () => {
     const checkChristmasMode = () => {
       const currentDate = new Date();
       const currentMonth = currentDate.getMonth(); // 0-based, December = 11
+      const currentDay = currentDate.getDate();
 
-      // Active en décembre (mois 11) et janvier (mois 0)
-      setIsChristmasMode(currentMonth === 11 || currentMonth === 0);
+      // Active en novembre (mois 10) et décembre (mois 11) et janvier (mois 0)
+      setIsChristmasMode((currentMonth === 10 && currentDay >= 20) || currentMonth === 11 || (currentMonth === 0 && currentDay < 5));
     };
 
     checkChristmasMode();
