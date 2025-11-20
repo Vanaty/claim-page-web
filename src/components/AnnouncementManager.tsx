@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Plus, Edit, Trash2, Eye, EyeOff, Save, X, AlertTriangle, Check, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getAnnouncements, createAnnouncement, updateAnnouncement, deleteAnnouncement } from '../services/apiService';
@@ -36,7 +36,7 @@ const AnnouncementManager: React.FC<AnnouncementManagerProps> = ({ user, showToa
   });
   const [errors, setErrors] = useState<{[key: string]: string}>({});
 
-  useEffect(() => {
+  useCallback(() => {
     loadAnnouncements();
   }, []);
 

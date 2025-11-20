@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export const useChristmasMode = () => {
   const [isChristmasMode, setIsChristmasMode] = useState(false);
@@ -22,16 +22,16 @@ export const useChristmasMode = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const getChristmasAnnouncement = () => {
+  const getChristmasAnnouncement = useCallback(() => {
     return {
       id: 'christmas-special',
-      title: '🎄 Offre Spéciale de Noël ! 🎄',
-      description: 'Achat de jetons par crypto avec bonus de Noël ! Payez en USDT, TRX, DOGE et recevez jusqu\'à 50 % de bonus !',
+      title: '🎄 Offre Spéciale de Noël ! 🎅',
+      description: 'Profitez de bonus exceptionnels sur tous nos packs de jetons pendant les fêtes !',
       link: '/buy-tokens',
-      linkText: '🎁 Voir les packs de Noël',
-      type: 'success',
+      linkText: '🎁 Voir les offres',
+      type: 'success'
     };
-  };
+  }, []);
 
   const getChristmasStyles = () => {
     return {

@@ -67,7 +67,7 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
     };
 
     fetchAnnouncementsData();
-  }, [isChristmasMode, getChristmasAnnouncement]);
+  }, [isChristmasMode]);
 
   // Auto-scroll announcements
   useEffect(() => {
