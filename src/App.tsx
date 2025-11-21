@@ -334,7 +334,7 @@ function App() {
                   />
                   <Route path="/payment/success/:orderId" element={<PaymentSuccess />} />
                   <Route path="/payment/:paymentId" element={<PaymentInterface showToast={showToast} />} />
-                  <Route path="/wheel/:paymentId" element={<WheelOfFortune showToast={showToast} />} />
+                  <Route path="/wheel" element={<WheelOfFortune showToast={showToast} onRewardClaimed={(reward) => user.tokens += reward.value} />} />
                   <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
               </Layout>

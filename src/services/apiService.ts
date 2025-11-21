@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { User, TronAccount,AccountHistory, LoginResponse, ClaimResult, TransferAlert, PasswordResetRequest, PasswordResetResponse, PasswordChangeRequest, SiteKey, SupportedCurrency, WheelData, WheelSpinRequest, WheelSpinResult } from '../types';
+import { User, TronAccount,AccountHistory, LoginResponse, ClaimResult, TransferAlert, PasswordResetResponse, SiteKey, SupportedCurrency, WheelData, WheelSpinResult } from '../types';
 import { parseTronAccount } from './utils';
 
 const api = axios.create({

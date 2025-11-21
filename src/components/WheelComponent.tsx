@@ -4,6 +4,7 @@ export interface WheelComponentProps {
     segments: string[]
     segColors: string[]
     winningSegment: string
+    beforeSpingGetWinner?: () => Promise<string>
     onFinished: (segment: string) => void
     primaryColor?: string
     contrastColor?: string
@@ -21,6 +22,7 @@ const WheelComponent = ({
     segments,
     segColors,
     winningSegment,
+    beforeSpingGetWinner,
     onFinished,
     primaryColor = 'black',
     contrastColor = 'white',
@@ -89,10 +91,21 @@ const WheelComponent = ({
     }
     const spin = () => {
         isStarted = true
-        if (timerHandle === 0) {
-            spinStart = new Date().getTime()
-            maxSpeed = Math.PI / segments.length
-            timerHandle = window.setInterval(onTimerTick, timerDelay)
+        if (beforeSpingGetWinner) {
+            beforeSpingGetWinner().then((winner) => {
+                winningSegment = winner
+                if (timerHandle === 0) {
+                    spinStart = new Date().getTime()
+                    maxSpeed = Math.PI / segments.length
+                    timerHandle = window.setInterval(onTimerTick, timerDelay)
+                }
+            })
+        } else {
+            if (timerHandle === 0) {
+                spinStart = new Date().getTime()
+                maxSpeed = Math.PI / segments.length
+                timerHandle = window.setInterval(onTimerTick, timerDelay)
+            }
         }
     }
     const onTimerTick = () => {

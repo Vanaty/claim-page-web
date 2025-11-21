@@ -2,48 +2,99 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  padding: 30px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 20px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-  max-width: 400px;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  max-width: 450px;
   margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.wheel-of-fortune-container.christmas-wheel {
+  background: linear-gradient(135deg, #dc2626 0%, #16a34a 50%, #dc2626 100%);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 20px 40px rgba(220, 38, 38, 0.2);
 }
 
 .spins-info {
-  margin-bottom: 20px;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 15px 25px;
-  border-radius: 15px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 25px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 20px 30px;
+  border-radius: 18px;
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  min-width: 250px;
 }
 
-.spins-info p {
+.spins-counter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   margin: 0;
   font-size: 18px;
   font-weight: 600;
   color: white;
-  text-align: center;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.spins-icon {
+  color: #fbbf24;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.spins-number {
+  font-size: 24px;
+  font-weight: 800;
+  color: #fbbf24;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.spin-cooldown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  font-style: italic;
 }
 
 .no-spins-message {
-  margin-top: 20px;
-  padding: 15px 25px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 15px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-top: 25px;
+  padding: 20px 30px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 18px;
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  text-align: center;
+  max-width: 320px;
 }
 
 .no-spins-message p {
-  margin: 0;
+  margin: 10px 0;
   font-size: 16px;
   font-weight: 500;
   color: white;
-  text-align: center;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  line-height: 1.5;
+}
+
+.no-spins-icon {
+  color: #fbbf24;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.christmas-encouragement {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #fbbf24;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 /* Animation pour l'effet de brillance */
@@ -68,18 +119,204 @@
   100% { background-position: 0 0; }
 }
 
+/* Christmas Header */
+.christmas-header {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.christmas-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: white;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+  margin-bottom: 8px;
+}
+
+.christmas-subtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Loading and Error States */
+.loading-message, .error-message {
+  text-align: center;
+  padding: 40px 20px;
+  color: white;
+}
+
+.loading-spinner {
+  color: #fbbf24;
+  margin-bottom: 20px;
+}
+
+.error-icon {
+  color: #ef4444;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.retry-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  margin: 20px auto 0;
+}
+
+.retry-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.retry-btn.christmas-button {
+  background: linear-gradient(135deg, #dc2626, #16a34a);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+/* Wheel Wrapper */
+.wheel-wrapper {
+  position: relative;
+  margin: 20px 0;
+}
+
+/* Win Animation Overlay */
+.win-animation-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  border-radius: 24px;
+  backdrop-filter: blur(10px);
+}
+
+.win-content {
+  text-align: center;
+  color: white;
+  padding: 40px;
+}
+
+.win-trophy {
+  color: #fbbf24;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+.win-content h3 {
+  font-size: 28px;
+  margin: 20px 0 10px;
+  font-weight: 800;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+.win-content p {
+  font-size: 18px;
+  margin: 10px 0;
+  opacity: 0.9;
+}
+
+.win-prize {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fbbf24;
+  margin-top: 15px;
+  padding: 15px 25px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  border: 2px solid rgba(251, 191, 36, 0.3);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Sparkle Effects */
+.sparkle-effects {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+.sparkle {
+  position: absolute;
+  font-size: 16px;
+  pointer-events: none;
+  z-index: 10;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .wheel-of-fortune-container {
-    max-width: 320px;
-    padding: 15px;
+    max-width: 350px;
+    padding: 20px;
   }
   
-  .spins-info p {
+  .christmas-title {
+    font-size: 20px;
+  }
+  
+  .christmas-subtitle {
+    font-size: 12px;
+  }
+  
+  .spins-counter {
     font-size: 16px;
+  }
+  
+  .spins-number {
+    font-size: 20px;
   }
   
   .no-spins-message p {
     font-size: 14px;
+  }
+  
+  .win-content h3 {
+    font-size: 24px;
+  }
+  
+  .win-content p {
+    font-size: 16px;
+  }
+  
+  .win-prize {
+    font-size: 20px;
+    padding: 12px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wheel-of-fortune-container {
+    max-width: 300px;
+    padding: 15px;
+  }
+  
+  .spins-info {
+    padding: 15px 20px;
+    min-width: 200px;
+  }
+  
+  .no-spins-message {
+    padding: 15px 20px;
+    max-width: 280px;
   }
 }
