@@ -113,7 +113,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, accounts, onUpdateAccounts 
       {isChristmasMode && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={{ opacity: 1, y: 4 }}
           className="mb-6 bg-gradient-to-r from-red-500 to-green-500 rounded-xl p-6 text-white relative overflow-hidden"
         >
           <div className="absolute inset-0 bg-white bg-opacity-10"></div>
@@ -153,7 +153,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, accounts, onUpdateAccounts 
       {!isRefillTime && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={{ opacity: 1, y: 4 }}
           className={`mb-6 p-6 rounded-xl text-white relative overflow-hidden ${
             isChristmasMode 
               ? 'bg-gradient-to-r from-red-600 via-green-600 to-red-600' 
@@ -210,7 +210,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, accounts, onUpdateAccounts 
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className={`mb-6 p-6 rounded-xl text-white relative overflow-hidden ${
+          className={`mb-6 p-6 rounded-xl text-white relative overflow-hidden gap-4 ${
             isChristmasMode 
               ? 'bg-gradient-to-r from-green-500 via-red-500 to-green-500' 
               : 'bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500'
@@ -244,89 +244,12 @@ const Dashboard: React.FC<DashboardProps> = ({ user, accounts, onUpdateAccounts 
         </motion.div>
       )}
 
-      {/* Auto-claim toggle */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <h2 className={`text-2xl font-bold ${isChristmasMode ? 'text-green-800' : 'text-slate-800'}`}>
-          {isChristmasMode ? '🎄 Tableau de bord 🎄' : 'Tableau de bord'}
-        </h2>
-        
-        <div className="flex items-center">
-          <div className="relative inline-flex items-center cursor-pointer mr-4">
-            <input 
-              type="checkbox" 
-              value="" 
-              className="sr-only peer" 
-              checked={isAutoClaiming}
-              onChange={() => setIsAutoClaiming(!isAutoClaiming)}
-            />
-            <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            <span className="ml-3 text-sm font-medium text-slate-700">Auto-Claim</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <motion.div variants={item} className="glass-card p-5 flex items-center">
-          <div className="bg-blue-100 rounded-full p-3 mr-4">
-            <Wallet className="text-blue-700" size={24} />
-          </div>
-          <div>
-            <h3 className="token-balance text-2xl">{user.tokens}</h3>
-            <p className="text-slate-500 text-sm">Jetons disponibles</p>
-          </div>
-        </motion.div>
-        
-        <motion.div variants={item} className="glass-card p-5 flex items-center">
-          <div className="bg-green-100 rounded-full p-3 mr-4">
-            <TrendingUp className="text-green-600" size={24} />
-          </div>
-          <div>
-            <h3 className="text-2xl font-bold text-green-600">{activeAccounts}</h3>
-            <p className="text-slate-500 text-sm">Comptes actifs</p>
-          </div>
-        </motion.div>
-        
-        <motion.div variants={item} className="glass-card p-5 flex items-center">
-          <div className="bg-indigo-100 rounded-full p-3 mr-4">
-            <TrendingUp className="text-indigo-600" size={24} />
-          </div>
-          <div>
-            <h3 className="text-2xl font-bold text-indigo-600">{totalBalance.toFixed(2)}</h3>
-            <p className="text-slate-500 text-sm">TRX Total</p>
-          </div>
-        </motion.div>
-
-        <motion.div variants={item} className="glass-card p-5 flex items-center">
-          <div className={`${isChristmasMode ? 'bg-red-100' : 'bg-purple-100'} rounded-full p-3 mr-4`}>
-            <RotateCcw className={`${isChristmasMode ? 'text-red-600' : 'text-purple-600'}`} size={24} />
-          </div>
-          <div>
-            {wheelLoading ? (
-              <div className="animate-pulse">
-                <div className="h-6 bg-slate-200 rounded w-8 mb-1"></div>
-                <div className="h-4 bg-slate-200 rounded w-16"></div>
-              </div>
-            ) : (
-              <>
-                <h3 className={`text-2xl font-bold ${isChristmasMode ? 'text-red-600' : 'text-purple-600'}`}>
-                  {spinsRemaining}
-                </h3>
-                <p className="text-slate-500 text-sm">
-                  {isChristmasMode ? '🎄 Tours magiques' : 'Tours de roue'}
-                </p>
-              </>
-            )}
-          </div>
-        </motion.div>
-      </div>
-
       {/* Wheel of Fortune Section */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className={`glass-card p-6 mb-6 ${isChristmasMode ? 'bg-gradient-to-br from-red-50 to-green-50 border-2 border-red-200' : ''}`}
+        className={`glass-card p-6 mb-6 gap-4 ${isChristmasMode ? 'bg-gradient-to-br from-red-50 to-green-50 border-2 border-red-200' : ''}`}
       >
         <div className="flex flex-col md:flex-row items-center justify-between">
           <div className="flex-1 mb-4 md:mb-0">
@@ -431,6 +354,83 @@ const Dashboard: React.FC<DashboardProps> = ({ user, accounts, onUpdateAccounts 
           </div>
         </div>
       </motion.div>
+
+      {/* Auto-claim toggle */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <h2 className={`text-2xl font-bold ${isChristmasMode ? 'text-green-800' : 'text-slate-800'}`}>
+          {isChristmasMode ? '🎄 Tableau de bord 🎄' : 'Tableau de bord'}
+        </h2>
+        
+        <div className="flex items-center">
+          <div className="relative inline-flex items-center cursor-pointer mr-4">
+            <input 
+              type="checkbox" 
+              value="" 
+              className="sr-only peer" 
+              checked={isAutoClaiming}
+              onChange={() => setIsAutoClaiming(!isAutoClaiming)}
+            />
+            <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            <span className="ml-3 text-sm font-medium text-slate-700">Auto-Claim</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <motion.div variants={item} className="glass-card p-5 flex items-center">
+          <div className="bg-blue-100 rounded-full p-3 mr-4">
+            <Wallet className="text-blue-700" size={24} />
+          </div>
+          <div>
+            <h3 className="token-balance text-2xl">{user.tokens}</h3>
+            <p className="text-slate-500 text-sm">Jetons disponibles</p>
+          </div>
+        </motion.div>
+        
+        <motion.div variants={item} className="glass-card p-5 flex items-center">
+          <div className="bg-green-100 rounded-full p-3 mr-4">
+            <TrendingUp className="text-green-600" size={24} />
+          </div>
+          <div>
+            <h3 className="text-2xl font-bold text-green-600">{activeAccounts}</h3>
+            <p className="text-slate-500 text-sm">Comptes actifs</p>
+          </div>
+        </motion.div>
+        
+        <motion.div variants={item} className="glass-card p-5 flex items-center">
+          <div className="bg-indigo-100 rounded-full p-3 mr-4">
+            <TrendingUp className="text-indigo-600" size={24} />
+          </div>
+          <div>
+            <h3 className="text-2xl font-bold text-indigo-600">{totalBalance.toFixed(2)}</h3>
+            <p className="text-slate-500 text-sm">TRX Total</p>
+          </div>
+        </motion.div>
+
+        <motion.div variants={item} className="glass-card p-5 flex items-center">
+          <div className={`${isChristmasMode ? 'bg-red-100' : 'bg-purple-100'} rounded-full p-3 mr-4`}>
+            <RotateCcw className={`${isChristmasMode ? 'text-red-600' : 'text-purple-600'}`} size={24} />
+          </div>
+          <div>
+            {wheelLoading ? (
+              <div className="animate-pulse">
+                <div className="h-6 bg-slate-200 rounded w-8 mb-1"></div>
+                <div className="h-4 bg-slate-200 rounded w-16"></div>
+              </div>
+            ) : (
+              <>
+                <h3 className={`text-2xl font-bold ${isChristmasMode ? 'text-red-600' : 'text-purple-600'}`}>
+                  {spinsRemaining}
+                </h3>
+                <p className="text-slate-500 text-sm">
+                  {isChristmasMode ? '🎄 Tours magiques' : 'Tours de roue'}
+                </p>
+              </>
+            )}
+          </div>
+        </motion.div>
+      </div>
 
       {/* Accounts List */}
       {accounts.length === 0 ? (
