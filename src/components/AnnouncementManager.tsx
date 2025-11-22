@@ -36,7 +36,7 @@ const AnnouncementManager: React.FC<AnnouncementManagerProps> = ({ user, showToa
   });
   const [errors, setErrors] = useState<{[key: string]: string}>({});
 
-  useCallback(() => {
+  useEffect(() => {
     loadAnnouncements();
   }, []);
 
