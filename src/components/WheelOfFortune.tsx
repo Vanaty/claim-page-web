@@ -273,6 +273,7 @@ const WheelOfFortune: React.FC<WheelOfFortuneProps> = ({
                     winningSegment={actualWinner.current?.name || ''}
                     beforeSpingGetWinner={beforeSpingGetWinner}
                     onFinished={onFinished}
+                    isOnlyOnce={false}
                     primaryColor={isChristmasMode ? '#dc2626' : '#e5e7eb'}
                     contrastColor='white'
                     buttonText={
