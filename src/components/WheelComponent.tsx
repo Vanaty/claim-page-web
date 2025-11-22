@@ -51,6 +51,7 @@ const WheelComponent = ({
     let currentSegment = ''
     let isStarted = false
     const [isFinished, setFinished] = useState(false)
+    const [isSpinning, setIsSpinning] = useState(false)
     let timerHandle = 0
     const timerDelay = segments.length
     let angleCurrent = 0
@@ -90,8 +91,9 @@ const WheelComponent = ({
         canvasContext = canvas?.getContext('2d')
     }
     const spin = () => {
-        if (isStarted) return;
+        if (isSpinning) return;
         isStarted = true
+        setIsSpinning(true)
         if (beforeSpingGetWinner) {
             beforeSpingGetWinner().then((winner) => {
                 winningSegment = winner
@@ -138,9 +140,9 @@ const WheelComponent = ({
         angleCurrent += angleDelta
         while (angleCurrent >= Math.PI * 2) angleCurrent -= Math.PI * 2
         if (finished) {
-            isStarted = false
             setFinished(true)
             onFinished(currentSegment)
+            setIsSpinning(false)
             clearInterval(timerHandle)
             timerHandle = 0
             angleDelta = 0
