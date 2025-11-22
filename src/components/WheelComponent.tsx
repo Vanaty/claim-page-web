@@ -90,6 +90,7 @@ const WheelComponent = ({
         canvasContext = canvas?.getContext('2d')
     }
     const spin = () => {
+        if (isStarted) return;
         isStarted = true
         if (beforeSpingGetWinner) {
             beforeSpingGetWinner().then((winner) => {
@@ -142,6 +143,7 @@ const WheelComponent = ({
             clearInterval(timerHandle)
             timerHandle = 0
             angleDelta = 0
+            isStarted = false
         }
     }
 
