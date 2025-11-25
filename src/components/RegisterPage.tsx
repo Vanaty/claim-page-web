@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { User, Mail, Lock, Wallet, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User, Mail, Lock, Wallet, Eye, EyeOff, ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useChristmasMode } from '../hooks/useChristmasMode';
 import ChristmasDecorations from './ChristmasDecorations';
+import { checkEmailAvailability, checkUsernameAvailability } from '../services/apiService';
 
 interface RegisterPageProps {
   onRegister: (username: string, email: string, password: string) => void;
@@ -22,13 +23,132 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onRegister, isLoading = fal
   const [passwordMatch, setPasswordMatch] = useState(true);
   const [acceptTerms, setAcceptTerms] = useState(false);
   
+  // Validation states
+  const [emailValidation, setEmailValidation] = useState<{
+    isChecking: boolean;
+    isValid: boolean | null;
+    message: string;
+  }>({ isChecking: false, isValid: null, message: '' });
+  
+  const [usernameValidation, setUsernameValidation] = useState<{
+    isChecking: boolean;
+    isValid: boolean | null;
+    message: string;
+  }>({ isChecking: false, isValid: null, message: '' });
+  
   const { isChristmasMode, getChristmasStyles } = useChristmasMode();
+
+  // Debounce timer refs
+  const emailDebounceRef = React.useRef<NodeJS.Timeout>();
+  const usernameDebounceRef = React.useRef<NodeJS.Timeout>();
+
+  // Validate email format
+  const isValidEmailFormat = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Check email availability with debounce
+  useEffect(() => {
+    if (formData.email.length > 0) {
+      if (!isValidEmailFormat(formData.email)) {
+        setEmailValidation({
+          isChecking: false,
+          isValid: false,
+          message: 'Format d\'email invalide'
+        });
+        return;
+      }
+
+      setEmailValidation({ isChecking: true, isValid: null, message: 'Vérification...' });
+
+      if (emailDebounceRef.current) {
+        clearTimeout(emailDebounceRef.current);
+      }
+
+      emailDebounceRef.current = setTimeout(async () => {
+        try {
+          const result = await checkEmailAvailability(formData.email);
+          setEmailValidation({
+            isChecking: false,
+            isValid: result.available,
+            message: result.available 
+              ? 'Email disponible ✓' 
+              : result.message || 'Cet email est déjà utilisé'
+          });
+        } catch {
+          setEmailValidation({
+            isChecking: false,
+            isValid: false,
+            message: 'Erreur lors de la vérification'
+          });
+        }
+      }, 500);
+    } else {
+      setEmailValidation({ isChecking: false, isValid: null, message: '' });
+    }
+
+    return () => {
+      if (emailDebounceRef.current) {
+        clearTimeout(emailDebounceRef.current);
+      }
+    };
+  }, [formData.email]);
+
+  // Check username availability with debounce
+  useEffect(() => {
+    if (formData.username.length >= 3) {
+      setUsernameValidation({ isChecking: true, isValid: null, message: 'Vérification...' });
+
+      if (usernameDebounceRef.current) {
+        clearTimeout(usernameDebounceRef.current);
+      }
+
+      usernameDebounceRef.current = setTimeout(async () => {
+        try {
+          const result = await checkUsernameAvailability(formData.username);
+          setUsernameValidation({
+            isChecking: false,
+            isValid: result.available,
+            message: result.available 
+              ? 'Nom d\'utilisateur disponible ✓' 
+              : result.message || 'Ce nom d\'utilisateur est déjà pris'
+          });
+        } catch {
+          setUsernameValidation({
+            isChecking: false,
+            isValid: false,
+            message: 'Erreur lors de la vérification'
+          });
+        }
+      }, 500);
+    } else if (formData.username.length > 0) {
+      setUsernameValidation({
+        isChecking: false,
+        isValid: false,
+        message: 'Minimum 3 caractères requis'
+      });
+    } else {
+      setUsernameValidation({ isChecking: false, isValid: null, message: '' });
+    }
+
+    return () => {
+      if (usernameDebounceRef.current) {
+        clearTimeout(usernameDebounceRef.current);
+      }
+    };
+  }, [formData.username]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
       setPasswordMatch(false);
+      return;
+    }
+
+    // Check validations before submitting
+    if (!emailValidation.isValid || !usernameValidation.isValid) {
       return;
     }
     
@@ -104,17 +224,47 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onRegister, isLoading = fal
                 <User size={16} className="mr-2 text-slate-500" />
                 Nom d'utilisateur
               </label>
-              <input
-                type="text"
-                className="form-input"
-                name="username"
-                value={formData.username}
-                onChange={handleInputChange}
-                required
-                placeholder="Votre nom d'utilisateur"
-                disabled={isLoading}
-                minLength={3}
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  className={`form-input pr-10 ${
+                    usernameValidation.isValid === false 
+                      ? 'border-red-500 focus:ring-red-500' 
+                      : usernameValidation.isValid === true 
+                      ? 'border-green-500 focus:ring-green-500' 
+                      : ''
+                  }`}
+                  name="username"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  required
+                  placeholder="Votre nom d'utilisateur"
+                  disabled={isLoading}
+                  minLength={3}
+                />
+                {usernameValidation.isChecking && (
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                    <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                )}
+                {!usernameValidation.isChecking && usernameValidation.isValid === true && (
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-green-500">
+                    <CheckCircle size={18} />
+                  </div>
+                )}
+                {!usernameValidation.isChecking && usernameValidation.isValid === false && (
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-red-500">
+                    <XCircle size={18} />
+                  </div>
+                )}
+              </div>
+              {usernameValidation.message && (
+                <small className={`block mt-1 ${
+                  usernameValidation.isValid === false ? 'text-red-500' : 'text-green-600'
+                }`}>
+                  {usernameValidation.message}
+                </small>
+              )}
             </div>
             
             <div>
@@ -122,16 +272,46 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onRegister, isLoading = fal
                 <Mail size={16} className="mr-2 text-slate-500" />
                 Email
               </label>
-              <input
-                type="email"
-                className="form-input"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-                placeholder="votre@email.com"
-                disabled={isLoading}
-              />
+              <div className="relative">
+                <input
+                  type="email"
+                  className={`form-input pr-10 ${
+                    emailValidation.isValid === false 
+                      ? 'border-red-500 focus:ring-red-500' 
+                      : emailValidation.isValid === true 
+                      ? 'border-green-500 focus:ring-green-500' 
+                      : ''
+                  }`}
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                  placeholder="votre@email.com"
+                  disabled={isLoading}
+                />
+                {emailValidation.isChecking && (
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                    <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                )}
+                {!emailValidation.isChecking && emailValidation.isValid === true && (
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-green-500">
+                    <CheckCircle size={18} />
+                  </div>
+                )}
+                {!emailValidation.isChecking && emailValidation.isValid === false && (
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-red-500">
+                    <XCircle size={18} />
+                  </div>
+                )}
+              </div>
+              {emailValidation.message && (
+                <small className={`block mt-1 ${
+                  emailValidation.isValid === false ? 'text-red-500' : 'text-green-600'
+                }`}>
+                  {emailValidation.message}
+                </small>
+              )}
             </div>
 
             <div>
@@ -217,7 +397,15 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onRegister, isLoading = fal
             <button 
               type="submit" 
               className={`btn w-full mt-6 ${isChristmasMode ? 'christmas-button text-white' : 'btn-primary'}`}
-              disabled={isLoading || !passwordMatch || !acceptTerms}
+              disabled={
+                isLoading || 
+                !passwordMatch || 
+                !acceptTerms || 
+                emailValidation.isValid !== true || 
+                usernameValidation.isValid !== true ||
+                emailValidation.isChecking ||
+                usernameValidation.isChecking
+              }
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">

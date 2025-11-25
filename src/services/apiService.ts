@@ -38,6 +38,16 @@ export const registerUser = async (username: string, email: string, password: st
   return response.data;
 };
 
+export const checkEmailAvailability = async (email: string): Promise<{ available: boolean; message?: string }> => {
+  const response = await api.post('/auth/check-email', { email });
+  return response.data;
+};
+
+export const checkUsernameAvailability = async (username: string): Promise<{ available: boolean; message?: string }> => {
+  const response = await api.post('/auth/check-username', { username });
+  return response.data;
+};
+
 export const fetchUser = async (): Promise<User> => {
   const response = await api.get<User>('/users');
   return response.data;
