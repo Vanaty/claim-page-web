@@ -3,6 +3,7 @@ export interface User {
   username: string;
   email: string;
   tokens: number;
+  tokensBonus?: number | 0;
   registeredAt: Date;
   spinsRemaining?: number;
   role?: string; // Add role field to User type
