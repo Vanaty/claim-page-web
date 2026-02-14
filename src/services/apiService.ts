@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { User, TronAccount,AccountHistory, LoginResponse, ClaimResult, TransferAlert, PasswordResetResponse, SiteKey, SupportedCurrency, WheelData, WheelSpinResult } from '../types';
+import { User, TronAccount,AccountHistory, LoginResponse, ClaimResult, TransferAlert, PasswordResetResponse, SiteKey, SupportedCurrency, WheelData, WheelSpinResult, Token } from '../types';
 import { parseTronAccount } from './utils';
 
 const api = axios.create({
@@ -16,14 +16,76 @@ api.interceptors.request.use(config => {
   return config;
 });
 
-// Handle 401 errors
+// Variable to track if we're currently refreshing the token
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  
+  failedQueue = [];
+};
+
+// Handle 401 errors with token refresh
 api.interceptors.response.use(
   response => response,
-  error => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('tronpick_token'); // Remove token on 401 error
-      window.location.reload();
+  async error => {
+    const originalRequest = error.config;
+    
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        // If already refreshing, queue this request
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(token => {
+          originalRequest.headers['Authorization'] = 'Bearer ' + token;
+          return api(originalRequest);
+        }).catch(err => {
+          return Promise.reject(err);
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const refreshToken = localStorage.getItem('tronpick_token');
+        if (!refreshToken) {
+          throw new Error('No refresh token available');
+        }
+
+        const response = await axios.post('/api/auth/refresh-token', {
+          token: refreshToken
+        });
+
+        const tokenData: Token = response.data;
+        localStorage.setItem('tronpick_token', tokenData.access_token);
+        api.defaults.headers.common['Authorization'] = 'Bearer ' + tokenData.access_token;
+        originalRequest.headers['Authorization'] = 'Bearer ' + tokenData.access_token;
+
+        processQueue(null, tokenData.access_token);
+        isRefreshing = false;
+
+        return api(originalRequest);
+      } catch (err) {
+        processQueue(err, null);
+        isRefreshing = false;
+        
+        // If refresh fails, logout
+        localStorage.removeItem('tronpick_token');
+        localStorage.removeItem('tronpick_refresh_token');
+        window.location.reload();
+        
+        return Promise.reject(err);
+      }
     }
+    
     return Promise.reject(error);
   }
 );
