@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Trash2, Eye, EyeOff, X, Edit, Gamepad2 } from 'lucide-react';
 import { TronAccount, BaseUrlOption } from '../types';
-import { addAccount as apiAddAccount, removeAccount as apiRemoveAccount, updateAccount as apiUpdateAccount } from '../services/apiService';
+import { addAccount as apiAddAccount, removeAccount as apiRemoveAccount, updateAccount as apiUpdateAccount, checkJobStatus } from '../services/apiService';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface AccountManagerProps {
@@ -67,7 +67,8 @@ const AccountManager: React.FC<AccountManagerProps> = ({
         // Ajouter les minutes et secondes à la date actuelle
         today.setMinutes(today.getMinutes() + minutes, today.getSeconds() + seconds);
 
-        const newAccount = await apiAddAccount({
+        // Add account and get job
+        const job = await apiAddAccount({
           address: formData.address,
           privateKey: formData.privateKey,
           balance: formData.balance,
@@ -79,9 +80,12 @@ const AccountManager: React.FC<AccountManagerProps> = ({
           canGame: formData.canGame,
           cookies: addMethod === 'cookie' ? formData.cookie : '',
         });
-        onAddAccount(newAccount);
+
+        if (showToast) showToast('info', 'Traitement de l\'ajout du compte en cours...');
+        
+        // Poll job status
+        await pollJobStatus(job.id);
         resetForm();
-        if (showToast) showToast('success', 'Compte ajouté avec succès!');
       }
     } catch (error: any) {
       console.error('Failed to add account:', error);
@@ -95,6 +99,41 @@ const AccountManager: React.FC<AccountManagerProps> = ({
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const pollJobStatus = async (jobId: string) => {
+    const maxAttempts = 60; // 60 tentatives = 5 minutes max (5 secondes entre chaque)
+    let attempts = 0;
+
+    const checkStatus = async (): Promise<void> => {
+      try {
+        const job = await checkJobStatus(jobId);
+        
+        if (job.status === 'completed') {
+          if (showToast) showToast('success', job.message || 'Compte ajouté avec succès!');
+          // Refresh accounts - trigger parent component to reload accounts
+          window.location.reload();
+          return;
+        } else if (job.status === 'failed') {
+          if (showToast) showToast('error', job.message || 'Échec de l\'ajout du compte');
+          return;
+        } else if (job.status === 'beginning') {
+          // Still processing, check again
+          attempts++;
+          if (attempts >= maxAttempts) {
+            if (showToast) showToast('error', 'Le traitement prend plus de temps que prévu. Veuillez rafraîchir la page dans quelques instants.');
+            return;
+          }
+          // Wait 5 seconds before next check
+          setTimeout(checkStatus, 5000);
+        }
+      } catch (error: any) {
+        console.error('Failed to check job status:', error);
+        if (showToast) showToast('error', 'Erreur lors de la vérification du statut');
+      }
+    };
+
+    await checkStatus();
   };
   const validateCookie = (cookie: string): boolean => {
     // Basic validation for cookie format

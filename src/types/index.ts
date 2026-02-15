@@ -127,3 +127,12 @@ export interface WheelSpinResult {
   signature: string;
   spinsRemaining: number;
 }
+
+export interface Job {
+  id: string;
+  user_id: string;
+  status: 'beginning' | 'failed' | 'completed';
+  scheduled_at: string;
+  completed_at: string | null;
+  message: string;
+}

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { User, TronAccount,AccountHistory, LoginResponse, ClaimResult, TransferAlert, PasswordResetResponse, SiteKey, SupportedCurrency, WheelData, WheelSpinResult, Token } from '../types';
+import { User, TronAccount,AccountHistory, LoginResponse, ClaimResult, TransferAlert, PasswordResetResponse, SiteKey, SupportedCurrency, WheelData, WheelSpinResult, Token, Job } from '../types';
 import { parseTronAccount } from './utils';
 
 const api = axios.create({
@@ -120,10 +120,15 @@ export const fetchAccounts = async (): Promise<TronAccount[]> => {
   return response.data;
 };
 
-export const addAccount = async (account: Omit<TronAccount, 'id' | 'addedAt'>): Promise<TronAccount> => {
+export const addAccount = async (account: Omit<TronAccount, 'id' | 'addedAt'>): Promise<Job> => {
   console.log('Adding account:', account);
   const response = await api.post('/tron-accounts', account, { timeout: 120000 });
-  return parseTronAccount(response.data);
+  return response.data;
+};
+
+export const checkJobStatus = async (jobId: string): Promise<Job> => {
+  const response = await api.get(`/tron-accounts/jobs/${jobId}`);
+  return response.data;
 };
 
 export const removeAccount = async (accountId: string): Promise<void> => {
