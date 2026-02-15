@@ -102,31 +102,26 @@ const AccountManager: React.FC<AccountManagerProps> = ({
   };
 
   const pollJobStatus = async (jobId: string) => {
-    const maxAttempts = 60; // 60 tentatives = 5 minutes max (5 secondes entre chaque)
-    let attempts = 0;
+    const maxAttempts = 60;
 
     const checkStatus = async (): Promise<void> => {
       try {
-        const job = await checkJobStatus(jobId);
-        
-        if (job.status === 'completed') {
-          if (showToast) showToast('success', job.message || 'Compte ajouté avec succès!');
-          // Refresh accounts - trigger parent component to reload accounts
-          window.location.reload();
-          return;
-        } else if (job.status === 'failed') {
-          if (showToast) showToast('error', job.message || 'Échec de l\'ajout du compte');
-          return;
-        } else if (job.status === 'beginning') {
-          // Still processing, check again
-          attempts++;
-          if (attempts >= maxAttempts) {
-            if (showToast) showToast('error', 'Le traitement prend plus de temps que prévu. Veuillez rafraîchir la page dans quelques instants.');
+        for (let i = 0; i < maxAttempts; i++) {
+          const job = await checkJobStatus(jobId);
+          
+          if (job.status === 'completed') {
+            if (showToast) showToast('success', job.message || 'Compte ajouté avec succès!');
+            // Refresh accounts - trigger parent component to reload accounts
+            window.location.reload();
+            return;
+          } else if (job.status === 'failed') {
+            if (showToast) showToast('error', job.message || 'Échec de l\'ajout du compte');
             return;
           }
-          // Wait 5 seconds before next check
-          setTimeout(checkStatus, 5000);
+          await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds before next check
         }
+        if (showToast) showToast('error', 'Le traitement prend plus de temps que prévu. Veuillez rafraîchir la page dans quelques instants.');
+        return;
       } catch (error: any) {
         console.error('Failed to check job status:', error);
         if (showToast) showToast('error', 'Erreur lors de la vérification du statut');
