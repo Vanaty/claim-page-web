@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Wallet, Clock, TrendingUp, Zap, Globe, BarChart3, ChevronDown, ChevronUp } from 'lucide-react';
+import { Wallet, Clock, TrendingUp, Zap, Globe, BarChart3, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
 import { TronAccount } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
 import AccountHistoryChart from './AccountHistoryChart';
@@ -16,6 +16,22 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, onClaim, canClaim, s
   const [canClaimNow, setCanClaimNow] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [hasAutoClaimIssue, setHasAutoClaimIssue] = useState(false);
+
+  // Vérifier si l'autoclaim rencontre un problème
+  useEffect(() => {
+    if (account.lastClaim) {
+      const now = new Date();
+      const lastClaimDate = new Date(account.lastClaim);
+      const diffMs = now.getTime() - lastClaimDate.getTime();
+      const diffMinutes = diffMs / (1000 * 60);
+      
+      // Si la différence est supérieure à 1h02min (62 minutes)
+      setHasAutoClaimIssue(diffMinutes > 62);
+    } else {
+      setHasAutoClaimIssue(false);
+    }
+  }, [account.lastClaim]);
 
   useEffect(() => {
     const updateTimer = () => {
@@ -164,6 +180,16 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, onClaim, canClaim, s
         {account.lastClaim && (
           <div className="mt-3 text-xs text-center text-slate-500">
             Dernier claim: {new Date(account.lastClaim).toLocaleString('fr-FR')}
+          </div>
+        )}
+
+        {/* Avertissement si l'autoclaim rencontre un problème */}
+        {hasAutoClaimIssue && (
+          <div className="mt-3 bg-orange-50 border border-orange-200 rounded-lg p-2 flex items-center">
+            <AlertTriangle size={16} className="text-orange-600 mr-2 flex-shrink-0" />
+            <span className="text-xs text-orange-700">
+              L'autoclaim pour ce compte semble rencontrer un problème
+            </span>
           </div>
         )}
         
