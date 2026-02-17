@@ -188,7 +188,7 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, onClaim, canClaim, s
           <div className="mt-3 bg-orange-50 border border-orange-200 rounded-lg p-2 flex items-center">
             <AlertTriangle size={16} className="text-orange-600 mr-2 flex-shrink-0" />
             <span className="text-xs text-orange-700">
-              L'autoclaim pour ce compte semble rencontrer un problème
+              L'autoclaim sur {account.baseUrl ? account.baseUrl : 'ce compte'} est momentanément mise en pause en raison de problèmes techniques. Nous travaillons activement à la résolution de ce problème. Merci de votre compréhension.
             </span>
           </div>
         )}
