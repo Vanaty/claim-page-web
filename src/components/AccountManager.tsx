@@ -26,7 +26,7 @@ const AccountManager: React.FC<AccountManagerProps> = ({
     privateKey: '',
     balance: 0,
     lastClaim: '',
-    proxy: 'http://129.151.178.48:8888',
+    proxy: '',
     baseUrl: 'tronpick.io' as BaseUrlOption,
     canGame: 0,
     cookie: '',
@@ -400,7 +400,7 @@ const AccountManager: React.FC<AccountManagerProps> = ({
                       name="proxy"
                       value={formData.proxy}
                       onChange={handleInputChange}
-                      placeholder="http://proxy:port"
+                      placeholder="socks5h://myuser:mypass@127.0.0.1:1080"
                       required
                     />
                     <small className="text-slate-500 text-xs mt-1 block">Proxy pour les requêtes associées à ce compte</small>
