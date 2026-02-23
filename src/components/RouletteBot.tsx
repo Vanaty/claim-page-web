@@ -516,15 +516,17 @@ const RouletteBot: React.FC<RouletteBotProps> = ({ accounts, showToast }) => {
 
     setIsSubmitting(true);
     try {
-      const payload: RouletteConfig = {
-        ...config,
-        schedule: resolvedSchedule,
-        bets,
-        account_ids: selectedAccountIds,
-      };
-      const result = await startRouletteBot(payload);
-      showToast('success', result.message || 'Bot roulette démarré !');
-      await refreshStatus();
+        for (const id of selectedAccountIds) {
+            const payload: RouletteConfig = {
+                ...config,
+                schedule: resolvedSchedule,
+                bets,
+                account_id: id, // send one request per account for better tracking and control
+            };
+            const result = await startRouletteBot(payload);
+            showToast('success', result.message || 'Bot roulette démarré !');
+        }
+        await refreshStatus();
     } catch (err: unknown) {
       const e = err as { response?: { data?: { detail?: string } } };
       showToast('error', e?.response?.data?.detail || 'Erreur lors du démarrage du bot.');

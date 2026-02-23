@@ -151,7 +151,7 @@ export interface RouletteBet {
 
 export interface RouletteConfig {
   /** Account IDs to run the bot on */
-  account_ids: string[];
+  account_id: string;
   /** Cron expression or ISO-8601 duration (e.g. "PT5M" every 5 min) */
   schedule: string;
   /** All bets placed per round (multiple zones with individual amounts) */
