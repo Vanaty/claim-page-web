@@ -26,6 +26,7 @@ import Footer from './components/Footer';
 import PaymentInterface from './components/PaymentInterface';
 import AnnouncementManager from './components/AnnouncementManager';
 import WheelOfFortune from './components/WheelOfFortune';
+import LevelUp from './components/LevelUp';
 import { useChristmasMode } from './hooks/useChristmasMode';
 
 function App() {
@@ -335,6 +336,7 @@ function App() {
                   <Route path="/payment/success/:orderId" element={<PaymentSuccess />} />
                   <Route path="/payment/:paymentId" element={<PaymentInterface showToast={showToast} />} />
                   <Route path="/wheel" element={<WheelOfFortune showToast={showToast} onRewardClaimed={(reward) => {user.tokens += reward.value; if(user.spinsRemaining) { user.spinsRemaining -= 1; }}} />} />
+                  <Route path="/level" element={<LevelUp accounts={accounts} showToast={showToast} />} />
                   <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
               </Layout>

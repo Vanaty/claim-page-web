@@ -136,3 +136,45 @@ export interface Job {
   completed_at: string | null;
   message: string;
 }
+
+// ─── Roulette Bot ────────────────────────────────────────────────────────────
+
+export type RouletteMartingaleStrategy = 'none' | 'martingale' | 'reverse_martingale' | 'fibonacci';
+
+/** A single bet placed on the table */
+export interface RouletteBet {
+  /** Bet zone: 'red', 'black', 'n17', 'dozen1', 'col2', etc. */
+  zone: number;
+  /** Id du chip */
+  chip_id: number;
+}
+
+export interface RouletteConfig {
+  /** Account IDs to run the bot on */
+  account_ids: string[];
+  /** Cron expression or ISO-8601 duration (e.g. "PT5M" every 5 min) */
+  schedule: string;
+  /** All bets placed per round (multiple zones with individual amounts) */
+  bets: RouletteBet[];
+  /** Martingale-style strategy applied per bet */
+  strategy: RouletteMartingaleStrategy;
+  /** Stop when cumulative loss >= this value (0 = disabled) */
+  stop_loss: number;
+  /** Stop when cumulative win >= this value (0 = disabled) */
+  stop_win: number;
+  /** Stop when total wagered >= this value (0 = disabled) */
+  stop_on_wagered: number;
+}
+
+export interface RouletteSession {
+  session_id: string;
+  account_id: string;
+  status: 'running' | 'stopped' | 'completed';
+  total_wagered: number;
+  total_win: number;
+  total_loss: number;
+  rounds_played: number;
+  created_at: string;
+  stopped_at?: string;
+  stop_reason?: string;
+}
