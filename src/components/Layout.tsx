@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Wallet, LogOut, Menu, X, TrendingUp, Plus, Send, Settings, ShieldAlert, Key, CreditCard, Newspaper, Gift, ChevronLeft, ChevronRight } from 'lucide-react';
+import { User, Wallet, LogOut, Menu, X, TrendingUp, Plus, Send, Settings, ShieldAlert, Key, CreditCard, Newspaper, Gift, ChevronLeft, ChevronRight, Zap } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User as UserType } from '../types';
@@ -105,6 +105,7 @@ const Layout: React.FC<LayoutProps> = ({ user, userRole, onLogout, children, acc
     { path: '/accounts', icon: Plus, label: `Comptes (${accountsCount})` },
     { path: '/transfer', icon: Send, label: 'Transfert' },
     { path: '/buy-tokens', icon: CreditCard, label: 'Acheter des jetons' },
+    { path: '/level', icon: Zap, label: 'Level UP' },
     { path: '/announcements', icon: Newspaper, label: 'Annonces' },
     { path: '/settings', icon: Settings, label: 'Paramètres' },
   ];

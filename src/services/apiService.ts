@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { User, TronAccount,AccountHistory, LoginResponse, ClaimResult, TransferAlert, PasswordResetResponse, SiteKey, SupportedCurrency, WheelData, WheelSpinResult, Token, Job } from '../types';
+import { User, TronAccount,AccountHistory, LoginResponse, ClaimResult, TransferAlert, PasswordResetResponse, SiteKey, SupportedCurrency, WheelData, WheelSpinResult, Token, Job, RouletteConfig, RouletteSession } from '../types';
 import { parseTronAccount } from './utils';
 
 const api = axios.create({
@@ -285,5 +285,27 @@ export const fetchWheelData = async (): Promise<WheelData> => {
 
 export const spinWheel = async (userId: string): Promise<WheelSpinResult> => {
   const response = await api.post('/wheel/spin', { userId });
+  return response.data;
+};
+
+// ─── Roulette Bot ────────────────────────────────────────────────────────────
+
+export const startRouletteBot = async (config: RouletteConfig): Promise<{ session_ids: string[]; message: string }> => {
+  const response = await api.post('/roulette/start', config);
+  return response.data;
+};
+
+export const stopRouletteBot = async (sessionId: string): Promise<{ message: string }> => {
+  const response = await api.post(`/roulette/stop/${sessionId}`);
+  return response.data;
+};
+
+export const stopAllRouletteBots = async (): Promise<{ message: string }> => {
+  const response = await api.post('/roulette/stop-all');
+  return response.data;
+};
+
+export const getRouletteStatus = async (): Promise<RouletteSession[]> => {
+  const response = await api.get('/roulette/status');
   return response.data;
 };
