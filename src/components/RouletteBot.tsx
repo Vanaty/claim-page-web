@@ -1063,9 +1063,9 @@ const RouletteBot: React.FC<RouletteBotProps> = ({ accounts, showToast }) => {
                       <td className="px-4 py-2.5 font-mono text-xs text-slate-700 max-w-[120px] truncate">{session.account_id}</td>
                       <td className="px-4 py-2.5"><StatusBadge status={session.status} /></td>
                       <td className="px-4 py-2.5 text-slate-600 hidden sm:table-cell">{session.rounds_played}</td>
-                      <td className="px-4 py-2.5 text-slate-600 hidden md:table-cell">{session.total_wagered.toLocaleString()}</td>
-                      <td className="px-4 py-2.5 text-green-600 font-medium hidden md:table-cell">+{session.total_win.toLocaleString()}</td>
-                      <td className="px-4 py-2.5 text-red-500 font-medium hidden md:table-cell">-{session.total_loss.toLocaleString()}</td>
+                      <td className="px-4 py-2.5 text-slate-600 hidden md:table-cell">{session.total_wagered.toFixed(8).toLocaleString()}</td>
+                      <td className="px-4 py-2.5 text-green-600 font-medium hidden md:table-cell">+{session.total_win.toFixed(8).toLocaleString()}</td>
+                      <td className="px-4 py-2.5 text-red-500 font-medium hidden md:table-cell">-{session.total_loss.toFixed(8).toLocaleString()}</td>
                       <td className="px-4 py-2.5 text-slate-400 text-xs hidden lg:table-cell">{session.stop_reason ?? '—'}</td>
                       <td className="px-4 py-2.5">
                         {session.status === 'running' ? (
