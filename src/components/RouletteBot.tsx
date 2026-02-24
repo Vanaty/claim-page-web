@@ -771,6 +771,7 @@ const RouletteBot: React.FC<RouletteBotProps> = ({ accounts, showToast }) => {
                   <div className="flex flex-wrap gap-1.5">
                     {STRATEGIES.map(s => (
                       <button
+                        disabled
                         key={s.value}
                         onClick={() => setField('strategy', s.value)}
                         className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all
@@ -835,7 +836,7 @@ const RouletteBot: React.FC<RouletteBotProps> = ({ accounts, showToast }) => {
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <input
-                      type="number" min={0}
+                      type="number" min={0} step={0.0001}
                       value={config.stop_loss}
                       onChange={e => setField('stop_loss', Math.max(0, Number(e.target.value)))}
                       className="w-28 px-3 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
@@ -860,6 +861,7 @@ const RouletteBot: React.FC<RouletteBotProps> = ({ accounts, showToast }) => {
                   <div className="flex items-center gap-2">
                     <input
                       type="number" min={0}
+                      step={0.0001}
                       value={config.stop_win}
                       onChange={e => setField('stop_win', Math.max(0, Number(e.target.value)))}
                       className="w-28 px-3 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-200"
@@ -883,7 +885,7 @@ const RouletteBot: React.FC<RouletteBotProps> = ({ accounts, showToast }) => {
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <input
-                      type="number" min={0}
+                      type="number" min={0} step={0.0001}
                       value={config.stop_on_wagered}
                       onChange={e => setField('stop_on_wagered', Math.max(0, Number(e.target.value)))}
                       className="w-28 px-3 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-200"
