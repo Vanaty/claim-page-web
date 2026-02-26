@@ -505,6 +505,10 @@ const RouletteBot: React.FC<RouletteBotProps> = ({ accounts, showToast }) => {
       showToast('error', 'Définissez un intervalle de planification.');
       return;
     }
+    if (config.stop_loss === 0 && config.stop_win === 0 && config.stop_on_wagered === 0) {
+      showToast('error', 'Définissez au moins une condition d\'arrêt (Stop Loss, Stop Win ou Stop sur Misé).');
+      return;
+    }
     const bets: RouletteBet[] = Object.entries(selectedBets)
       .filter(([key]) => ZONE_MAP[key] !== undefined)
       .flatMap(([key, chipIds]) => chipIds.map(chip_id => ({ zone: ZONE_MAP[key], chip_id })));
@@ -831,6 +835,7 @@ const RouletteBot: React.FC<RouletteBotProps> = ({ accounts, showToast }) => {
                   <div className="flex items-center gap-1.5">
                     <TrendingDown size={14} className="text-red-400" />
                     Stop Loss
+                    <span className="text-red-400 text-xs font-bold" title="Au moins une condition d'arrêt est requise">*</span>
                   </div>
                 </td>
                 <td className="px-4 py-3">
@@ -855,6 +860,7 @@ const RouletteBot: React.FC<RouletteBotProps> = ({ accounts, showToast }) => {
                   <div className="flex items-center gap-1.5">
                     <TrendingUp size={14} className="text-green-500" />
                     Stop Win
+                    <span className="text-red-400 text-xs font-bold" title="Au moins une condition d'arrêt est requise">*</span>
                   </div>
                 </td>
                 <td className="px-4 py-3">
@@ -880,6 +886,7 @@ const RouletteBot: React.FC<RouletteBotProps> = ({ accounts, showToast }) => {
                   <div className="flex items-center gap-1.5">
                     <Coins size={14} className="text-yellow-500" />
                     Stop sur Misé
+                    <span className="text-red-400 text-xs font-bold" title="Au moins une condition d'arrêt est requise">*</span>
                   </div>
                 </td>
                 <td className="px-4 py-3">
@@ -896,6 +903,13 @@ const RouletteBot: React.FC<RouletteBotProps> = ({ accounts, showToast }) => {
                   </div>
                 </td>
                 <td className="px-4 py-3 text-slate-400 text-xs hidden md:table-cell">Stoppe si total misé ≥ seuil</td>
+              </tr>
+
+              {/* Required note row */}
+              <tr>
+                <td colSpan={3} className="px-4 py-2 text-xs text-red-400 italic">
+                  * Au moins une condition d'arrêt est requise.
+                </td>
               </tr>
 
             </tbody>
