@@ -1071,7 +1071,7 @@ const RouletteBot: React.FC<RouletteBotProps> = ({ accounts, showToast }) => {
                 <tbody className="divide-y divide-slate-100">
                   {sessions.map(session => (
                     <tr key={session.session_id} className="hover:bg-slate-50/50">
-                      <td className="px-4 py-2.5 font-mono text-xs text-slate-700 max-w-[120px] truncate">{session.account_id}</td>
+                      <td className="px-4 py-2.5 font-mono text-xs text-slate-700 max-w-[120px] truncate">{accounts.find(a => a.id === session.account_id)?.address}</td>
                       <td className="px-4 py-2.5"><StatusBadge status={session.status} /></td>
                       <td className="px-4 py-2.5 text-slate-600 hidden sm:table-cell">{session.rounds_played}</td>
                       <td className="px-4 py-2.5 text-slate-600 hidden md:table-cell">{session.total_wagered.toFixed(8).toLocaleString()}</td>
