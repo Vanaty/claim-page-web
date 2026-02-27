@@ -202,21 +202,21 @@ const AccountHistoryChart: React.FC<AccountHistoryChartProps> = ({ accountId, ac
       <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
         <div className="text-center p-2 bg-blue-50 rounded">
           <div className="font-medium text-blue-700">
-            {sortedHistory.filter(h => h.action === 'claim').length}
+            {sortedHistory.length > 0 ? sortedHistory[0].balance.toFixed(6) : '0.000000'}
           </div>
-          <div className="text-slate-500">Claims</div>
+          <div className="text-slate-500">Avant</div>
         </div>
         <div className="text-center p-2 bg-purple-50 rounded">
           <div className="font-medium text-purple-700">
-            {sortedHistory.filter(h => h.action === 'game').length}
+            {sortedHistory.length > 0 ? sortedHistory[sortedHistory.length - 1].balance.toFixed(6) : '0.000000'}
           </div>
-          <div className="text-slate-500">Jeux</div>
+          <div className="text-slate-500">Après</div>
         </div>
         <div className="text-center p-2 bg-green-50 rounded">
           <div className="font-medium text-green-700">
-            {sortedHistory.reduce((sum, h) => sum + (h.claimAmount || 0), 0).toFixed(2)}
+            {sortedHistory.length > 0 ? (sortedHistory[0].balance - sortedHistory[sortedHistory.length - 1].balance).toFixed(6) : '0.000000'}
           </div>
-          <div className="text-slate-500">Total TRX</div>
+          <div className="text-slate-500">Total</div>
         </div>
       </div>
     </div>

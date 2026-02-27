@@ -139,8 +139,8 @@ const AccountCard: React.FC<AccountCardProps> = ({ account, onClaim, canClaim, s
         <div className="grid grid-cols-2 gap-4 mb-5">
           <div className="text-center p-2 bg-slate-50 rounded-lg">
             <TrendingUp size={18} className="text-green-600 mx-auto mb-1" />
-            <div className="font-bold text-green-600">{account.balance.toFixed(2)}</div>
-            <small className="text-slate-500 text-xs">TRX</small>
+            <div className="font-bold text-green-600">{account.balance.toFixed(6)}</div>
+            <small className="text-slate-500 text-xs">{account.baseUrl?.split('pick')[0].toLocaleUpperCase()}</small>
           </div>
           
           <div className="text-center p-2 bg-slate-50 rounded-lg">
