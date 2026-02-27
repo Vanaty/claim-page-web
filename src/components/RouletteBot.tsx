@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import StepInput from './StepInput';
 import {
   Play,
   Square,
@@ -74,9 +75,9 @@ interface BotConfig {
 
 const DEFAULT_BOT_CONFIG: BotConfig = {
   strategy:        'none',
-  stop_loss:       0,
-  stop_win:        0,
-  stop_on_wagered: 0,
+  stop_loss:       0.0,
+  stop_win:        0.0,
+  stop_on_wagered: 0.0,
 };
 
 const BET_LABELS: Record<string, string> = {
@@ -839,15 +840,14 @@ const RouletteBot: React.FC<RouletteBotProps> = ({ accounts, showToast }) => {
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number" min={0} step={0.0001}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <StepInput
                       value={config.stop_loss}
-                      onChange={e => setField('stop_loss', Math.max(0, Number(e.target.value)))}
-                      className="w-28 px-3 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-red-200"
-                      placeholder="0 = désactivé"
+                      onChange={v => setField('stop_loss', v)}
+                      step={0.0001}
+                      ringColor="focus:ring-red-200"
                     />
-                    <span className="text-slate-400 text-xs">jetons</span>
+                    <span className="text-slate-400 text-xs">TRX</span>
                     {config.stop_loss === 0 && <span className="text-xs text-slate-400 italic">désactivé</span>}
                   </div>
                 </td>
@@ -864,16 +864,14 @@ const RouletteBot: React.FC<RouletteBotProps> = ({ accounts, showToast }) => {
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number" min={0}
-                      step={0.0001}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <StepInput
                       value={config.stop_win}
-                      onChange={e => setField('stop_win', Math.max(0, Number(e.target.value)))}
-                      className="w-28 px-3 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-200"
-                      placeholder="0 = désactivé"
+                      onChange={v => setField('stop_win', v)}
+                      step={0.0001}
+                      ringColor="focus:ring-green-200"
                     />
-                    <span className="text-slate-400 text-xs">jetons</span>
+                    <span className="text-slate-400 text-xs">TRX</span>
                     {config.stop_win === 0 && <span className="text-xs text-slate-400 italic">désactivé</span>}
                   </div>
                 </td>
@@ -890,15 +888,14 @@ const RouletteBot: React.FC<RouletteBotProps> = ({ accounts, showToast }) => {
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number" min={0} step={0.0001}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <StepInput
                       value={config.stop_on_wagered}
-                      onChange={e => setField('stop_on_wagered', Math.max(0, Number(e.target.value)))}
-                      className="w-28 px-3 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-200"
-                      placeholder="0 = désactivé"
+                      onChange={v => setField('stop_on_wagered', v)}
+                      step={0.0001}
+                      ringColor="focus:ring-yellow-200"
                     />
-                    <span className="text-slate-400 text-xs">jetons</span>
+                    <span className="text-slate-400 text-xs">TRX</span>
                     {config.stop_on_wagered === 0 && <span className="text-xs text-slate-400 italic">désactivé</span>}
                   </div>
                 </td>
