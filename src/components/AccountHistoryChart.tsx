@@ -214,7 +214,7 @@ const AccountHistoryChart: React.FC<AccountHistoryChartProps> = ({ accountId, ac
         </div>
         <div className="text-center p-2 bg-green-50 rounded">
           <div className="font-medium text-green-700">
-            {sortedHistory.length > 0 ? (sortedHistory[0].balance - sortedHistory[sortedHistory.length - 1].balance).toFixed(6) : '0.000000'}
+            {sortedHistory.length > 0 ? (sortedHistory[sortedHistory.length - 1].balance - sortedHistory[0].balance).toFixed(6) : '0.000000'}
           </div>
           <div className="text-slate-500">Total</div>
         </div>
