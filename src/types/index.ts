@@ -10,6 +10,7 @@ export interface User {
 }
 
 export type BaseUrlOption = 
+  | 'tronlux.io'
   | 'tronpick.io'
   | 'litepick.io'
   | 'dogepick.io'

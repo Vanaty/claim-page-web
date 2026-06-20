@@ -377,6 +377,7 @@ const AccountManager: React.FC<AccountManagerProps> = ({
                       onChange={handleInputChange}
                       required
                     >
+                      <option value="tronlux.io">tronlux.io</option>
                       <option value="tronpick.io">tronpick.io</option>
                       <option value="litepick.io">litepick.io</option>
                       <option value="dogepick.io">dogepick.io</option>
