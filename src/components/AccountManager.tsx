@@ -21,6 +21,7 @@ const AccountManager: React.FC<AccountManagerProps> = ({
   const [showPrivateKey, setShowPrivateKey] = useState<string | null>(null);
   const [editingAccountId, setEditingAccountId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [addAccountJobError, setAddAccountJobError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     address: '',
     privateKey: '',
@@ -37,6 +38,7 @@ const AccountManager: React.FC<AccountManagerProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setAddAccountJobError(null);
 
     try {
       if (editingAccountId) {
@@ -85,7 +87,6 @@ const AccountManager: React.FC<AccountManagerProps> = ({
         
         // Poll job status
         await pollJobStatus(job.id);
-        resetForm();
       }
     } catch (error: any) {
       console.error('Failed to add account:', error);
@@ -115,16 +116,16 @@ const AccountManager: React.FC<AccountManagerProps> = ({
             window.location.reload();
             return;
           } else if (job.status === 'failed') {
-            if (showToast) showToast('error', job.message || 'Échec de l\'ajout du compte');
+            setAddAccountJobError(job.message || 'Échec de l\'ajout du compte');
             return;
           }
           await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds before next check
         }
-        if (showToast) showToast('error', 'Le traitement prend plus de temps que prévu. Veuillez rafraîchir la page dans quelques instants.');
+        setAddAccountJobError('Le traitement prend plus de temps que prévu. Veuillez rafraîchir la page dans quelques instants.');
         return;
       } catch (error: any) {
         console.error('Failed to check job status:', error);
-        if (showToast) showToast('error', 'Erreur lors de la vérification du statut');
+        setAddAccountJobError('Erreur lors de la vérification du statut');
       }
     };
 
@@ -209,6 +210,7 @@ const AccountManager: React.FC<AccountManagerProps> = ({
       cookie: '',
       password: ''
     });
+    setAddAccountJobError(null);
     setShowAddForm(false);
     setEditingAccountId(null);
   };
@@ -437,6 +439,12 @@ const AccountManager: React.FC<AccountManagerProps> = ({
                     </div>
                   {/* )} */}
                 </div>
+
+                {!editingAccountId && addAccountJobError && (
+                  <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {addAccountJobError}
+                  </div>
+                )}
 
                 <div className="flex gap-2 flex-col md:flex-row">
                   <button 
