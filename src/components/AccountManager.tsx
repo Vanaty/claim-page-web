@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Plus, Trash2, Eye, EyeOff, X, Edit, Gamepad2 } from 'lucide-react';
 import { TronAccount, BaseUrlOption } from '../types';
-import { addAccount as apiAddAccount, removeAccount as apiRemoveAccount, updateAccount as apiUpdateAccount, checkJobStatus } from '../services/apiService';
+import { addAccount as apiAddAccount, removeAccount as apiRemoveAccount, updateAccount as apiUpdateAccount, checkJobStatus, submitVerificationCode } from '../services/apiService';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface AccountManagerProps {
@@ -34,6 +34,26 @@ const AccountManager: React.FC<AccountManagerProps> = ({
     password: ''
   });
   const [addMethod, setAddMethod] = useState<'cookie' | 'login'>('cookie'); // Toggle between methods
+
+  // Verification modal state
+  const [verificationModal, setVerificationModal] = useState<{
+    visible: boolean;
+    jobId: string;
+    message: string;
+    code: string;
+    isSubmitting: boolean;
+    error: string | null;
+  }>({
+    visible: false,
+    jobId: '',
+    message: '',
+    code: '',
+    isSubmitting: false,
+    error: null,
+  });
+
+  // Ref to hold the resolver for the verification code Promise
+  const verificationResolverRef = useRef<((code: string) => void) | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,37 +125,85 @@ const AccountManager: React.FC<AccountManagerProps> = ({
   const pollJobStatus = async (jobId: string) => {
     const maxAttempts = 60;
 
-    const checkStatus = async (): Promise<void> => {
-      try {
-        for (let i = 0; i < maxAttempts; i++) {
-          const job = await checkJobStatus(jobId);
-          
-          if (job.status === 'completed') {
-            if (showToast) showToast('success', job.message || 'Compte ajouté avec succès!');
-            // Refresh accounts - trigger parent component to reload accounts
-            window.location.reload();
-            return;
-          } else if (job.status === 'failed') {
-            setAddAccountJobError(job.message || 'Échec de l\'ajout du compte');
-            return;
-          }
-          await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds before next check
-        }
-        setAddAccountJobError('Le traitement prend plus de temps que prévu. Veuillez rafraîchir la page dans quelques instants.');
-        return;
-      } catch (error: any) {
-        console.error('Failed to check job status:', error);
-        setAddAccountJobError('Erreur lors de la vérification du statut');
-      }
-    };
+    try {
+      for (let i = 0; i < maxAttempts; i++) {
+        const job = await checkJobStatus(jobId);
 
-    await checkStatus();
+        if (job.status === 'completed') {
+          if (showToast) showToast('success', job.message || 'Compte ajouté avec succès!');
+          setVerificationModal(prev => ({ ...prev, visible: false }));
+          window.location.reload();
+          return;
+        } else if (job.status === 'failed') {
+          setAddAccountJobError(job.message || 'Échec de l\'ajout du compte');
+          setVerificationModal(prev => ({ ...prev, visible: false }));
+          return;
+        } else if (job.status.includes('login_verification_required')) {
+          // Show modal and loop until the code is accepted
+          let codeSent = false;
+          while (!codeSent) {
+            // Wait for user to enter and submit the code
+            const code = await new Promise<string>((resolve) => {
+              verificationResolverRef.current = resolve;
+              setVerificationModal(prev => ({
+                ...prev,
+                visible: true,
+                jobId,
+                message: job.message || 'Un code à 4 chiffres a été envoyé à votre adresse email.',
+                isSubmitting: false,
+              }));
+            });
+
+            // Submit code to API
+            setVerificationModal(prev => ({ ...prev, isSubmitting: true, error: null }));
+            try {
+              await submitVerificationCode(jobId, code);
+              verificationResolverRef.current = null;
+              codeSent = true;
+              // Keep modal open but mark as submitting=false; it closes on next status update
+              setVerificationModal(prev => ({ ...prev, isSubmitting: false, error: null }));
+            } catch (err: any) {
+              verificationResolverRef.current = null;
+              const errMsg = err.response?.data?.detail || 'Code invalide. Veuillez réessayer.';
+              setVerificationModal(prev => ({
+                ...prev,
+                isSubmitting: false,
+                error: errMsg,
+                code: '',
+              }));
+              // Loop continues – modal stays open for user to retry
+            }
+          }
+          // After code accepted, poll immediately (don't wait 5s)
+          continue;
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds before next check
+      }
+      setAddAccountJobError('Le traitement prend plus de temps que prévu. Veuillez rafraîchir la page dans quelques instants.');
+    } catch (error: any) {
+      console.error('Failed to check job status:', error);
+      setAddAccountJobError('Erreur lors de la vérification du statut');
+    }
   };
   const validateCookie = (cookie: string): boolean => {
     // Basic validation for cookie format
     const cookiePattern = /^([^=;\s]+=[^;]*)(;\s+[^=;\s]+=[^;]*)*;?$/;
     return cookiePattern.test(cookie.trim());
   }
+
+  // Called when the user submits the 4-digit code in the verification modal
+  const handleVerificationSubmit = () => {
+    if (verificationModal.code.length === 4 && verificationResolverRef.current) {
+      verificationResolverRef.current(verificationModal.code);
+    }
+  };
+
+  const handleVerificationCodeChange = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 4);
+    setVerificationModal(prev => ({ ...prev, code: digits, error: null }));
+  };
+
   const handleUpdateAccount = async () => {
     if (!editingAccountId) return;
 
@@ -255,6 +323,107 @@ const AccountManager: React.FC<AccountManagerProps> = ({
 
   return (
     <div>
+      {/* ── Verification Modal Overlay ─────────────────────────────────────── */}
+      <AnimatePresence>
+        {verificationModal.visible && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6"
+            >
+              {/* Icon */}
+              <div className="flex justify-center mb-4">
+                <div className="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-7 h-7 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-bold text-slate-800 text-center mb-2">
+                Vérification requise
+              </h3>
+              <p className="text-sm text-slate-500 text-center mb-6">
+                {verificationModal.message}
+              </p>
+
+              {/* 4-digit input */}
+              <div className="flex justify-center gap-3 mb-4">
+                {[0, 1, 2, 3].map((idx) => (
+                  <input
+                    key={idx}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={verificationModal.code[idx] || ''}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '');
+                      const codeArr = verificationModal.code.split('');
+                      codeArr[idx] = val.slice(-1);
+                      const newCode = codeArr.join('').slice(0, 4);
+                      setVerificationModal(prev => ({ ...prev, code: newCode, error: null }));
+                      // Auto-focus next input
+                      if (val && idx < 3) {
+                        const next = document.getElementById(`vcode-${idx + 1}`);
+                        next?.focus();
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Backspace' && !verificationModal.code[idx] && idx > 0) {
+                        const prev = document.getElementById(`vcode-${idx - 1}`);
+                        prev?.focus();
+                      }
+                      if (e.key === 'Enter' && verificationModal.code.length === 4) {
+                        handleVerificationSubmit();
+                      }
+                    }}
+                    id={`vcode-${idx}`}
+                    className={`w-12 h-14 text-center text-2xl font-bold border-2 rounded-xl outline-none transition-colors
+                      ${verificationModal.error ? 'border-red-400 bg-red-50' : 'border-slate-300 focus:border-blue-500 bg-slate-50 focus:bg-white'}`}
+                    disabled={verificationModal.isSubmitting}
+                  />
+                ))}
+              </div>
+
+              {/* Error message */}
+              {verificationModal.error && (
+                <p className="text-sm text-red-600 text-center mb-4">
+                  {verificationModal.error}
+                </p>
+              )}
+
+              {/* Submit button */}
+              <button
+                className="w-full py-3 rounded-xl font-semibold text-white transition-colors
+                  bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={handleVerificationSubmit}
+                disabled={verificationModal.code.length < 4 || verificationModal.isSubmitting}
+              >
+                {verificationModal.isSubmitting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                    Vérification…
+                  </span>
+                ) : (
+                  'Confirmer le code'
+                )}
+              </button>
+
+              <p className="text-xs text-slate-400 text-center mt-4">
+                En attente de la confirmation du serveur après l'envoi…
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Add Account Button and Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <h2 className="text-2xl font-bold text-slate-800">Gestion des comptes</h2>

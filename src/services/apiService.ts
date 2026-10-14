@@ -131,6 +131,11 @@ export const checkJobStatus = async (jobId: string): Promise<Job> => {
   return response.data;
 };
 
+export const submitVerificationCode = async (jobId: string, code: string): Promise<Job> => {
+  const response = await api.post(`/tron-accounts/device-verification`, { jobId,code });
+  return response.data;
+};
+
 export const removeAccount = async (accountId: string): Promise<void> => {
   await api.delete(`/tron-accounts/${accountId}`);
 };
