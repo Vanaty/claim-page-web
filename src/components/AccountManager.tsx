@@ -557,9 +557,9 @@ const AccountManager: React.FC<AccountManagerProps> = ({
                       <option value="polpick.io">polpick.io</option>
                       <option value="tonpick.game">tonpick.game</option>
                       <option value="suipick.io">suipick.io</option>
-                      <option value="freetron.in">freetron.in</option>
+                      {/* <option value="freetron.in">freetron.in</option>
                       <option value="freexrp.in">freexrp.in</option>
-                      <option value="usdpick.io">usdpick.io</option>
+                      <option value="usdpick.io">usdpick.io</option> */}
                     </select>
                     <small className="text-slate-500 text-xs mt-1 block">Sélectionnez la plateforme pour ce compte</small>
                   </div>
